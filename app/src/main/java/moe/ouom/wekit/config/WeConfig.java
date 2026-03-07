@@ -5,22 +5,15 @@ import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
-
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import moe.ouom.wekit.constants.Constants;
 
 public abstract class WeConfig implements SharedPreferences, SharedPreferences.Editor {
 
     private static WeConfig sDefConfig;
-    private static WeConfig sCache;
-    private static final ConcurrentHashMap<String, WeConfig> sUinConfig =
-            new ConcurrentHashMap<>(4);
 
     protected WeConfig() {
     }
@@ -31,46 +24,6 @@ public abstract class WeConfig implements SharedPreferences, SharedPreferences.E
             sDefConfig = new MmkvConfigManagerImpl("global_config");
         }
         return sDefConfig;
-    }
-
-    /**
-     * Get isolated config for a specified account
-     *
-     * @param wxid wechat id
-     * @return config for raed/write
-     */
-    @NonNull
-    public static synchronized WeConfig forAccount(String wxid) {
-        var cfg = sUinConfig.get(wxid);
-        if (cfg != null) {
-            return cfg;
-        }
-        cfg = new MmkvConfigManagerImpl("cfg_" + wxid);
-        sUinConfig.put(wxid, cfg);
-        // save uin to config
-        if (cfg.getLongOrDefault("wx", 0) == 0) {
-            cfg.putString("uin", wxid);
-        }
-        return cfg;
-    }
-
-    /**
-     * Get isolated config for current account logged in. See {@link #forAccount(String)}
-     *
-     * @return if no account is logged in, {@code null} will be returned.
-     */
-    @Nullable
-    public static WeConfig getExFriendCfg() {
-        // TODO: get current account
-        return null;
-    }
-
-    @NonNull
-    public static synchronized WeConfig getCache() {
-        if (sCache == null) {
-            sCache = new MmkvConfigManagerImpl("global_cache");
-        }
-        return sCache;
     }
 
     @Nullable
@@ -112,35 +65,6 @@ public abstract class WeConfig implements SharedPreferences, SharedPreferences.E
         return getDefaultConfig().getIntOrDefault(key, d);
     }
 
-
-    public static void cPutBoolean(@NonNull String key, Boolean b) {
-        getCache().edit().putBoolean(key, b).apply();
-    }
-
-    public static void cPutString(@NonNull String key, String s) {
-        getCache().edit().putString(key, s).apply();
-    }
-
-    public static void cPutInt(@NonNull String key, int i) {
-        getCache().edit().putInt(key, i).apply();
-    }
-
-    public static boolean cGetBoolean(@NonNull String key) {
-        return getCache().getBooleanOrFalse(key);
-    }
-
-    public static boolean cGetBoolean(@NonNull String key, boolean d) {
-        return getCache().getBooleanOrDefault(key, d);
-    }
-
-    public static String cGetString(@NonNull String key, String d) {
-        return getCache().getStringOrDefault(key, d);
-    }
-
-    public static int cGetInt(@NonNull String key, int d) {
-        return getCache().getIntOrDefault(key, d);
-    }
-
     public boolean getBooleanOrFalse(@NonNull String key) {
         return getBooleanOrDefault(key, false);
     }
@@ -149,7 +73,7 @@ public abstract class WeConfig implements SharedPreferences, SharedPreferences.E
         return getBooleanOrDefault(Constants.PrekXXX + key, false);
     }
 
-    public String getStringPrek(@NonNull String key, String def) {
+    public String getStringPrek(@NonNull String key, @Nullable String def) {
         return getString(Constants.PrekXXX + key, def);
     }
 
@@ -186,14 +110,6 @@ public abstract class WeConfig implements SharedPreferences, SharedPreferences.E
     @Nullable
     public abstract Object getObject(@NonNull String key);
 
-    public <T> T cGetObject(String key, TypeReference<T> type) {
-        var data = getCache().getString(key);
-        if (data == null || data.isEmpty()) {
-            return null;
-        }
-        return JSON.parseObject(data, type);
-    }
-
     @Nullable
     public byte[] getBytes(@NonNull String key) {
         return getBytes(key, null);
@@ -205,8 +121,7 @@ public abstract class WeConfig implements SharedPreferences, SharedPreferences.E
     @NonNull
     public abstract byte[] getBytesOrDefault(@NonNull String key, @NonNull byte[] defValue);
 
-    @NonNull
-    public abstract WeConfig putBytes(@NonNull String key, @NonNull byte[] value);
+    public abstract void putBytes(@NonNull String key, @NonNull byte[] value);
 
     /**
      * @return READ-ONLY all config

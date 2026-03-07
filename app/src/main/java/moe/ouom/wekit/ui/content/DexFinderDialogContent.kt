@@ -71,6 +71,8 @@ private sealed class DialogPhase {
     data class Error(val message: String) : DialogPhase()
 }
 
+private const val TAG = "DexFinderDialog"
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DexFinderContent(
@@ -118,7 +120,7 @@ fun DexFinderContent(
             progressChannel.send(ScanProgress.Start(path))
             val descriptors = item.dexFind(dexKit)
             WeLogger.i(
-                "[DexFinderDialog]",
+                TAG,
                 "Total descriptors: ${descriptors.size}, keys: ${descriptors.keys}"
             )
             DexCacheManager.saveCache(item, descriptors)
@@ -165,7 +167,7 @@ fun DexFinderContent(
                     phase = DialogPhase.Done(failed)
                 }
             } catch (e: Exception) {
-                WeLogger.e("[DexFinderDialog] Scanning failed", e)
+                WeLogger.e(TAG, "Scanning failed", e)
                 phase = DialogPhase.Error("扫描过程中发生未知错误: ${e.message}")
             }
         }

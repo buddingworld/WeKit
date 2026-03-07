@@ -13,7 +13,7 @@ import moe.ouom.wekit.utils.log.WeLogger
 import org.json.JSONArray
 import org.json.JSONObject
 
-@HookItem(path = "红包与支付/修改转账显示余额", desc = "点击配置")
+@HookItem(path = "红包与支付/修改转账显示余额", desc = "伪装转账时显示的余额文字")
 object ModifyTransferWalletBalanceDisplay : BaseClickableFunctionHookItem(), IWePkgInterceptor {
 
     private const val KEY_CFT_BALANCE = "cashier_cft_balance"

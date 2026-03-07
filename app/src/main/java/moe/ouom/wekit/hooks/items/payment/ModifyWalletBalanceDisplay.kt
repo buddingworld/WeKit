@@ -26,9 +26,9 @@ object ModifyWalletBalanceDisplay : BaseClickableFunctionHookItem(), IDexFind {
 
     private val config = WeConfig.getDefaultConfig()
     private const val KEY_BALANCE = "fake_wallet_balance"
-    private const val DEFAULT_BALANCE = "¥8,888,888.88"
 
     private val methodUpdateBalanceDisplay by dexMethod()
+    private val methodTickerViewSetText by dexMethod()
 
     override fun entry(classLoader: ClassLoader) {
         methodUpdateBalanceDisplay.toDexMethod {
@@ -37,7 +37,15 @@ object ModifyWalletBalanceDisplay : BaseClickableFunctionHookItem(), IDexFind {
                     val balanceView = param.thisObject.asResolver()
                         .firstField { type = TextView::class }
                         .get()!! as TextView
-                    balanceView.text = config.getStringPrek(KEY_BALANCE, DEFAULT_BALANCE) ?: DEFAULT_BALANCE
+                    balanceView.text = config.getStringPrek(KEY_BALANCE, null) ?: return@afterIfEnabled
+                }
+            }
+        }
+
+        methodTickerViewSetText.toDexMethod {
+            hook {
+                beforeIfEnabled { param ->
+                    param.args[0] = config.getStringPrek(KEY_BALANCE, null) ?: return@beforeIfEnabled
                 }
             }
         }
@@ -53,13 +61,21 @@ object ModifyWalletBalanceDisplay : BaseClickableFunctionHookItem(), IDexFind {
             }
         }
 
+        methodTickerViewSetText.find(dexKit, descriptors) {
+            matcher {
+                // TickerView is only used for displaying balance
+                declaredClass = "com.robinhood.ticker.TickerView"
+                usingEqStrings("Need to call #setCharacterLists first.")
+            }
+        }
+
         return descriptors
     }
 
     override fun onClick(context: Context) {
         showComposeDialog(context, true) { onDismiss ->
             var input by remember { mutableStateOf(
-                config.getStringPrek(KEY_BALANCE, DEFAULT_BALANCE) ?: DEFAULT_BALANCE) }
+                config.getStringPrek(KEY_BALANCE, null) ?: "") }
 
             AlertDialogContent(
                 title = { Text("修改显示余额") },
@@ -73,7 +89,12 @@ object ModifyWalletBalanceDisplay : BaseClickableFunctionHookItem(), IDexFind {
                     config.putString(Constants.PrekXXX + KEY_BALANCE, input)
                     onDismiss()
                 }) { Text("确定") } },
-                dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } }
+                dismissButton = {
+                    TextButton(onClick = {
+                        config.remove(Constants.PrekXXX + KEY_BALANCE)
+                        onDismiss()
+                    }) { Text("清除") }
+                    TextButton(onClick = onDismiss) { Text("取消") } }
             )
         }
     }

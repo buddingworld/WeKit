@@ -573,12 +573,10 @@ public class MmkvConfigManagerImpl extends WeConfig {
         return mmkv.getBytes(key, defValue);
     }
 
-    @NonNull
     @Override
-    public WeConfig putBytes(@NonNull String key, @NonNull byte[] value) {
+    public void putBytes(@NonNull String key, @NonNull byte[] value) {
         mmkv.putBytes(key, value);
         mmkv.putInt(key.concat(TYPE_SUFFIX), TYPE_BYTES);
-        return this;
     }
 
     @NonNull
