@@ -181,7 +181,6 @@ object AddMainScreenFab : BaseSwitchFunctionHookItem() {
                     val rootView = activity.findViewById<ViewGroup>(android.R.id.content)
                     rootView.setLifecycleOwner(lifecycleOwner)
 
-                    WeLogger.i(TAG, "injected compose fab into root view")
                     rootView.addView(
                         ComposeView(activity).apply {
                             setLifecycleOwner(lifecycleOwner)
