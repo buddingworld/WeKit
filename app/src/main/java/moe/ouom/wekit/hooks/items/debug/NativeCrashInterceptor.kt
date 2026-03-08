@@ -1,5 +1,6 @@
 package moe.ouom.wekit.hooks.items.debug
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -11,11 +12,11 @@ import android.os.Looper
 import android.os.Process
 import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
+import com.highcapable.kavaref.extension.toClass
 import moe.ouom.wekit.config.RuntimeConfig
 import moe.ouom.wekit.core.model.BaseSwitchFunctionHookItem
 import moe.ouom.wekit.hooks.core.annotation.HookItem
 import moe.ouom.wekit.ui.utils.CommonContextWrapper
-import moe.ouom.wekit.utils.Initiator
 import moe.ouom.wekit.utils.crash.CrashLogManager
 import moe.ouom.wekit.utils.crash.NativeCrashHandler
 import moe.ouom.wekit.utils.io.SafUtils
@@ -32,12 +33,13 @@ object NativeCrashInterceptor : BaseSwitchFunctionHookItem() {
     private var crashLogManager: CrashLogManager? = null
     private var appContext: Context? = null
     private var hasPendingCrashToShow = false
+    @SuppressLint("StaticFieldLeak")
     private var pendingDialog: MaterialDialog? = null
 
     override fun entry(classLoader: ClassLoader) {
         try {
             // 获取Application Context
-            val activityThreadClass = Initiator.loadClass("android.app.ActivityThread")
+            val activityThreadClass = "android.app.ActivityThread".toClass()
             val currentApplicationMethod = activityThreadClass.getMethod("currentApplication")
             appContext = currentApplicationMethod.invoke(null) as? Context
 

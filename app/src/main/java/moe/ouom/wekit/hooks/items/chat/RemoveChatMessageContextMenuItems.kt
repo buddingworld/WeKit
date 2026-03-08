@@ -26,7 +26,7 @@ object RemoveChatMessageContextMenuItems : BaseClickableFunctionHookItem(), IDex
     // although there are multiple addMenuItem() methods, i only found the usage of those two in the context menu of chat messages
     private val methodAddMenuItem1 by dexMethod()
     private val methodAddMenuItem2 by dexMethod()
-    private val config = WeConfig.getDefaultConfig()
+    private val config = WeConfig.defaultConfig
     private const val KEY_REMOVED_ITEM_NAMES = "removed_menu_item_names"
     private const val DEFAULT_REMOVED_ITEM_NAMES =
         "收藏,提醒,翻译,搜一搜,编辑,打开,相关表情,合拍,查看专辑,静音播放,听筒播放,背景播放"
@@ -37,8 +37,7 @@ object RemoveChatMessageContextMenuItems : BaseClickableFunctionHookItem(), IDex
                 afterIfEnabled { param ->
                     val name = param.args[3] as CharSequence
                     val removedNames =
-                        config.getStringPref(KEY_REMOVED_ITEM_NAMES, DEFAULT_REMOVED_ITEM_NAMES)
-                            .split(',')
+                        config.getStringPref(KEY_REMOVED_ITEM_NAMES, DEFAULT_REMOVED_ITEM_NAMES)!!.split(',')
 
                     if (removedNames.contains(name)) {
                         val list = param.thisObject.asResolver()
@@ -55,8 +54,7 @@ object RemoveChatMessageContextMenuItems : BaseClickableFunctionHookItem(), IDex
                 afterIfEnabled { param ->
                     val name = param.args[3] as CharSequence
                     val removedNames =
-                        config.getStringPref(KEY_REMOVED_ITEM_NAMES, DEFAULT_REMOVED_ITEM_NAMES)
-                            .split(',')
+                        config.getStringPref(KEY_REMOVED_ITEM_NAMES, DEFAULT_REMOVED_ITEM_NAMES)!!.split(',')
 
                     if (removedNames.contains(name)) {
                         val list = param.thisObject.asResolver()
@@ -115,7 +113,7 @@ object RemoveChatMessageContextMenuItems : BaseClickableFunctionHookItem(), IDex
                     config.getStringPref(
                         KEY_REMOVED_ITEM_NAMES,
                         DEFAULT_REMOVED_ITEM_NAMES
-                    )
+                    )!!
                 )
             }
             AlertDialogContent(

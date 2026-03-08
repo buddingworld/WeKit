@@ -116,7 +116,8 @@ configure<ApplicationExtension> {
         buildConfigField("long", "BUILD_TIMESTAMP", "${System.currentTimeMillis()}L")
 
         ndk {
-            abiFilters += setOf("arm64-v8a", "x86_64")
+            // noinspection ChromeOsAbiSupport
+            abiFilters += "arm64-v8a"
         }
     }
 
@@ -378,7 +379,7 @@ val rustLibName    = "libwekit_native.so"
 
 val abiToTarget = mapOf(
     "arm64-v8a"   to "aarch64-linux-android",
-    "x86_64"      to "x86_64-linux-android",
+    // "x86_64"      to "x86_64-linux-android",
 )
 val cargoTasks = abiToTarget.map { (abi, target) ->
     tasks.register<Exec>("cargoBuild_${abi.replace('-', '_')}") {

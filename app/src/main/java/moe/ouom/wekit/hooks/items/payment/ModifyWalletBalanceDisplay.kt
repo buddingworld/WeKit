@@ -24,7 +24,7 @@ import org.luckypray.dexkit.DexKitBridge
 @HookItem(path = "红包与支付/修改显示余额", desc = "伪装钱包余额文字")
 object ModifyWalletBalanceDisplay : BaseClickableFunctionHookItem(), IDexFind {
 
-    private val config = WeConfig.getDefaultConfig()
+    private val config = WeConfig.defaultConfig
     private const val KEY_BALANCE = "fake_wallet_balance"
 
     private val methodUpdateBalanceDisplay by dexMethod()

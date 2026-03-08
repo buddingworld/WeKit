@@ -1,5 +1,6 @@
 package moe.ouom.wekit.loader.startup;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
@@ -8,6 +9,13 @@ import androidx.annotation.NonNull;
 import java.io.File;
 
 import moe.ouom.wekit.BuildConfig;
+import moe.ouom.wekit.host.impl.HostInfo;
+import moe.ouom.wekit.loader.core.NativeCoreBridge;
+import moe.ouom.wekit.loader.core.WeLauncher;
+import moe.ouom.wekit.loader.hookimpl.InMemoryClassLoaderHelper;
+import moe.ouom.wekit.loader.hookimpl.LibXposedApiByteCodeGenerator;
+import moe.ouom.wekit.utils.common.SyncUtils;
+import moe.ouom.wekit.utils.log.WeLogger;
 
 /**
  * Startup hook for QQ They should act differently according to the process they belong to.
@@ -20,11 +28,7 @@ import moe.ouom.wekit.BuildConfig;
  */
 public class StartupHook {
 
-    private static StartupHook sInstance;
     private static boolean sSecondStageInit = false;
-
-    private StartupHook() {
-    }
 
     /**
      * Entry point for static or dynamic initialization. NOTICE: Do NOT change the method name or signature.
@@ -36,10 +40,28 @@ public class StartupHook {
             throw new IllegalStateException("Second stage init already executed");
         }
         HybridClassLoader.setHostClassLoader(ctx.getClassLoader());
-        StartupRoutine.execPostStartupInit(ctx);
+        execPostStartupInit(ctx);
         sSecondStageInit = true;
         deleteDirIfNecessaryNoThrow(ctx);
+    }
 
+    /**
+     * From now on, kotlin, androidx or third party libraries may be accessed without crashing the ART.
+     * <p>
+     * Kotlin and androidx are dangerous, and should be invoked only after the class loader is ready.
+     *
+     * @param ctx Application context for host
+     */
+    public static void execPostStartupInit(@NonNull Context ctx) {
+        // init all kotlin utils here
+        HostInfo.init((Application) ctx);
+        // perform full initialization for native core -- including primary and secondary native libraries
+        StartupInfo.getLoaderService().setClassLoaderHelper(InMemoryClassLoaderHelper.INSTANCE);
+        LibXposedApiByteCodeGenerator.init();
+        NativeCoreBridge.initNativeCore();
+        WeLogger.d("execPostStartupInit -> processName: " + SyncUtils.getProcessName());
+        var launcher = new WeLauncher();
+        launcher.init(ctx.getClassLoader(), ctx.getApplicationInfo(), ctx.getApplicationInfo().sourceDir, ctx);
     }
 
     static void deleteDirIfNecessaryNoThrow(Context ctx) {
@@ -48,13 +70,6 @@ public class StartupHook {
         } catch (Throwable e) {
             log_e(e);
         }
-    }
-
-    public static StartupHook getInstance() {
-        if (sInstance == null) {
-            sInstance = new StartupHook();
-        }
-        return sInstance;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -90,7 +105,7 @@ public class StartupHook {
         }
     }
 
-    public void initializeAfterAppCreate(@NonNull Context ctx) {
+    public static void initializeAfterAppCreate(@NonNull Context ctx) {
         execStartupInit(ctx);
         deleteDirIfNecessaryNoThrow(ctx);
     }

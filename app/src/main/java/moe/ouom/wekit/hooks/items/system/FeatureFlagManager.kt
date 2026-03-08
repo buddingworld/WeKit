@@ -59,7 +59,7 @@ object FeatureFlagManager : BaseClickableFunctionHookItem(), IDexFind {
 
     private val TAG = nameof(FeatureFlagManager)
 
-    private val config = WeConfig.getDefaultConfig()
+    private val config = WeConfig.defaultConfig
     private const val KEY_HOOKED_FEATURE_FLAGS = Constants.PREF_KEY_PREFIX + "hooked_feature_flags"
 
     // explanation: i: int, f: float, l: long, s: string

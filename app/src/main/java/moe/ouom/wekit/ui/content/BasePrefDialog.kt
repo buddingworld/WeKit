@@ -273,7 +273,7 @@ private fun DialogContent(
     val switchStates = remember {
         mutableStateMapOf<String, Boolean>().also { map ->
             rows.filterIsInstance<PrefRow.Switch>().forEach { row ->
-                map[row.configKey] = WeConfig.getDefaultConfig().getBooleanOrFalse(row.configKey)
+                map[row.configKey] = WeConfig.defaultConfig.getBooleanOrFalse(row.configKey)
             }
         }
     }
@@ -282,13 +282,13 @@ private fun DialogContent(
     val summaryStates = remember {
         mutableStateMapOf<String, String>().also { map ->
             rows.filterIsInstance<PrefRow.EditText>().forEach { row ->
-                val v = WeConfig.getDefaultConfig().getString(row.configKey, row.defaultValue)
+                val v = WeConfig.defaultConfig.getString(row.configKey, row.defaultValue)
                     ?: row.defaultValue
                 map[row.configKey] = row.summaryFormatter?.invoke(v)
                     ?: if (v.isEmpty()) row.baseSummary else "${row.baseSummary}: $v"
             }
             rows.filterIsInstance<PrefRow.Select>().forEach { row ->
-                val v = WeConfig.getDefaultConfig().getInt(row.configKey, row.defaultValue)
+                val v = WeConfig.defaultConfig.getInt(row.configKey, row.defaultValue)
                 map[row.configKey] = row.options[v] ?: "${row.baseSummary}: $v"
             }
         }
@@ -298,7 +298,7 @@ private fun DialogContent(
     fun rowEnabled(rowKey: String): Boolean {
         dependencies.forEach { (configKey, depList) ->
             val value = switchStates[configKey]
-                ?: WeConfig.getDefaultConfig().getBooleanOrFalse(configKey)
+                ?: WeConfig.defaultConfig.getBooleanOrFalse(configKey)
             depList.forEach { dep ->
                 if (dep.dependentRowKey == rowKey) {
                     return if (dep.enableWhen) value else !value
@@ -311,7 +311,7 @@ private fun DialogContent(
     fun rowVisible(rowKey: String): Boolean {
         dependencies.forEach { (configKey, depList) ->
             val value = switchStates[configKey]
-                ?: WeConfig.getDefaultConfig().getBooleanOrFalse(configKey)
+                ?: WeConfig.defaultConfig.getBooleanOrFalse(configKey)
             depList.forEach { dep ->
                 if (dep.dependentRowKey == rowKey && dep.hideWhenDisabled) {
                     return if (dep.enableWhen) value else !value
@@ -396,7 +396,7 @@ private fun DialogContent(
                                     enabled = enabled,
                                     onCheckedChange = { checked ->
                                         switchStates[row.configKey] = checked
-                                        WeConfig.getDefaultConfig().edit()
+                                        WeConfig.defaultConfig.edit()
                                             .putBoolean(row.configKey, checked).apply()
                                         WeLogger.d(
                                             TAG,
@@ -467,7 +467,7 @@ private fun DialogContent(
         InputDialog(
             row = row,
             onConfirm = { newValue ->
-                WeConfig.getDefaultConfig().edit().putString(row.configKey, newValue).apply()
+                WeConfig.defaultConfig.edit().putString(row.configKey, newValue).apply()
                 val display = row.summaryFormatter?.invoke(newValue)
                     ?: if (newValue.isEmpty()) row.baseSummary else "${row.baseSummary}: $newValue"
                 summaryStates[row.configKey] = display
@@ -483,7 +483,7 @@ private fun DialogContent(
         SelectDialog(
             row = row,
             onSelect = { value, displayText ->
-                WeConfig.getDefaultConfig().edit().putInt(row.configKey, value).apply()
+                WeConfig.defaultConfig.edit().putInt(row.configKey, value).apply()
                 summaryStates[row.configKey] = displayText
                 WeLogger.d(TAG, "Config changed [${row.configKey}] -> $value")
                 selectDialogRow = null
@@ -625,7 +625,7 @@ private fun InputDialog(
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val current = WeConfig.getDefaultConfig()
+    val current = WeConfig.defaultConfig
         .getString(row.configKey, row.defaultValue) ?: row.defaultValue
     var text by remember { mutableStateOf(current) }
 
@@ -667,7 +667,7 @@ private fun SelectDialog(
     onDismiss: () -> Unit,
 ) {
     var selected by remember {
-        mutableIntStateOf(WeConfig.getDefaultConfig().getInt(row.configKey, row.defaultValue))
+        mutableIntStateOf(WeConfig.defaultConfig.getInt(row.configKey, row.defaultValue))
     }
 
     AlertDialog(

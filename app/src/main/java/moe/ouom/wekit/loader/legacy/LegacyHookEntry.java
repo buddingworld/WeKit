@@ -7,7 +7,6 @@ import androidx.annotation.Keep;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
-import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import moe.ouom.wekit.loader.ModuleLoader;
 
@@ -68,7 +67,6 @@ public class LegacyHookEntry implements IXposedHookLoadPackage, IXposedHookZygot
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws ReflectiveOperationException {
         sLoadPackageParam = lpparam;
         // check LSPosed dex-obfuscation
-        Class<?> kXposedBridge = XposedBridge.class;
         switch (lpparam.packageName) {
             case PACKAGE_NAME_SELF: {
                 Xp51HookStatusInit.init(lpparam.classLoader);
@@ -79,7 +77,7 @@ public class LegacyHookEntry implements IXposedHookLoadPackage, IXposedHookZygot
                     throw new IllegalStateException("handleLoadPackage: sInitZygoteStartupParam is null");
                 }
                 sCurrentPackageName = lpparam.packageName;
-                ModuleLoader.initialize(lpparam.appInfo.dataDir, lpparam.classLoader,
+                ModuleLoader.initialize(lpparam.classLoader,
                         Xp51HookImpl.INSTANCE, Xp51HookImpl.INSTANCE, getModulePath());
                 break;
             default:

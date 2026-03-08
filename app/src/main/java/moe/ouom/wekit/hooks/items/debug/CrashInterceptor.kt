@@ -11,11 +11,12 @@ import android.os.Looper
 import android.os.Process
 import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
+import com.highcapable.kavaref.extension.toClass
+import dev.ujhhgtg.nameof.nameof
 import moe.ouom.wekit.config.RuntimeConfig
 import moe.ouom.wekit.core.model.BaseSwitchFunctionHookItem
 import moe.ouom.wekit.hooks.core.annotation.HookItem
 import moe.ouom.wekit.ui.utils.CommonContextWrapper
-import moe.ouom.wekit.utils.Initiator
 import moe.ouom.wekit.utils.crash.CrashLogManager
 import moe.ouom.wekit.utils.crash.JavaCrashHandler
 import moe.ouom.wekit.utils.io.SafUtils
@@ -29,6 +30,8 @@ import java.io.File
 @SuppressLint("StaticFieldLeak")
 object CrashInterceptor : BaseSwitchFunctionHookItem() {
 
+    private val TAG = nameof(CrashInterceptor)
+
     private var javaCrashHandler: JavaCrashHandler? = null
     private var crashLogManager: CrashLogManager? = null
     private var appContext: Context? = null
@@ -38,7 +41,7 @@ object CrashInterceptor : BaseSwitchFunctionHookItem() {
     override fun entry(classLoader: ClassLoader) {
         try {
             // 获取 Application Context
-            val activityThreadClass = Initiator.loadClass("android.app.ActivityThread")
+            val activityThreadClass = "android.app.ActivityThread".toClass()
             val currentApplicationMethod = activityThreadClass.getMethod("currentApplication")
             appContext = currentApplicationMethod.invoke(null) as? Context
 
@@ -135,7 +138,7 @@ object CrashInterceptor : BaseSwitchFunctionHookItem() {
             val context = appContext ?: return false
             val processName = getProcessName()
             processName == context.packageName
-        } catch (e: Throwable) {
+        } catch (_: Throwable) {
             false
         }
     }
@@ -143,7 +146,7 @@ object CrashInterceptor : BaseSwitchFunctionHookItem() {
     private fun getProcessName(): String {
         return try {
             File("/proc/${Process.myPid()}/cmdline").readText().trim('\u0000')
-        } catch (e: Throwable) {
+        } catch (_: Throwable) {
             ""
         }
     }
@@ -182,6 +185,8 @@ object CrashInterceptor : BaseSwitchFunctionHookItem() {
             }
 
             val summary = extractCrashSummary(crashInfo)
+
+            WeLogger.e(TAG, "crashLogFile: ${crashLogFile.path}")
 
             Handler(Looper.getMainLooper()).post {
                 try {
@@ -379,7 +384,7 @@ object CrashInterceptor : BaseSwitchFunctionHookItem() {
             val clip = ClipData.newPlainText("Crash Log", text)
             clipboard?.setPrimaryClip(clip)
             showToast("已复制到剪贴板")
-        } catch (e: Throwable) {
+        } catch (_: Throwable) {
             showToast("复制失败")
         }
     }

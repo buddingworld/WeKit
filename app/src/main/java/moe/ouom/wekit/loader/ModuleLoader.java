@@ -16,7 +16,6 @@ public class ModuleLoader {
     private static boolean sLoaded = false;
 
     public static void initialize(
-            @NonNull String hostDataDir,
             @NonNull ClassLoader hostClassLoader,
             @NonNull ILoaderService loaderService,
             @Nullable IHookBridge hookBridge,
@@ -25,9 +24,8 @@ public class ModuleLoader {
         if (sLoaded) {
             return;
         }
-        // invoke the startup routine
         sLoaded = true;
-        UnifiedEntryPoint.INSTANCE.entry(modulePath, hostDataDir, loaderService, hostClassLoader, hookBridge);
+        UnifiedEntryPoint.INSTANCE.entry(modulePath, loaderService, hostClassLoader, hookBridge);
     }
 
     public static List<Throwable> getInitErrors() {

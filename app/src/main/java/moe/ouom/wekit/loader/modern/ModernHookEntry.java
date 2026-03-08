@@ -41,7 +41,7 @@ public class ModernHookEntry extends XposedModule {
         var dataDir = ai.dataDir;
         WeLogger.d(TAG, "handleLoadHostPackage: dataDir=" + dataDir + ", modulePath=" + modulePath + ", processName=" + processName);
         try {
-            ModuleLoader.initialize(dataDir, cl, Lsp100HookImpl.INSTANCE, Lsp100HookImpl.INSTANCE, modulePath);
+            ModuleLoader.initialize(cl, Lsp100HookImpl.INSTANCE, Lsp100HookImpl.INSTANCE, modulePath);
         } catch (ReflectiveOperationException e) {
             WeLogger.e(TAG, "failed to invoke ModuleLoader.initialize");
             throw new RuntimeException(e);

@@ -3,13 +3,13 @@ package moe.ouom.wekit.hooks.sdk.ui
 import android.app.Activity
 import android.content.Context
 import android.widget.BaseAdapter
+import com.highcapable.kavaref.extension.toClass
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import dev.ujhhgtg.nameof.nameof
 import moe.ouom.wekit.core.model.ApiHookItem
 import moe.ouom.wekit.hooks.core.annotation.HookItem
-import moe.ouom.wekit.utils.Initiator.loadClass
 import moe.ouom.wekit.utils.log.WeLogger
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
@@ -80,14 +80,14 @@ object WeChatContactDetailsApi : ApiHookItem() {
         synchronized(this) {
             if (isRefInitialized) return
 
-            val prefClass = loadClass("com.tencent.mm.ui.base.preference.Preference")
+            val prefClass = "com.tencent.mm.ui.base.preference.Preference".toClass()
             prefConstructor = prefClass.getConstructor(Context::class.java)
             prefKeyField = prefClass.declaredFields.first { field ->
                 field.type == String::class.java && !Modifier.isFinal(field.modifiers)
             }
 
-            val contactInfoUIClass = loadClass("com.tencent.mm.plugin.profile.ui.ContactInfoUI")
-            adapterField = contactInfoUIClass.superclass.declaredFields.first {
+            val contactInfoUIClass = "com.tencent.mm.plugin.profile.ui.ContactInfoUI".toClass()
+            adapterField = contactInfoUIClass.superclass!!.declaredFields.first {
                 BaseAdapter::class.java.isAssignableFrom(it.type)
             }.apply { isAccessible = true }
             onPreferenceTreeClickMethod = contactInfoUIClass.declaredMethods.first {

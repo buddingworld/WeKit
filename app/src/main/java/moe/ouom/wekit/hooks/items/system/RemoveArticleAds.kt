@@ -25,7 +25,7 @@ object RemoveArticleAds : BaseSwitchFunctionHookItem(), IWePkgInterceptor {
         try {
             val data = WeProtoData()
             data.fromBytes(respBytes)
-            val json = data.toJSON()
+            val json = data.toJsonObject()
 
             // 获取字段2
             val field2 = json.optJSONObject("2") ?: return null
@@ -74,7 +74,7 @@ object RemoveArticleAds : BaseSwitchFunctionHookItem(), IWePkgInterceptor {
             if (modified) {
                 // 放回修改后的广告JSON
                 field2.put("3", adJson.toString())
-                data.applyViewJSON(json, true)
+                data.applyViewJson(json, true)
                 WeLogger.d(TAG, "已清空所有广告相关数据")
                 return data.toPacketBytes()
             }

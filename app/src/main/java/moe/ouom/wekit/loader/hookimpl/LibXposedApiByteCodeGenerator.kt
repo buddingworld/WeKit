@@ -1,180 +1,156 @@
-package moe.ouom.wekit.loader.hookimpl;
+package moe.ouom.wekit.loader.hookimpl
 
-import androidx.annotation.NonNull;
+import moe.ouom.wekit.dexkit.DexMethodDescriptor
+import moe.ouom.wekit.loader.startup.StartupInfo
+import moe.ouom.wekit.utils.io.IoUtils
+import org.jf.dexlib2.Opcode
+import org.jf.dexlib2.Opcodes
+import org.jf.dexlib2.iface.ClassDef
+import org.jf.dexlib2.iface.instruction.Instruction
+import org.jf.dexlib2.immutable.ImmutableClassDef
+import org.jf.dexlib2.immutable.ImmutableDexFile
+import org.jf.dexlib2.immutable.ImmutableField
+import org.jf.dexlib2.immutable.ImmutableMethod
+import org.jf.dexlib2.immutable.ImmutableMethodImplementation
+import org.jf.dexlib2.immutable.ImmutableMethodParameter
+import org.jf.dexlib2.immutable.instruction.ImmutableInstruction10x
+import org.jf.dexlib2.immutable.instruction.ImmutableInstruction11x
+import org.jf.dexlib2.immutable.instruction.ImmutableInstruction31i
+import org.jf.dexlib2.immutable.instruction.ImmutableInstruction35c
+import org.jf.dexlib2.immutable.reference.ImmutableMethodReference
+import org.jf.dexlib2.immutable.value.ImmutableIntEncodedValue
+import org.jf.dexlib2.writer.io.MemoryDataStore
+import org.jf.dexlib2.writer.pool.DexPool
+import java.lang.reflect.Modifier
 
-import org.jf.dexlib2.Opcode;
-import org.jf.dexlib2.Opcodes;
-import org.jf.dexlib2.iface.ClassDef;
-import org.jf.dexlib2.iface.instruction.Instruction;
-import org.jf.dexlib2.iface.value.EncodedValue;
-import org.jf.dexlib2.immutable.ImmutableClassDef;
-import org.jf.dexlib2.immutable.ImmutableDexFile;
-import org.jf.dexlib2.immutable.ImmutableField;
-import org.jf.dexlib2.immutable.ImmutableMethod;
-import org.jf.dexlib2.immutable.ImmutableMethodImplementation;
-import org.jf.dexlib2.immutable.ImmutableMethodParameter;
-import org.jf.dexlib2.immutable.instruction.ImmutableInstruction10x;
-import org.jf.dexlib2.immutable.instruction.ImmutableInstruction11x;
-import org.jf.dexlib2.immutable.instruction.ImmutableInstruction31i;
-import org.jf.dexlib2.immutable.instruction.ImmutableInstruction35c;
-import org.jf.dexlib2.immutable.reference.ImmutableFieldReference;
-import org.jf.dexlib2.immutable.reference.ImmutableMethodReference;
-import org.jf.dexlib2.immutable.value.ImmutableIntEncodedValue;
-import org.jf.dexlib2.writer.io.MemoryDataStore;
-import org.jf.dexlib2.writer.pool.DexPool;
+object LibXposedApiByteCodeGenerator {
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+    private const val CMD_SET_WRAPPER = "SetLibXposedNewApiByteCodeGeneratorWrapper"
+    private const val ACC_CONSTRUCTOR = 0x00010000
 
-import moe.ouom.wekit.dexkit.DexMethodDescriptor;
-import moe.ouom.wekit.loader.startup.StartupInfo;
-import moe.ouom.wekit.utils.io.IoUtils;
-
-
-public class LibXposedNewApiByteCodeGenerator {
-
-    private static final String CMD_SET_WRAPPER = "SetLibXposedNewApiByteCodeGeneratorWrapper";
-    private static final int ACC_CONSTRUCTOR = 0x00010000;
-
-    private LibXposedNewApiByteCodeGenerator() {
-    }
-
-    public static void init() {
-        var loader = StartupInfo.getLoaderService();
-        Method call;
-        try {
-            call = LibXposedNewApiByteCodeGenerator.class.getMethod("call", int.class, Object[].class);
-        } catch (NoSuchMethodException e) {
-            throw IoUtils.unsafeThrow(e);
+    @JvmStatic
+    fun init() {
+        val loader = StartupInfo.getLoaderService()
+        val call = try {
+            LibXposedApiByteCodeGenerator::class.java.getMethod("call", Int::class.java, Array<Any>::class.java)
+        } catch (e: NoSuchMethodException) {
+            throw IoUtils.unsafeThrow(e)
         }
-        loader.queryExtension(CMD_SET_WRAPPER, call);
+        loader.queryExtension(CMD_SET_WRAPPER, call)
     }
 
-    @NonNull
-    public static byte[] call(int version, Object[] args) {
+    @JvmStatic
+    fun call(version: Int, args: Array<Any?>): ByteArray {
         if (version == 1) {
             return impl1(
-                    (String) args[0],
-                    (Integer) args[1],
-                    (String) args[2],
-                    (String) args[3],
-                    (String) args[4]
-            );
+                args[0] as String,
+                args[1] as Int,
+                args[2] as String,
+                args[3] as String,
+                args[4] as String
+            )
         }
-        throw new UnsupportedOperationException("Unsupported version: " + version);
+        throw UnsupportedOperationException("Unsupported version: $version")
     }
 
-    private static String classNameToDescriptor(String className) {
-        return "L" + className.replace('.', '/') + ";";
-    }
+    private fun classNameToDescriptor(className: String): String =
+        "L${className.replace('.', '/')};"
 
-    @NonNull
-    public static byte[] impl1(
-            @NonNull String targetClassName,
-            @NonNull Integer tagValue,
-            @NonNull String classNameXposedInterfaceHooker,
-            @NonNull String classBeforeHookCallback,
-            @NonNull String classAfterHookCallback
-    ) {
-        Objects.requireNonNull(targetClassName, "targetClassName");
-        Objects.requireNonNull(tagValue, "tagValue");
-        Objects.requireNonNull(classNameXposedInterfaceHooker, "classNameXposedInterfaceHooker");
-        var typeTargetClass = classNameToDescriptor(targetClassName);
-        var typeXposedInterfaceHooker = classNameToDescriptor(classNameXposedInterfaceHooker);
-        var typeBeforeHookCallback = classNameToDescriptor(classBeforeHookCallback);
-        var typeAfterHookCallback = classNameToDescriptor(classAfterHookCallback);
-        //.field public static final tag:I = 0x32
-        var tagField = new ImmutableField(
-                typeTargetClass, "tag", "I",
-                Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL,
-                (EncodedValue) new ImmutableIntEncodedValue(tagValue),
-                null, null
-        );
+    @JvmStatic
+    fun impl1(
+        targetClassName: String,
+        tagValue: Int,
+        classNameXposedInterfaceHooker: String,
+        classBeforeHookCallback: String,
+        classAfterHookCallback: String
+    ): ByteArray {
+        val typeTargetClass = classNameToDescriptor(targetClassName)
+        val typeXposedInterfaceHooker = classNameToDescriptor(classNameXposedInterfaceHooker)
+        val typeBeforeHookCallback = classNameToDescriptor(classBeforeHookCallback)
+        val typeAfterHookCallback = classNameToDescriptor(classAfterHookCallback)
 
-        var methods = new ArrayList<ImmutableMethod>();
-        {
-            var insCtor = new ArrayList<Instruction>();
-            // invoke-direct {p0}, Ljava/lang/Object;-><init>()V
-            insCtor.add(new ImmutableInstruction35c(Opcode.INVOKE_DIRECT, 1, 0, 0, 0, 0, 0,
-                    referenceMethod("Ljava/lang/Object;", "<init>", "()V")));
-            // return-void
-            insCtor.add(new ImmutableInstruction10x(Opcode.RETURN_VOID));
-            var ctorMethodImpl = new ImmutableMethodImplementation(1, insCtor, null, null);
-            var ctorMethod = new ImmutableMethod(typeTargetClass, "<init>", List.of(),
-                    "V", Modifier.PUBLIC | ACC_CONSTRUCTOR, null, null, ctorMethodImpl);
-            methods.add(ctorMethod);
-        }
-        var typeInvocationParamWrapper = "Lmoe/ouom/wekit/loader/modern/Lsp100HookWrapper$InvocationParamWrapper;";
-        var typeLsp100HookAgent = "Lmoe/ouom/wekit/loader/modern/Lsp100HookWrapper$Lsp100HookAgent;";
-        {
-            var insBefore = new ArrayList<Instruction>();
-            insBefore.add(new ImmutableInstruction31i(Opcode.CONST, 0, tagValue));
-            insBefore.add(new ImmutableInstruction35c(Opcode.INVOKE_STATIC, 2, 1, 0, 0, 0, 0,
-                    new ImmutableMethodReference(typeLsp100HookAgent, "handleBeforeHookedMethod",
-                            List.of(typeBeforeHookCallback, "I"), typeInvocationParamWrapper)));
+        val tagField = ImmutableField(
+            typeTargetClass, "tag", "I",
+            Modifier.PUBLIC or Modifier.STATIC or Modifier.FINAL,
+            ImmutableIntEncodedValue(tagValue),
+            null, null
+        )
 
-            insBefore.add(new ImmutableInstruction11x(Opcode.MOVE_RESULT_OBJECT, 0));
-            insBefore.add(new ImmutableInstruction11x(Opcode.RETURN_OBJECT, 0));
-            var beforeMethodImpl = new ImmutableMethodImplementation(2, insBefore, null, null);
-            var beforeMethod = new ImmutableMethod(typeTargetClass, "before", List.of(
-                    new ImmutableMethodParameter(typeBeforeHookCallback, null, "c")
-            ), typeInvocationParamWrapper, Modifier.PUBLIC | Modifier.STATIC, null, null, beforeMethodImpl);
-            methods.add(beforeMethod);
-        }
-        {
-            var insAfter = new ArrayList<Instruction>();
-            insAfter.add(new ImmutableInstruction31i(Opcode.CONST, 0, tagValue));
-            insAfter.add(new ImmutableInstruction35c(Opcode.INVOKE_STATIC, 3, 1, 2, 0, 0, 0,
-                    new ImmutableMethodReference(typeLsp100HookAgent, "handleAfterHookedMethod",
-                            List.of(typeAfterHookCallback, typeInvocationParamWrapper, "I"), "V")));
-            // return-void
-            insAfter.add(new ImmutableInstruction10x(Opcode.RETURN_VOID));
-            var afterMethodImpl = new ImmutableMethodImplementation(3, insAfter, null, null);
-            var afterMethod = new ImmutableMethod(typeTargetClass, "after", List.of(
-                    new ImmutableMethodParameter(typeAfterHookCallback, null, "c"),
-                    new ImmutableMethodParameter(typeInvocationParamWrapper, null, "p")
-            ), "V", Modifier.PUBLIC | Modifier.STATIC, null, null, afterMethodImpl);
-            methods.add(afterMethod);
+        val methods = ArrayList<ImmutableMethod>()
+
+        // Constructor
+        run {
+            val insCtor = ArrayList<Instruction>()
+            insCtor.add(ImmutableInstruction35c(Opcode.INVOKE_DIRECT, 1, 0, 0, 0, 0, 0,
+                referenceMethod("Ljava/lang/Object;", "<init>", "()V")))
+            insCtor.add(ImmutableInstruction10x(Opcode.RETURN_VOID))
+            val ctorMethodImpl = ImmutableMethodImplementation(1, insCtor, null, null)
+            val ctorMethod = ImmutableMethod(typeTargetClass, "<init>", listOf(),
+                "V", Modifier.PUBLIC or ACC_CONSTRUCTOR, null, null, ctorMethodImpl)
+            methods.add(ctorMethod)
         }
 
-        ImmutableDexFile proxyDex;
-        {
-            ImmutableClassDef classDef;
-            classDef = new ImmutableClassDef(typeTargetClass, Modifier.PUBLIC, "Ljava/lang/Object;",
-                    Collections.singletonList(typeXposedInterfaceHooker),
-                    "LibXposedNewApiByteCodeGenerator.dexlib2", null,
-                    Collections.singletonList(tagField), methods);
-            proxyDex = new ImmutableDexFile(Opcodes.forDexVersion(35), Collections.singletonList(classDef));
+        val typeInvocationParamWrapper =
+            $$"Lmoe/ouom/wekit/loader/modern/Lsp100HookWrapper$InvocationParamWrapper;"
+        val typeLsp100HookAgent =
+            $$"Lmoe/ouom/wekit/loader/modern/Lsp100HookWrapper$Lsp100HookAgent;"
+
+        // before()
+        run {
+            val insBefore = ArrayList<Instruction>()
+            insBefore.add(ImmutableInstruction31i(Opcode.CONST, 0, tagValue))
+            insBefore.add(ImmutableInstruction35c(Opcode.INVOKE_STATIC, 2, 1, 0, 0, 0, 0,
+                ImmutableMethodReference(typeLsp100HookAgent, "handleBeforeHookedMethod",
+                    listOf(typeBeforeHookCallback, "I"), typeInvocationParamWrapper)))
+            insBefore.add(ImmutableInstruction11x(Opcode.MOVE_RESULT_OBJECT, 0))
+            insBefore.add(ImmutableInstruction11x(Opcode.RETURN_OBJECT, 0))
+            val beforeMethodImpl = ImmutableMethodImplementation(2, insBefore, null, null)
+            val beforeMethod = ImmutableMethod(typeTargetClass, "before", listOf(
+                ImmutableMethodParameter(typeBeforeHookCallback, null, "c")
+            ), typeInvocationParamWrapper, Modifier.PUBLIC or Modifier.STATIC, null, null, beforeMethodImpl)
+            methods.add(beforeMethod)
         }
-        // to bytes
-        var memoryDataStore = new MemoryDataStore();
-        var dexPool = new DexPool(proxyDex.getOpcodes());
-        for (ClassDef classDef : proxyDex.getClasses()) {
-            dexPool.internClass(classDef);
+
+        // after()
+        run {
+            val insAfter = ArrayList<Instruction>()
+            insAfter.add(ImmutableInstruction31i(Opcode.CONST, 0, tagValue))
+            insAfter.add(ImmutableInstruction35c(Opcode.INVOKE_STATIC, 3, 1, 2, 0, 0, 0,
+                ImmutableMethodReference(typeLsp100HookAgent, "handleAfterHookedMethod",
+                    listOf(typeAfterHookCallback, typeInvocationParamWrapper, "I"), "V")))
+            insAfter.add(ImmutableInstruction10x(Opcode.RETURN_VOID))
+            val afterMethodImpl = ImmutableMethodImplementation(3, insAfter, null, null)
+            val afterMethod = ImmutableMethod(typeTargetClass, "after", listOf(
+                ImmutableMethodParameter(typeAfterHookCallback, null, "c"),
+                ImmutableMethodParameter(typeInvocationParamWrapper, null, "p")
+            ), "V", Modifier.PUBLIC or Modifier.STATIC, null, null, afterMethodImpl)
+            methods.add(afterMethod)
+        }
+
+        val classDef = ImmutableClassDef(
+            typeTargetClass, Modifier.PUBLIC, "Ljava/lang/Object;",
+            listOf(typeXposedInterfaceHooker),
+            "LibXposedNewApiByteCodeGenerator.dexlib2", null,
+            listOf(tagField), methods
+        )
+        val proxyDex = ImmutableDexFile(Opcodes.forDexVersion(35), listOf(classDef))
+
+        val memoryDataStore = MemoryDataStore()
+        val dexPool = DexPool(proxyDex.opcodes)
+        for (cd: ClassDef in proxyDex.classes) {
+            dexPool.internClass(cd)
         }
         try {
-            dexPool.writeTo(memoryDataStore);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            dexPool.writeTo(memoryDataStore)
+        } catch (e: Exception) {
+            throw RuntimeException(e)
         }
-        return memoryDataStore.getData();
+        return memoryDataStore.data
     }
 
-    private static ImmutableMethodReference referenceMethod(String declaringClass, String name, String descriptor) {
-        return referenceMethod(new DexMethodDescriptor(declaringClass, name, descriptor));
-    }
+    private fun referenceMethod(declaringClass: String, name: String, descriptor: String): ImmutableMethodReference =
+        referenceMethod(DexMethodDescriptor(declaringClass, name, descriptor))
 
-    private static ImmutableMethodReference referenceMethod(DexMethodDescriptor md) {
-        return new ImmutableMethodReference(md.declaringClass, md.name, md.getParameterTypes(), md.getReturnType());
-    }
-
-    public static ImmutableFieldReference referenceField(String declaringClass, String name, String type) {
-        return new ImmutableFieldReference(declaringClass, name, type);
-    }
-
+    private fun referenceMethod(md: DexMethodDescriptor): ImmutableMethodReference =
+        ImmutableMethodReference(md.declaringClass, md.name, md.getParameterTypes(), md.getReturnType())
 }

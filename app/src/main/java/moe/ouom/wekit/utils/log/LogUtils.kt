@@ -32,11 +32,6 @@ object LogUtils {
             }
         }
 
-    fun getCallStack(): String {
-        val throwable = Throwable()
-        return getStackTrace(throwable)
-    }
-
     /**
      * 获取堆栈跟踪
      * 
@@ -53,14 +48,6 @@ object LogUtils {
             result.append(stackTraceElement).append("\n")
         }
         return result.toString()
-    }
-
-    fun addError(e: Throwable) {
-        addError("Error Log", e.toString(), e)
-    }
-
-    fun addRunLog(content: Any?) {
-        addRunLog("Run Log", content)
     }
 
     /**
@@ -91,10 +78,9 @@ object LogUtils {
         addLog(tag, desc, e, true)
     }
 
-
     private fun addLog(fileName: String, desc: String?, content: Any?, isError: Boolean) {
         try {
-            if (NativeCoreBridge.isNativeCoreInitialized() && !WeConfig.getDefaultConfig()
+            if (NativeCoreBridge.isNativeCoreInitialized() && !WeConfig.defaultConfig
                     .getBooleanOrFalse(Constants.ENABLE_LOG_PREF_KEY)
             ) {
                 return

@@ -47,9 +47,9 @@ object ModifyTransferWalletBalanceDisplay : BaseClickableFunctionHookItem(), IWe
         try {
             val data = WeProtoData()
             data.fromBytes(respBytes)
-            val json = data.toJSON()
+            val json = data.toJsonObject()
             processJsonObject(json)
-            data.applyViewJSON(json, true)
+            data.applyViewJson(json, true)
 
             WeLogger.i(TAG, "篡改完成，返回新数据包")
             return data.toPacketBytes()
@@ -67,7 +67,7 @@ object ModifyTransferWalletBalanceDisplay : BaseClickableFunctionHookItem(), IWe
             keysList.add(keysIterator.next())
         }
 
-        val config = WeConfig.getDefaultConfig()
+        val config = WeConfig.defaultConfig
         val customCft = config.getStringPref(KEY_CFT_BALANCE, null)
         val customLqt = config.getStringPref(KEY_LQT_BALANCE, null)
 
@@ -137,7 +137,7 @@ object ModifyTransferWalletBalanceDisplay : BaseClickableFunctionHookItem(), IWe
         super.unload(classLoader)
     }
 
-    private val config = WeConfig.getDefaultConfig()
+    private val config = WeConfig.defaultConfig
 
     override fun onClick(context: Context) {
         showComposeDialog(context) { onDismiss ->

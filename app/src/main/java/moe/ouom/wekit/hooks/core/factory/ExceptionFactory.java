@@ -1,7 +1,5 @@
 package moe.ouom.wekit.hooks.core.factory;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,9 +13,8 @@ import moe.ouom.wekit.utils.log.LogUtils;
 
 /**
  * 异常处理工厂
- * NOTE: 不要移除这个类名前面的 "_"，他能保护此方法不进入 Hidden DEX
  */
-public class _ExceptionFactory {
+public class ExceptionFactory {
     private final static Map<BaseHookItem, List<Throwable>> exceptionMap = new HashMap<>();
 
     /**
@@ -55,21 +52,5 @@ public class _ExceptionFactory {
             LogUtils.addError("item_" + item.getItemName(), throwable);
         } catch (NoClassDefFoundError ignored) {
         }
-
-
     }
-
-    public static String getStackTrace(BaseHookItem hookItem) {
-        var builder = new StringBuilder();
-        var exceptionsList = exceptionMap.get(hookItem);
-        if (exceptionsList == null) {
-            return builder.toString();
-        }
-        for (var ex : exceptionsList) {
-            builder.append(Log.getStackTraceString(ex));
-            builder.append("\n");
-        }
-        return builder.toString();
-    }
-
 }

@@ -1,634 +1,238 @@
-package moe.ouom.wekit.config;
+package moe.ouom.wekit.config
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import com.tencent.mmkv.MMKV
+import moe.ouom.wekit.utils.log.WeLogger
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import java.io.Serializable
 
-import com.tencent.mmkv.MMKV;
+class MmkvConfigManagerImpl(name: String) : WeConfig() {
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
+    val mmkv: MMKV = MMKV.mmkvWithID(name, MMKV.MULTI_PROCESS_MODE)
 
-import moe.ouom.wekit.utils.log.WeLogger;
+    val mCacheMap = HashMap<String, MutableMap.MutableEntry<String, Any?>>()
 
-
-public class MmkvConfigManagerImpl extends WeConfig {
-
-    // keep the following the same as ConfigManager.cc
-    public static final String TYPE_SUFFIX = "$shadow$type";
-    public static final int TYPE_JSON = 0x80 + 42;
-    private static final String CLASS_SUFFIX = "$shadow$class";
-    private static final int TYPE_BOOL = 0x80 + 2;
-    private static final int TYPE_INT = 0x80 + 4;
-    private static final int TYPE_LONG = 0x80 + 6;
-    private static final int TYPE_FLOAT = 0x80 + 7;
-    private static final int TYPE_STRING = 0x80 + 31;
-    private static final int TYPE_STRING_SET = 0x80 + 32;
-    private static final int TYPE_BYTES = 0x80 + 33;
-    private static final int TYPE_SERIALIZABLE = 0x80 + 41;
-    private final MMKV mmkv;
-    private final File file;
-    private final String mmkvId;
-    HashMap<String, Entry<String, Object>> mCacheMap = new HashMap<>();
-
-    protected MmkvConfigManagerImpl(@NonNull String name) {
-        mmkvId = Objects.requireNonNull(name, "name");
-        // 调用前需要等待模块mmkv初始化完毕
-        mmkv = MMKV.mmkvWithID(name, MMKV.MULTI_PROCESS_MODE);
-        file = new File(MMKV.getRootDir(), name);
+    companion object {
+        const val TYPE_SUFFIX = $$"$shadow$type"
+        private const val TYPE_BOOL = 0x80 + 2
+        private const val TYPE_INT = 0x80 + 4
+        private const val TYPE_LONG = 0x80 + 6
+        private const val TYPE_FLOAT = 0x80 + 7
+        private const val TYPE_STRING = 0x80 + 31
+        private const val TYPE_STRING_SET = 0x80 + 32
+        private const val TYPE_BYTES = 0x80 + 33
+        private const val TYPE_SERIALIZABLE = 0x80 + 41
     }
 
-    @NonNull
-    @Override
-    public File getFile() {
-        return file;
-    }    final Set<Entry<String, Object>> mVirtEntrySet = new Set<>() {
-        @Override
-        public int size() {
-            return mShadowMap.size();
-        }
+    inner class VirtEntry(override val key: String) : MutableMap.MutableEntry<String, Any?> {
+        override val value: Any? get() = getObject(key)
+        override fun setValue(newValue: Any?): Any = putObject(key, newValue!!)
+        override fun equals(other: Any?): Boolean = other is VirtEntry && key == other.key
+        override fun hashCode(): Int = key.hashCode()
+    }
 
-        @Override
-        public boolean isEmpty() {
-            return mShadowMap.isEmpty();
-        }
+    private val mVirtEntrySet: MutableSet<MutableMap.MutableEntry<String, Any?>> = object : AbstractMutableSet<MutableMap.MutableEntry<String, Any?>>() {
+        override val size: Int get() = mShadowMap.size
+        override fun isEmpty(): Boolean = mShadowMap.isEmpty()
 
-        @Override
-        public boolean contains(@Nullable Object o) {
-            if (!(o instanceof Entry)) {
-                return false;
-            }
-            var entry = (Entry<String, Object>) o;
-            for (var e : this) {
-                if (e.equals(entry)) {
-                    return true;
+        override fun contains(element: MutableMap.MutableEntry<String, Any?>): Boolean =
+            any { it == element }
+
+        override fun iterator(): MutableIterator<MutableMap.MutableEntry<String, Any?>> =
+            object : MutableIterator<MutableMap.MutableEntry<String, Any?>> {
+                val iterator = mShadowMap.keys.iterator()
+                override fun hasNext(): Boolean = iterator.hasNext()
+                override fun next(): MutableMap.MutableEntry<String, Any?> {
+                    val key = iterator.next()
+                    return mCacheMap.getOrPut(key) { VirtEntry(key) }
                 }
+                override fun remove() = throw UnsupportedOperationException("entry set")
             }
-            return false;
-        }
 
-        @NonNull
-        @Override
-        public Iterator<Entry<String, Object>> iterator() {
-            return new Iterator<>() {
-                final Iterator<String> iterator = mShadowMap.keySet().iterator();
+        override fun add(element: MutableMap.MutableEntry<String, Any?>): Boolean =
+            throw UnsupportedOperationException("entry set")
+    }
 
-                @Override
-                public boolean hasNext() {
-                    return iterator.hasNext();
-                }
+    private val mVirtValues: MutableCollection<Any?> = object : AbstractMutableCollection<Any?>() {
+        override val size: Int get() = mShadowMap.size
+        override fun isEmpty(): Boolean = mShadowMap.isEmpty()
+        override fun contains(element: Any?): Boolean = any { it == element }
 
-                @Override
-                public Entry<String, Object> next() {
-                    var key = iterator.next();
-                    return mCacheMap.computeIfAbsent(key, VirtEntry::new);
-                }
-            };
-        }
-
-        @NonNull
-        @Override
-        public Object[] toArray() {
-            throw new UnsupportedOperationException("entry set");
-        }
-
-        @NonNull
-        @Override
-        public <T> T[] toArray(@NonNull T[] a) {
-            throw new UnsupportedOperationException("entry set");
-        }
-
-        @Override
-        public boolean add(Entry<String, Object> stringObjectEntry) {
-            throw new UnsupportedOperationException("entry set");
-        }
-
-        @Override
-        public boolean remove(@Nullable Object o) {
-            throw new UnsupportedOperationException("entry set");
-        }
-
-        @Override
-        public boolean containsAll(@NonNull Collection<?> c) {
-            for (var o : c) {
-                if (!contains(o)) {
-                    return false;
-                }
+        override fun iterator(): MutableIterator<Any?> =
+            object : MutableIterator<Any?> {
+                val iterator = mShadowMap.keys.iterator()
+                override fun hasNext(): Boolean = iterator.hasNext()
+                override fun next(): Any? = getObject(iterator.next())
+                override fun remove() = throw UnsupportedOperationException("entry set")
             }
-            return true;
+
+        override fun add(element: Any?): Boolean =
+            throw UnsupportedOperationException("entry set")
+    }
+
+    val mShadowMap: MutableMap<String, Any?> = object : AbstractMutableMap<String, Any?>() {
+        override val size: Int get() = entries.size
+        override fun isEmpty(): Boolean = size == 0
+        override fun containsKey(key: String): Boolean = this@MmkvConfigManagerImpl.containsKey(key)
+
+        override fun containsValue(value: Any?): Boolean = entries.any { it == value }
+
+        override fun get(key: String): Any? = getObject(key)
+
+        override fun put(key: String, value: Any?): Any? {
+            val old = getObject(key)
+            putObject(key, value!!)
+            return old
         }
 
-        @Override
-        public boolean addAll(@NonNull Collection<? extends Entry<String, Object>> c) {
-            throw new UnsupportedOperationException("entry set");
+        override fun remove(key: String): Any? {
+            val obj = getObject(key)
+            if (obj != null) mmkv.remove(key)
+            return obj
         }
 
-        @Override
-        public boolean retainAll(@NonNull Collection<?> c) {
-            throw new UnsupportedOperationException("entry set");
+        override fun putAll(from: Map<out String, Any?>) {
+            for ((key, value) in from) putObject(key, value!!)
         }
 
-        @Override
-        public boolean removeAll(@NonNull Collection<?> c) {
-            throw new UnsupportedOperationException("entry set");
-        }
+        override fun clear() { mmkv.clear() }
 
-        @Override
-        public void clear() {
-            throw new UnsupportedOperationException("entry set");
-        }
-    };
+        override val keys: MutableSet<String>
+            get() = (mmkv.allKeys()
+                ?.filterNot { it.endsWith(TYPE_SUFFIX) }
+                ?.toHashSet()
+                ?: hashSetOf()) as MutableSet<String>
 
-    @Nullable
-    @Override
-    public String getString(@NonNull String key) {
-        return mmkv.getString(key, null);
-    }    final Collection<Object> mVirtValues = new Collection<>() {
-        @Override
-        public int size() {
-            return mShadowMap.size();
-        }
+        override val values: MutableCollection<Any?> get() = mVirtValues
+        override val entries: MutableSet<MutableMap.MutableEntry<String, Any?>> get() = mVirtEntrySet
+    }
 
-        @Override
-        public boolean isEmpty() {
-            return mShadowMap.isEmpty();
-        }
+    override fun getAll(): Map<String, *> = mShadowMap
 
-        @Override
-        public boolean contains(@Nullable Object o) {
-            for (var val : this) {
-                if (Objects.equals(o, val)) {
-                    return true;
-                }
+    override fun getString(key: String): String? = mmkv.getString(key, null)
+
+    override fun getString(key: String, defValue: String?): String? = mmkv.getString(key, defValue)
+
+    override fun getStringSet(key: String, defValues: Set<String>?): Set<String>? =
+        mmkv.getStringSet(key, defValues)
+
+    override fun getInt(key: String, defValue: Int): Int = mmkv.getInt(key, defValue)
+
+    override fun getLong(key: String, defValue: Long): Long = mmkv.getLong(key, defValue)
+
+    override fun getFloat(key: String, defValue: Float): Float = mmkv.getFloat(key, defValue)
+
+    override fun getBoolean(key: String, defValue: Boolean): Boolean = mmkv.getBoolean(key, defValue)
+
+    override fun contains(key: String): Boolean = mmkv.contains(key)
+
+    override fun getObject(key: String): Any? {
+        if (!mmkv.contains(key)) return null
+        return when (mmkv.getInt(key + TYPE_SUFFIX, 0)) {
+            TYPE_BOOL -> mmkv.getBoolean(key, false)
+            TYPE_FLOAT -> mmkv.getFloat(key, 0f)
+            TYPE_INT -> mmkv.getInt(key, 0)
+            TYPE_LONG -> mmkv.getLong(key, 0L)
+            TYPE_STRING -> mmkv.getString(key, null)
+            TYPE_STRING_SET -> mmkv.getStringSet(key, null)
+            TYPE_BYTES -> mmkv.getBytes(key, null)
+            TYPE_SERIALIZABLE -> {
+                val bytes = mmkv.getBytes(key, null) ?: return null
+                runCatching {
+                    ObjectInputStream(ByteArrayInputStream(bytes)).readObject()
+                }.onFailure { WeLogger.e(it) }.getOrNull()
             }
-            return false;
+            else -> null
         }
+    }
 
-        @NonNull
-        @Override
-        public Iterator<Object> iterator() {
-            return new Iterator<>() {
-                final Iterator<String> iterator = mShadowMap.keySet().iterator();
-
-                @Override
-                public boolean hasNext() {
-                    return iterator.hasNext();
-                }
-
-                @Override
-                public Object next() {
-                    return getObject(iterator.next());
-                }
-            };
-        }
-
-        @NonNull
-        @Override
-        public Object[] toArray() {
-            throw new UnsupportedOperationException("entry set");
-        }
-
-        @NonNull
-        @Override
-        public <T> T[] toArray(@NonNull T[] a) {
-            throw new UnsupportedOperationException("entry set");
-        }
-
-        @Override
-        public boolean add(Object o) {
-            throw new UnsupportedOperationException("entry set");
-        }
-
-        @Override
-        public boolean remove(@Nullable Object o) {
-            throw new UnsupportedOperationException("entry set");
-        }
-
-        @Override
-        public boolean containsAll(@NonNull Collection<?> c) {
-            for (var o : c) {
-                if (!contains(o)) {
-                    return false;
-                }
+    override fun putObject(key: String, v: Any): WeConfig {
+        when {
+            v is Float || v is Double -> putFloat(key, (v as Number).toFloat())
+            v is Long -> putLong(key, v)
+            v is Int -> putInt(key, v)
+            v is Boolean -> putBoolean(key, v)
+            v is String -> putString(key, v)
+            v is Set<*> -> @Suppress("UNCHECKED_CAST") putStringSet(key, v as Set<String>)
+            v is ByteArray -> putBytes(key, v)
+            v is Array<*> && v.isArrayOf<String>() -> {
+                @Suppress("UNCHECKED_CAST")
+                putStringSet(key, (v as Array<String>).toHashSet())
             }
-            return true;
+            v is Serializable -> runCatching {
+                val outputStream = ByteArrayOutputStream()
+                ObjectOutputStream(outputStream).writeObject(v)
+                mmkv.putBytes(key, outputStream.toByteArray())
+                mmkv.putInt(key + TYPE_SUFFIX, TYPE_SERIALIZABLE)
+            }.onFailure { throw RuntimeException(it) }
+            else -> throw IllegalArgumentException("unsupported type ${v::class}")
         }
-
-        @Override
-        public boolean addAll(@NonNull Collection<?> c) {
-            throw new UnsupportedOperationException("entry set");
-        }
-
-        @Override
-        public boolean removeAll(@NonNull Collection<?> c) {
-            throw new UnsupportedOperationException("entry set");
-        }
-
-        @Override
-        public boolean retainAll(@NonNull Collection<?> c) {
-            throw new UnsupportedOperationException("entry set");
-        }
-
-        @Override
-        public void clear() {
-            throw new UnsupportedOperationException("entry set");
-        }
-    };
-
-    @Nullable
-    @Override
-    public Object getObject(@NonNull String key) {
-        if (!mmkv.contains(key)) {
-            return null;
-        }
-        switch (mmkv.getInt(key.concat(TYPE_SUFFIX), 0)) {
-            case TYPE_BOOL:
-                return mmkv.getBoolean(key, false);
-            case TYPE_FLOAT:
-                return mmkv.getFloat(key, 0);
-            case TYPE_INT:
-                return mmkv.getInt(key, 0);
-            case TYPE_LONG:
-                return mmkv.getLong(key, 0L);
-            case TYPE_STRING:
-                return mmkv.getString(key, null);
-            case TYPE_STRING_SET:
-                return mmkv.getStringSet(key, null);
-            case TYPE_BYTES:
-                return mmkv.getBytes(key, null);
-            case TYPE_SERIALIZABLE: {
-                var bytes = mmkv.getBytes(key, null);
-                if (bytes == null) {
-                    return null;
-                }
-                var inputStream = new ByteArrayInputStream(bytes);
-                try {
-                    var objectInputStream = new ObjectInputStream(inputStream);
-                    return objectInputStream.readObject();
-                } catch (Exception e) {
-                    WeLogger.e(e);
-                    return null;
-                }
-            }
-            default:
-                return null;
-        }
-    }    final Map<String, Object> mShadowMap = new Map<>() {
-        @Override
-        public int size() {
-            return entrySet().size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return size() == 0;
-        }
-
-        @Override
-        public boolean containsKey(@Nullable Object key) {
-            Objects.requireNonNull(key);
-            return MmkvConfigManagerImpl.this.containsKey((String) key);
-        }
-
-        @Override
-        public boolean containsValue(@Nullable Object value) {
-            for (Object o : entrySet()) {
-                if (Objects.equals(o, value)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        @Nullable
-        @Override
-        public Object get(@Nullable Object key) {
-            Objects.requireNonNull(key);
-            return getObject((String) key);
-        }
-
-        @Nullable
-        @Override
-        public Object put(String key, Object value) {
-            Objects.requireNonNull(key);
-            var obj = getObject(key);
-            putObject(key, value);
-            return obj;
-        }
-
-        @Nullable
-        @Override
-        public Object remove(@Nullable Object key) {
-            Objects.requireNonNull(key);
-            var obj = getObject((String) key);
-            if (obj != null) {
-                mmkv.remove((String) key);
-            }
-            return obj;
-        }
-
-        @Override
-        public void putAll(@NonNull Map<? extends String, ?> m) {
-            for (var entry : m.entrySet()) {
-                var key = entry.getKey();
-                var value = entry.getValue();
-                putObject(key, value);
-            }
-        }
-
-        @Override
-        public void clear() {
-            mmkv.clear();
-        }
-
-        @NonNull
-        @Override
-        public Set<String> keySet() {
-            Set<String> keys = new HashSet<>();
-            var allKeys = mmkv.allKeys();
-            if (allKeys == null) {
-                return keys;
-            }
-            for (var s : allKeys) {
-                if (!s.endsWith(TYPE_SUFFIX)) {
-                    keys.add(s);
-                }
-            }
-            return keys;
-        }
-
-        @NonNull
-        @Override
-        public Collection<Object> values() {
-            return mVirtValues;
-        }
-
-        @NonNull
-        @Override
-        public Set<Entry<String, Object>> entrySet() {
-            return mVirtEntrySet;
-        }
-    };
-
-    @NonNull
-    @Override
-    public Map<String, ?> getAll() {
-        return mShadowMap;
+        return this
     }
 
-    @Nullable
-    @Override
-    public String getString(@NonNull String key, @Nullable String defValue) {
-        return mmkv.getString(key, defValue);
+    override fun putString(key: String, value: String?): WeConfig {
+        mmkv.putString(key, value)
+        mmkv.putInt(key + TYPE_SUFFIX, TYPE_STRING)
+        return this
     }
 
-    @Nullable
-    @Override
-    public Set<String> getStringSet(@NonNull String key, @Nullable Set<String> defValues) {
-        return mmkv.getStringSet(key, defValues);
+    override fun putStringSet(key: String, values: Set<String>?): WeConfig {
+        mmkv.putStringSet(key, values)
+        mmkv.putInt(key + TYPE_SUFFIX, TYPE_STRING_SET)
+        return this
     }
 
-    @Override
-    public int getInt(@NonNull String key, int defValue) {
-        return mmkv.getInt(key, defValue);
+    override fun putInt(key: String, value: Int): WeConfig {
+        mmkv.putInt(key, value)
+        mmkv.putInt(key + TYPE_SUFFIX, TYPE_INT)
+        return this
     }
 
-    @Override
-    public long getLong(@NonNull String key, long defValue) {
-        return mmkv.getLong(key, defValue);
+    override fun putLong(key: String, value: Long): WeConfig {
+        mmkv.putLong(key, value)
+        mmkv.putInt(key + TYPE_SUFFIX, TYPE_LONG)
+        return this
     }
 
-    @Override
-    public float getFloat(@NonNull String key, float defValue) {
-        return mmkv.getFloat(key, defValue);
+    override fun putFloat(key: String, value: Float): WeConfig {
+        mmkv.putFloat(key, value)
+        mmkv.putInt(key + TYPE_SUFFIX, TYPE_FLOAT)
+        return this
     }
 
-    @Override
-    public boolean getBoolean(@NonNull String key, boolean defValue) {
-        return mmkv.getBoolean(key, defValue);
+    override fun putBoolean(key: String, value: Boolean): WeConfig {
+        mmkv.putBoolean(key, value)
+        mmkv.putInt(key + TYPE_SUFFIX, TYPE_BOOL)
+        return this
     }
 
-    @Override
-    public boolean contains(@NonNull String key) {
-        return mmkv.contains(key);
+    override fun getBytesOrDefault(key: String, defValue: ByteArray): ByteArray =
+        mmkv.getBytes(key, defValue)!!
+
+    override fun getBytes(key: String, defValue: ByteArray?): ByteArray? =
+        mmkv.getBytes(key, defValue)
+
+    override fun putBytes(key: String, value: ByteArray) {
+        mmkv.putBytes(key, value)
+        mmkv.putInt(key + TYPE_SUFFIX, TYPE_BYTES)
     }
 
-    @Override
-    public void save() {
-        commit();
+    override fun remove(key: String): WeConfig {
+        mmkv.remove(key)
+        mmkv.remove(key + TYPE_SUFFIX)
+        return this
     }
 
-    @NonNull
-    @Override
-    public WeConfig putObject(@NonNull String key, @NonNull Object v) {
-        if (v == null || key == null) {
-            throw new NullPointerException("null key/value not allowed");
-        }
-        if (v instanceof Float || v instanceof Double) {
-            putFloat(key, ((Number) v).floatValue());
-        } else if (v instanceof Long) {
-            putLong(key, (long) v);
-        } else if (v instanceof Integer) {
-            putInt(key, (int) v);
-        } else if (v instanceof Boolean) {
-            putBoolean(key, (boolean) v);
-        } else if (v instanceof String) {
-            putString(key, (String) v);
-        } else if (v instanceof Set) {
-            putStringSet(key, (Set<String>) v);
-        } else if (v instanceof byte[]) {
-            putBytes(key, (byte[]) v);
-        } else if (v instanceof String[]) {
-            var set = new HashSet<String>(((String[]) v).length);
-            Collections.addAll(set, (String[]) v);
-            putStringSet(key, set);
-        } else if (v instanceof Serializable) {
-            try {
-                var outputStream = new ByteArrayOutputStream();
-                var objectOutputStream = new ObjectOutputStream(outputStream);
-                objectOutputStream.writeObject(v);
-                mmkv.putBytes(key, outputStream.toByteArray());
-                mmkv.putInt(key.concat(TYPE_SUFFIX), TYPE_SERIALIZABLE);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            throw new IllegalArgumentException("unsupported type" + v.getClass());
-        }
-        return this;
+    override fun clear(): WeConfig {
+        mmkv.clear()
+        return this
     }
 
-    @NonNull
-    @Override
-    public Editor putString(@NonNull String key, @Nullable String value) {
-        mmkv.putString(key, value);
-        mmkv.putInt(key.concat(TYPE_SUFFIX), TYPE_STRING);
-        return this;
-    }
-
-    @NonNull
-    @Override
-    public Editor putStringSet(@NonNull String key, @Nullable Set<String> values) {
-        mmkv.putStringSet(key, values);
-        mmkv.putInt(key.concat(TYPE_SUFFIX), TYPE_STRING_SET);
-        return this;
-    }
-
-    @NonNull
-    @Override
-    public Editor putInt(@NonNull String key, int value) {
-        mmkv.putInt(key, value);
-        mmkv.putInt(key.concat(TYPE_SUFFIX), TYPE_INT);
-        return this;
-    }
-
-    @NonNull
-    @Override
-    public Editor putLong(@NonNull String key, long value) {
-        mmkv.putLong(key, value);
-        mmkv.putInt(key.concat(TYPE_SUFFIX), TYPE_LONG);
-        return this;
-    }
-
-    @NonNull
-    @Override
-    public Editor putFloat(@NonNull String key, float value) {
-        mmkv.putFloat(key, value);
-        mmkv.putInt(key.concat(TYPE_SUFFIX), TYPE_FLOAT);
-        return this;
-    }
-
-    @NonNull
-    @Override
-    public Editor putBoolean(@NonNull String key, boolean value) {
-        mmkv.putBoolean(key, value);
-        mmkv.putInt(key.concat(TYPE_SUFFIX), TYPE_BOOL);
-        return this;
-    }
-
-    @NonNull
-    @Override
-    public byte[] getBytesOrDefault(@NonNull String key, @NonNull byte[] defValue) {
-        return mmkv.getBytes(key, defValue);
-    }
-
-    @Nullable
-    @Override
-    public byte[] getBytes(@NonNull String key, @Nullable byte[] defValue) {
-        return mmkv.getBytes(key, defValue);
-    }
-
-    @Override
-    public void putBytes(@NonNull String key, @NonNull byte[] value) {
-        mmkv.putBytes(key, value);
-        mmkv.putInt(key.concat(TYPE_SUFFIX), TYPE_BYTES);
-    }
-
-    @NonNull
-    @Override
-    public Editor remove(@NonNull String key) {
-        mmkv.remove(key);
-        mmkv.remove(key.concat(TYPE_SUFFIX));
-        return this;
-    }
-
-    @NonNull
-    @Override
-    public Editor clear() {
-        mmkv.clear();
-        return this;
-    }
-
-    @Override
-    public boolean commit() {
-        return true;
-    }
-
-    @Override
-    public void apply() {
-        // do nothing
-    }
-
-    @Override
-    public boolean isReadOnly() {
-        return false;
-    }
-
-    @Override
-    public boolean isPersistent() {
-        return true;
-    }
-
-    @NonNull
-    public String getMmkvId() {
-        return mmkvId;
-    }
-
-    /**
-     * Get the internal mmkv instance.
-     * <p>
-     * THIS IS USUALLY NOT WHAT YOU WANT.
-     *
-     * @return the underlying mmkv instance
-     * @see MMKV
-     */
-    @NonNull
-    public MMKV getInternalMmkv() {
-        return mmkv;
-    }
-
-    class VirtEntry implements Entry<String, Object> {
-
-        final String key;
-
-        VirtEntry(String key) {
-            this.key = key;
-        }
-
-        @Override
-        public String getKey() {
-            return key;
-        }
-
-        @Override
-        public Object getValue() {
-            return getObject(key);
-        }
-
-        @Override
-        public Object setValue(Object value) {
-            return putObject(key, value);
-        }
-
-        @Override
-        public boolean equals(@Nullable Object o) {
-            if (o instanceof VirtEntry) {
-                return key.equals(((VirtEntry) o).key);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return key.hashCode();
-        }
-    }
-
-
-
-
-
-
+    override fun save() { commit() }
+    override fun commit(): Boolean = true
+    override fun apply() = Unit
+    override val isReadOnly: Boolean = false
+    override val isPersistent: Boolean = true
 }

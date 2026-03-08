@@ -10,9 +10,8 @@ import moe.ouom.wekit.host.impl.HostInfo;
 import moe.ouom.wekit.loader.hookapi.IClassLoaderHelper;
 import moe.ouom.wekit.loader.hookapi.ILoaderService;
 import moe.ouom.wekit.loader.startup.StartupInfo;
-import moe.ouom.wekit.utils.log.WeLogger;
 
-public class ModuleAppImpl extends Application {
+public class ModuleApplication extends Application {
 
     @Override
     public void onCreate() {
@@ -83,5 +82,4 @@ public class ModuleAppImpl extends Application {
         StartupInfo.setModulePath(apkPath);
         StartupInfo.setLoaderService(loaderService);
     }
-
 }

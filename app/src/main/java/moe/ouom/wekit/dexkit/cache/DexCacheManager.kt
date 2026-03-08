@@ -54,8 +54,7 @@ object DexCacheManager {
                 clearAllCache()
 
                 // 重置"禁用版本适配"配置，确保新版本能够正常适配
-                WeConfig.getDefaultConfig()
-                    .putBoolean(Constants.DISABLE_DEX_FIND_PREF_KEY, false)
+                WeConfig.defaultConfig.putBoolean(Constants.DISABLE_DEX_FIND_PREF_KEY, false)
                 WeLogger.i(
                     "DexCacheManager",
                     "Reset disable_version_adaptation to false due to version change"

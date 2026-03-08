@@ -3,6 +3,7 @@ package moe.ouom.wekit.hooks.sdk.protocol
 import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
+import com.highcapable.kavaref.extension.toClass
 import de.robv.android.xposed.XposedHelpers
 import moe.ouom.wekit.core.dsl.dexClass
 import moe.ouom.wekit.core.dsl.dexMethod
@@ -10,7 +11,6 @@ import moe.ouom.wekit.core.model.ApiHookItem
 import moe.ouom.wekit.dexkit.intf.IDexFind
 import moe.ouom.wekit.hooks.core.annotation.HookItem
 import moe.ouom.wekit.hooks.sdk.protocol.intf.WeReqCallback
-import moe.ouom.wekit.utils.Initiator.loadClass
 import moe.ouom.wekit.utils.ProtoJsonBuilder
 import moe.ouom.wekit.utils.WeProtoData
 import moe.ouom.wekit.utils.log.WeLogger
@@ -324,7 +324,7 @@ object WePkgHelper : ApiHookItem(), IDexFind {
 
             val wrapperClassName = wrapperClassData.name
 
-            val wrapperClass = loadClass(wrapperClassName)
+            val wrapperClass = wrapperClassName.toClass()
             val realProtoClass = wrapperClass.declaredFields.firstOrNull { field ->
                 val type = field.type
                 !type.isPrimitive &&
@@ -570,7 +570,7 @@ object WePkgHelper : ApiHookItem(), IDexFind {
                                 bytes =
                                     XposedHelpers.callMethod(protoObj, "toByteArray") as? ByteArray
                                 if (bytes != null) {
-                                    json = WeProtoData().also { it.fromBytes(bytes) }.toJSON()
+                                    json = WeProtoData().also { it.fromBytes(bytes) }.toJsonObject()
                                         .toString()
                                 }
                             }
@@ -612,7 +612,7 @@ object WePkgHelper : ApiHookItem(), IDexFind {
                         }
                             ?: XposedHelpers.callMethod(yd, "toByteArray") as? ByteArray
                         val json =
-                            if (bytes != null) WeProtoData().also { it.fromBytes(bytes) }.toJSON()
+                            if (bytes != null) WeProtoData().also { it.fromBytes(bytes) }.toJsonObject()
                                 .toString() else "{}"
                         userCallback?.onSuccess(json, bytes)
                     } else {

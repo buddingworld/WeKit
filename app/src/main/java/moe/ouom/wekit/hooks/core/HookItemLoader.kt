@@ -1,6 +1,8 @@
 package moe.ouom.wekit.hooks.core
 
 import android.content.pm.ApplicationInfo
+import android.os.Handler
+import android.os.Looper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -26,10 +28,9 @@ import moe.ouom.wekit.utils.log.WeLogger
  */
 class HookItemLoader {
     fun loadHookItem(process: Int) {
-        val classLoader = RuntimeConfig.getHostClassLoader()
         val appInfo = RuntimeConfig.getHostApplicationInfo()
 
-        loadHookItem(process, classLoader, appInfo)
+        loadHookItem(process, appInfo)
     }
 
     /**
@@ -42,7 +43,6 @@ class HookItemLoader {
      */
     fun loadHookItem(
         process: Int,
-        classLoader: ClassLoader,
         appInfo: ApplicationInfo
     ) {
         // 获取全量 HookItem 列表
@@ -91,13 +91,13 @@ class HookItemLoader {
             var isEnabled = false
             when (hookItem) {
                 is BaseSwitchFunctionHookItem -> {
-                    hookItem.isEnabled = WeConfig.getDefaultConfig()
+                    hookItem.isEnabled = WeConfig.defaultConfig
                         .getBooleanOrFalse("$PREF_KEY_PREFIX${hookItem.path}")
                     isEnabled = hookItem.isEnabled && process == hookItem.targetProcess
                 }
 
                 is BaseClickableFunctionHookItem -> {
-                    hookItem.isEnabled = WeConfig.getDefaultConfig()
+                    hookItem.isEnabled = WeConfig.defaultConfig
                         .getBooleanOrFalse("$PREF_KEY_PREFIX${hookItem.path}")
                     isEnabled =
                         (hookItem.isEnabled && process == hookItem.targetProcess) || hookItem.alwaysRun
@@ -130,7 +130,7 @@ class HookItemLoader {
         appInfo: ApplicationInfo,
         brokenItems: List<IDexFind>
     ) {
-        val disableVersionAdaptation = WeConfig.getDefaultConfig()
+        val disableVersionAdaptation = WeConfig.defaultConfig
             .getBooleanOrFalse(DISABLE_DEX_FIND_PREF_KEY)
 
         if (disableVersionAdaptation) {
@@ -168,7 +168,7 @@ class HookItemLoader {
                     } catch (_: InterruptedException) {
                     }
 
-                    SyncUtils.post {
+                    Handler(Looper.getMainLooper()).post {
                         WeLogger.i("HookItemLoader", "Showing DexFinderDialog for repair")
                         showComposeDialog(activity) { onDismiss ->
                             DexFinderContent(

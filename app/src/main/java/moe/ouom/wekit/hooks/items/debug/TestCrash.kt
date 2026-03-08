@@ -6,10 +6,10 @@ import android.os.Handler
 import android.os.Looper
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
+import com.highcapable.kavaref.extension.toClass
 import moe.ouom.wekit.core.model.BaseClickableFunctionHookItem
 import moe.ouom.wekit.hooks.core.annotation.HookItem
 import moe.ouom.wekit.ui.utils.CommonContextWrapper
-import moe.ouom.wekit.utils.Initiator.loadClass
 import moe.ouom.wekit.utils.common.ToastUtils.showToast
 import moe.ouom.wekit.utils.crash.NativeCrashHandler
 import moe.ouom.wekit.utils.log.WeLogger
@@ -21,13 +21,14 @@ import moe.ouom.wekit.utils.log.WeLogger
 object TestCrash : BaseClickableFunctionHookItem() {
 
     private var appContext: Context? = null
+    @SuppressLint("StaticFieldLeak")
     private var nativeCrashHandler: NativeCrashHandler? = null
 
     override fun entry(classLoader: ClassLoader) {
         WeLogger.i("TestCrash", "=== TestCrash entry() called ===")
         try {
             // 获取 Application Context
-            val activityThreadClass = loadClass("android.app.ActivityThread")
+            val activityThreadClass = "android.app.ActivityThread".toClass()
             val currentApplicationMethod = activityThreadClass.getMethod("currentApplication")
             appContext = currentApplicationMethod.invoke(null) as? Context
 

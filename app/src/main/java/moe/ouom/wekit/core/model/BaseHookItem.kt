@@ -8,7 +8,7 @@ import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import moe.ouom.wekit.config.WeConfig
 import moe.ouom.wekit.constants.Constants
-import moe.ouom.wekit.hooks.core.factory._ExceptionFactory
+import moe.ouom.wekit.hooks.core.factory.ExceptionFactory
 import moe.ouom.wekit.loader.startup.HybridClassLoader
 import moe.ouom.wekit.utils.log.WeLogger
 import java.lang.reflect.Member
@@ -40,12 +40,6 @@ abstract class BaseHookItem {
         private set
 
     /**
-     * 获取简单类名
-     */
-    val simpleName: String
-        get() = this::class.java.simpleName
-
-    /**
      * 获取功能项名称（路径的最后一部分）
      */
     val itemName: String
@@ -72,7 +66,7 @@ abstract class BaseHookItem {
      * 开始加载 Hook
      */
     fun startLoad() {
-        val config = WeConfig.getDefaultConfig()
+        val config = WeConfig.defaultConfig
         val verboseLog = config.getBooleanOrFalse(Constants.VERBOSE_LOG_PREF_KEY)
 
         if (verboseLog) {
@@ -103,7 +97,7 @@ abstract class BaseHookItem {
             }
         } catch (e: Throwable) {
             WeLogger.e("BaseHookItem Load Failed", e)
-            _ExceptionFactory.add(this, e)
+            ExceptionFactory.add(this, e)
         }
     }
 
@@ -123,7 +117,7 @@ abstract class BaseHookItem {
      * 卸载 Hook
      */
     open fun unload(classLoader: ClassLoader) {
-        val config = WeConfig.getDefaultConfig()
+        val config = WeConfig.defaultConfig
         val verboseLog = config.getBooleanOrFalse(Constants.VERBOSE_LOG_PREF_KEY)
 
         if (verboseLog) {
@@ -495,7 +489,7 @@ abstract class BaseHookItem {
             try {
                 hookAction.call(param)
             } catch (throwable: Throwable) {
-                _ExceptionFactory.add(this, throwable)
+                ExceptionFactory.add(this, throwable)
             }
         }
     }

@@ -53,12 +53,12 @@ object CheckAbiVariantModel {
     }
 
     fun setPackageIgnored(packageName: String, ignored: Boolean) {
-        val cfg = WeConfig.getDefaultConfig()
+        val cfg = WeConfig.defaultConfig
         cfg.putBoolean("native_lib_abi_ignore.$packageName", ignored)
     }
 
     fun isPackageIgnored(packageName: String): Boolean {
-        val cfg = WeConfig.getDefaultConfig()
+        val cfg = WeConfig.defaultConfig
         return cfg.getBoolean("native_lib_abi_ignore.$packageName", false)
     }
 

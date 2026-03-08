@@ -25,8 +25,11 @@ import java.lang.reflect.Constructor
  * UPDATE LOG:
  * 2025.1.19 - 移除了 Theme.setTo(baseTheme)，防止宿主资源 ID 污染模块 Theme
  * - 代理 getAssets() 以确保资源加载链路完整
+ *
+ * NOTE: showComposeDialog 会自动使用本类
  */
 class CommonContextWrapper(base: Context?, themeResId: Int) : ContextWrapper(base) {
+
     private val mTheme: Resources.Theme
     private var mInflater: LayoutInflater? = null
     private val mResources: Resources
@@ -44,20 +47,13 @@ class CommonContextWrapper(base: Context?, themeResId: Int) : ContextWrapper(bas
             this.mTheme.applyStyle(themeResId, true)
         } else {
             // 尝试自动获取默认 Theme
-            val defaultTheme = getResourceIdSafe("Theme.WeKit", "style")
+            val defaultTheme = runCatching {
+                ModuleRes.getId("Theme.WeKit", "style") }.getOrDefault(0)
             if (defaultTheme != 0) {
                 this.mTheme.applyStyle(defaultTheme, true)
             } else {
                 WeLogger.w("CommonContextWrapper: Theme.WeKit not found!")
             }
-        }
-    }
-
-    private fun getResourceIdSafe(name: String?, type: String?): Int {
-        return try {
-            ModuleRes.getId(name, type)
-        } catch (_: Throwable) {
-            0
         }
     }
 

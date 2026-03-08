@@ -1,169 +1,146 @@
-package moe.ouom.wekit.config;
+package moe.ouom.wekit.config
 
-import android.content.SharedPreferences;
+import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import moe.ouom.wekit.constants.Constants
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+abstract class WeConfig protected constructor() : SharedPreferences, SharedPreferences.Editor {
 
-import java.io.File;
-import java.util.Map;
-import java.util.Set;
-
-import moe.ouom.wekit.constants.Constants;
-
-public abstract class WeConfig implements SharedPreferences, SharedPreferences.Editor {
-
-    private static WeConfig sDefConfig;
-
-    protected WeConfig() {
-    }
-
-    @NonNull
-    public static synchronized WeConfig getDefaultConfig() {
-        if (sDefConfig == null) {
-            sDefConfig = new MmkvConfigManagerImpl("global_config");
-        }
-        return sDefConfig;
-    }
-
-    public static void dPutBoolean(@NonNull String key, Boolean b) {
-        getDefaultConfig().edit().putBoolean(key, b).apply();
-    }
-
-    public static void dPutString(@NonNull String key, String s) {
-        getDefaultConfig().edit().putString(key, s).apply();
-    }
-
-    public static void dPutInt(@NonNull String key, int i) {
-        getDefaultConfig().edit().putInt(key, i).apply();
-    }
-
-    public static boolean dGetBoolean(@NonNull String key) {
-        return getDefaultConfig().getBooleanOrFalse(key);
-    }
-
-    public static boolean dGetBooleanDefTrue(@NonNull String key) {
-        return getDefaultConfig().getBooleanOrDefault(key, true);
-    }
-
-    public static String dGetString(@NonNull String key, String d) {
-        return getDefaultConfig().getStringOrDefault(key, d);
-    }
-
-    public static int dGetInt(@NonNull String key, int d) {
-        return getDefaultConfig().getIntOrDefault(key, d);
-    }
-
-    @Nullable
-    public abstract File getFile();
-
-    @Nullable
-    public Object getOrDefault(@NonNull String key, @Nullable Object def) {
+    fun getOrDefault(key: String, def: Any?): Any? {
         if (!containsKey(key)) {
-            return def;
+            return def
         }
-        return getObject(key);
+        return getObject(key)
     }
 
-    public boolean getBooleanOrFalse(@NonNull String key) {
-        return getBooleanOrDefault(key, false);
+    fun getBooleanOrFalse(key: String): Boolean {
+        return getBooleanOrDefault(key, false)
     }
 
-    public boolean getBoolPref(@NonNull String key) {
-        return getBooleanOrDefault(Constants.PREF_KEY_PREFIX + key, false);
+    fun getBoolPref(key: String): Boolean {
+        return getBooleanOrDefault(Constants.PREF_KEY_PREFIX + key, false)
     }
 
-    public String getStringPref(@NonNull String key, @Nullable String def) {
-        return getString(Constants.PREF_KEY_PREFIX + key, def);
+    @OptIn(ExperimentalContracts::class)
+    fun getStringPref(key: String, def: String?): String? {
+        contract {
+            returnsNotNull() implies (def != null)
+        }
+
+        return getString(Constants.PREF_KEY_PREFIX + key, def)
     }
 
-    public int getIntPrek(@NonNull String key, int def) {
-        return getInt(Constants.PREF_KEY_PREFIX + key, def);
+    fun getIntPrek(key: String, def: Int): Int {
+        return getInt(Constants.PREF_KEY_PREFIX + key, def)
     }
 
-    public long getLongPrek(@NonNull String key, long def) {
-        return getLong(Constants.PREF_KEY_PREFIX + key, def);
+    fun getLongPrek(key: String, def: Long): Long {
+        return getLong(Constants.PREF_KEY_PREFIX + key, def)
     }
 
-    public boolean getBooleanOrDefault(@NonNull String key, boolean def) {
-        return getBoolean(key, def);
+    fun getBooleanOrDefault(key: String, def: Boolean): Boolean {
+        return getBoolean(key, def)
     }
 
-    public int getIntOrDefault(@NonNull String key, int def) {
-        return getInt(key, def);
+    fun getIntOrDefault(key: String, def: Int): Int {
+        return getInt(key, def)
     }
 
 
-    @Nullable
-    public abstract String getString(@NonNull String key);
+    abstract fun getString(key: String): String?
 
-    @NonNull
-    public String getStringOrDefault(@NonNull String key, @NonNull String defVal) {
-        return getString(key, defVal);
+    fun getStringOrDefault(key: String, defVal: String): String {
+        return getString(key, defVal)!!
     }
 
-    @NonNull
-    public Set<String> getStringSetOrDefault(@NonNull String key, @NonNull Set<String> defVal) {
-        return getStringSet(key, defVal);
+    fun getStringSetOrDefault(key: String, defVal: MutableSet<String?>): MutableSet<String?> {
+        return getStringSet(key, defVal)!!
     }
 
-    @Nullable
-    public abstract Object getObject(@NonNull String key);
+    abstract fun getObject(key: String): Any?
 
-    @Nullable
-    public byte[] getBytes(@NonNull String key) {
-        return getBytes(key, null);
+    fun getBytes(key: String): ByteArray? {
+        return getBytes(key, null)
     }
 
-    @Nullable
-    public abstract byte[] getBytes(@NonNull String key, @Nullable byte[] defValue);
+    abstract fun getBytes(key: String, defValue: ByteArray?): ByteArray?
 
-    @NonNull
-    public abstract byte[] getBytesOrDefault(@NonNull String key, @NonNull byte[] defValue);
+    abstract fun getBytesOrDefault(key: String, defValue: ByteArray): ByteArray
 
-    public abstract void putBytes(@NonNull String key, @NonNull byte[] value);
+    abstract fun putBytes(key: String, value: ByteArray)
 
-    /**
-     * @return READ-ONLY all config
-     * @deprecated Avoid use getAll(), MMKV only have limited support for this.
-     */
-    @Override
-    @Deprecated
-    @NonNull
-    public abstract Map<String, ?> getAll();
+    abstract fun save()
 
-    public abstract void save();
-
-    public long getLongOrDefault(@Nullable String key, long i) {
-        return getLong(key, i);
+    fun getLongOrDefault(key: String?, i: Long): Long {
+        return getLong(key, i)
     }
 
-    @NonNull
-    public abstract WeConfig putObject(@NonNull String key, @NonNull Object v);
+    abstract fun putObject(key: String, v: Any): WeConfig
 
-    public boolean containsKey(@NonNull String k) {
-        return contains(k);
+    fun containsKey(k: String): Boolean {
+        return contains(k)
     }
 
-    @NonNull
-    @Override
-    public Editor edit() {
-        return this;
+    override fun edit(): SharedPreferences.Editor {
+        return this
     }
 
-    @Override
-    public void registerOnSharedPreferenceChangeListener(
-            @NonNull OnSharedPreferenceChangeListener listener) {
-        throw new UnsupportedOperationException("not implemented");
+    override fun registerOnSharedPreferenceChangeListener(
+        listener: OnSharedPreferenceChangeListener
+    ): Unit = TODO()
+
+    override fun unregisterOnSharedPreferenceChangeListener(
+        listener: OnSharedPreferenceChangeListener
+    ): Unit = TODO()
+
+    abstract val isReadOnly: Boolean
+
+    abstract val isPersistent: Boolean
+
+    companion object {
+        const val PREFS_NAME = "wekit_prefs"
+        const val CACHE_PREFS_NAME = "wekit_cache"
+
+        private var sDefConfig: WeConfig? = null
+
+        @JvmStatic
+        @get:Synchronized
+        val defaultConfig: WeConfig
+            get() {
+                if (sDefConfig == null) {
+                    sDefConfig = MmkvConfigManagerImpl(PREFS_NAME)
+                }
+                return sDefConfig!!
+            }
+
+        fun dPutBoolean(key: String, b: Boolean) {
+            defaultConfig.edit().putBoolean(key, b).apply()
+        }
+
+        fun dPutString(key: String, s: String?) {
+            defaultConfig.edit().putString(key, s).apply()
+        }
+
+        fun dPutInt(key: String, i: Int) {
+            defaultConfig.edit().putInt(key, i).apply()
+        }
+
+        fun dGetBoolean(key: String): Boolean {
+            return defaultConfig.getBooleanOrFalse(key)
+        }
+
+        fun dGetBooleanDefTrue(key: String): Boolean {
+            return defaultConfig.getBooleanOrDefault(key, true)
+        }
+
+        fun dGetString(key: String, d: String): String {
+            return defaultConfig.getStringOrDefault(key, d)
+        }
+
+        fun dGetInt(key: String, d: Int): Int {
+            return defaultConfig.getIntOrDefault(key, d)
+        }
     }
-
-    @Override
-    public void unregisterOnSharedPreferenceChangeListener(
-            @NonNull OnSharedPreferenceChangeListener listener) {
-        throw new UnsupportedOperationException("not implemented");
-    }
-
-    public abstract boolean isReadOnly();
-
-    public abstract boolean isPersistent();
 }

@@ -192,9 +192,9 @@ object JsScriptingHook : BaseClickableFunctionHookItem(),
         try {
             val data = WeProtoData()
             data.fromBytes(reqBytes)
-            val json = data.toJSON()
+            val json = data.toJsonObject()
             val modifiedJson = JsEngine.executeAllOnRequest(uri, cgiId, json)
-            data.applyViewJSON(modifiedJson, true)
+            data.applyViewJson(modifiedJson, true)
             return data.toPacketBytes()
         } catch (e: Exception) {
             WeLogger.e(TAG, e)
@@ -214,9 +214,9 @@ object JsScriptingHook : BaseClickableFunctionHookItem(),
         try {
             val data = WeProtoData()
             data.fromBytes(respBytes)
-            val json = data.toJSON()
+            val json = data.toJsonObject()
             val modifiedJson = JsEngine.executeAllOnResponse(uri, cgiId, json)
-            data.applyViewJSON(modifiedJson, true)
+            data.applyViewJson(modifiedJson, true)
             return data.toPacketBytes()
         } catch (e: Exception) {
             WeLogger.e(TAG, e)

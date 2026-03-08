@@ -9,6 +9,7 @@ import com.tencent.mmkv.MMKV;
 
 import java.io.File;
 
+import moe.ouom.wekit.config.WeConfig;
 import moe.ouom.wekit.host.HostInfo;
 import moe.ouom.wekit.utils.log.WeLogger;
 
@@ -85,8 +86,8 @@ public class NativeCoreBridge {
         WeLogger.i("MMKV initialized at: " + initializedPath);
 
         // 创建必要的 MMKV 实例
-        MMKV.mmkvWithID("global_config", MMKV.MULTI_PROCESS_MODE);
-        MMKV.mmkvWithID("global_cache", MMKV.MULTI_PROCESS_MODE);
+        MMKV.mmkvWithID(WeConfig.PREFS_NAME, MMKV.MULTI_PROCESS_MODE);
+        MMKV.mmkvWithID(WeConfig.CACHE_PREFS_NAME, MMKV.MULTI_PROCESS_MODE);
 
         setNativeCoreInitialized(true);
         WeLogger.i("NativeCoreBridge initialization complete");

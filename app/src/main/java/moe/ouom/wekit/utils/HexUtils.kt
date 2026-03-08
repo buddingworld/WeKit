@@ -10,11 +10,11 @@ object HexUtils {
     fun hexToBytes(src: String?): ByteArray? {
         if (src.isNullOrEmpty()) return null
 
-        // 1. 清洗空白字符 (对应 Hutool 的 cleanBlank)
+        // 1. 清洗空白字符
         val cleaned = src.filterNot { isBlankChar(it.code) }
         if (cleaned.isEmpty()) return null
 
-        // 2. 处理奇数长度 (对应 Hutool 的逻辑)
+        // 2. 处理奇数长度
         var finalHex = cleaned
         if ((finalHex.length and 0x01) != 0) {
             finalHex = "0$finalHex"

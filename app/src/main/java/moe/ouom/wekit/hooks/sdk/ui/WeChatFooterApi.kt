@@ -4,13 +4,13 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
+import com.highcapable.kavaref.extension.toClass
 import de.robv.android.xposed.XposedHelpers
 import dev.ujhhgtg.nameof.nameof
 import moe.ouom.wekit.core.model.ApiHookItem
 import moe.ouom.wekit.hooks.core.annotation.HookItem
 import moe.ouom.wekit.hooks.items.chat.SendCustomAppMessage
 import moe.ouom.wekit.hooks.sdk.base.WeMessageApi
-import moe.ouom.wekit.utils.Initiator.loadClass
 import moe.ouom.wekit.utils.common.ToastUtils
 import moe.ouom.wekit.utils.log.WeLogger
 
@@ -23,7 +23,7 @@ object WeChatFooterApi : ApiHookItem() {
 
     override fun entry(classLoader: ClassLoader) {
         try {
-            val chatFooterClass = loadClass(CLASS_CHAT_FOOTER)
+            val chatFooterClass = CLASS_CHAT_FOOTER.toClass()
 
             hookAfter(
                 chatFooterClass,

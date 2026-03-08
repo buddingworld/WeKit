@@ -12,7 +12,6 @@ import moe.ouom.wekit.constants.WeChatVersion
 import moe.ouom.wekit.core.model.ApiHookItem
 import moe.ouom.wekit.hooks.core.annotation.HookItem
 import moe.ouom.wekit.host.HostInfo
-import moe.ouom.wekit.utils.Initiator.loadClass
 import moe.ouom.wekit.utils.log.WeLogger
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -98,7 +97,7 @@ object WeDatabaseListenerApi : ApiHookItem() {
     // ==================== 私有辅助方法 ====================
 
     private fun shouldLogDatabase(): Boolean {
-        val config = WeConfig.getDefaultConfig()
+        val config = WeConfig.defaultConfig
         return config.getBooleanOrFalse(Constants.VERBOSE_LOG_PREF_KEY) &&
                 config.getBooleanOrFalse(Constants.DB_VERBOSE_LOG_PREF_KEY)
     }
@@ -263,10 +262,10 @@ object WeDatabaseListenerApi : ApiHookItem() {
     }
 
     private fun hookOldQueryMethod() {
-        val clsSQLite = loadClass(DB_CLASS_NAME)
+        val clsSQLite = DB_CLASS_NAME.toClass()
         val cursorFactoryClass =
-            loadClass($$"com.tencent.wcdb.database.SQLiteDatabase$CursorFactory")
-        val cancellationSignalClass = loadClass("com.tencent.wcdb.support.CancellationSignal")
+            $$"com.tencent.wcdb.database.SQLiteDatabase$CursorFactory".toClass()
+        val cancellationSignalClass = "com.tencent.wcdb.support.CancellationSignal".toClass()
 
         XposedHelpers.findMethodExact(
             clsSQLite,

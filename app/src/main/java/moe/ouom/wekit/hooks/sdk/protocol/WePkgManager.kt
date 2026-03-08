@@ -20,7 +20,7 @@ object WePkgManager {
             data.fromBytes(reqBytes)
             WeLogger.logChunkedI(
                 "WePkgInterceptor-Request",
-                "Request: $uri, CGI=$cgiId, LEN=${reqBytes.size}, Data=${data.toJSON()}, Stack=${WeLogger.getStackTraceString()}"
+                "Request: $uri, CGI=$cgiId, LEN=${reqBytes.size}, Data=${data.toJsonObject()}, Stack=${WeLogger.getStackTraceString()}"
             )
         }
 
@@ -37,7 +37,7 @@ object WePkgManager {
             data.fromBytes(respBytes)
             WeLogger.logChunkedI(
                 "WePkgInterceptor-Response",
-                "Received: $uri, CGI=$cgiId, LEN=${respBytes.size}, Data=${data.toJSON()}"
+                "Received: $uri, CGI=$cgiId, LEN=${respBytes.size}, Data=${data.toJsonObject()}"
             )
         }
         for (listener in listeners) {

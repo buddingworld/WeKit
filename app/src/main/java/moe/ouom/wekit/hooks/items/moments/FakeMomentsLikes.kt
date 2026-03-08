@@ -12,7 +12,6 @@ import moe.ouom.wekit.hooks.sdk.base.WeDatabaseApi
 import moe.ouom.wekit.hooks.sdk.base.WeDatabaseListenerApi
 import moe.ouom.wekit.hooks.sdk.ui.WeMomentsContextMenuApi
 import moe.ouom.wekit.ui.utils.CommonContextWrapper
-import moe.ouom.wekit.utils.Initiator.loadClass
 import moe.ouom.wekit.utils.common.ModuleRes
 import moe.ouom.wekit.utils.log.WeLogger
 import java.lang.reflect.Field
@@ -101,7 +100,7 @@ object FakeMomentsLikes : BaseSwitchFunctionHookItem(), WeMomentsContextMenuApi.
                 }
             }
 
-            snsUserProtobufClass = loadClass("com.tencent.mm.plugin.sns.ui.SnsCommentFooter")
+            snsUserProtobufClass = "com.tencent.mm.plugin.sns.ui.SnsCommentFooter".toClass()
                 .getMethod("getCommentInfo").returnType
 
             WeLogger.d(TAG, "反射初始化成功")

@@ -23,6 +23,7 @@ import moe.ouom.wekit.utils.common.SyncUtils;
 import moe.ouom.wekit.utils.log.WeLogger;
 
 public class WeLauncher {
+
     private static final String TAG = "WeLauncher";
 
     public void init(@NonNull ClassLoader cl, @NonNull ApplicationInfo ai, @NonNull String modulePath, Context context) {

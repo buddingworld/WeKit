@@ -77,7 +77,7 @@ object AutoOpenRedPacket : BaseClickableFunctionHookItem(), WeDatabaseListenerAp
 
     private fun handleRedPacket(values: ContentValues) {
         try {
-            val config = WeConfig.getDefaultConfig()
+            val config = WeConfig.defaultConfig
             if (values.getAsInteger("isSend") == 1 && !config.getBoolPref("red_packet_self")) return
 
             val content = values.getAsString("content") ?: return

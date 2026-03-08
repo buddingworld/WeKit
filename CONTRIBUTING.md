@@ -1755,7 +1755,7 @@ class HookQueryCashierPkg : BaseClickableFunctionHookItem(), IWePkgInterceptor {
 
     private fun processJsonObject(obj: JSONObject) {
         // 获取用户配置的余额
-        val config = WeConfig.getDefaultConfig()
+        val config = WeConfig.defaultConfig
         val customCft = config.getStringPrek(KEY_CFT_BALANCE, DEFAULT_CFT) ?: DEFAULT_CFT
         val customLqt = config.getStringPrek(KEY_LQT_BALANCE, DEFAULT_LQT) ?: DEFAULT_LQT
 

@@ -38,7 +38,7 @@ class CategorySettingsDialog(
         summary: String,
     ) {
         val configKey = "${Constants.PREF_KEY_PREFIX}${item.path}"
-        val initialChecked = WeConfig.getDefaultConfig().getBooleanOrFalse(configKey)
+        val initialChecked = WeConfig.defaultConfig.getBooleanOrFalse(configKey)
 
         rows += SettingsRow.SwitchRow(
             rowKey = nextKey("sw_${item.path}"),
@@ -49,7 +49,7 @@ class CategorySettingsDialog(
             onBeforeToggle = { checked ->
                 val allowed = item.onBeforeToggle(checked, context)
                 if (allowed) {
-                    WeConfig.getDefaultConfig().edit().putBoolean(configKey, checked).apply()
+                    WeConfig.defaultConfig.edit().putBoolean(configKey, checked).apply()
                     item.isEnabled = checked
                 }
                 allowed
@@ -70,7 +70,7 @@ class CategorySettingsDialog(
         summary: String,
     ) {
         val configKey = "${Constants.PREF_KEY_PREFIX}${item.path}"
-        val initialChecked = WeConfig.getDefaultConfig().getBooleanOrFalse(configKey)
+        val initialChecked = WeConfig.defaultConfig.getBooleanOrFalse(configKey)
 
         rows += SettingsRow.ClickableRow(
             rowKey = nextKey("cl_${item.path}"),
@@ -82,7 +82,7 @@ class CategorySettingsDialog(
             onBeforeToggle = { checked ->
                 val allowed = item.onBeforeToggle(checked, context)
                 if (allowed) {
-                    WeConfig.getDefaultConfig().edit().putBoolean(configKey, checked).apply()
+                    WeConfig.defaultConfig.edit().putBoolean(configKey, checked).apply()
                     item.isEnabled = checked
                 }
                 allowed

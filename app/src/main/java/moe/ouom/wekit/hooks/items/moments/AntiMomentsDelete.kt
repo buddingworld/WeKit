@@ -47,7 +47,6 @@ object AntiMomentsDelete : BaseSwitchFunctionHookItem(), WeDatabaseListenerApi.I
         if (sourceVal != 0) return
 
         val kindName = MomentsContentType.fromId(typeVal)?.displayName ?: "Unknown[$typeVal]"
-        WeLogger.d(TAG, "捕获删除信号 -> $kindName ($typeVal)")
 
         // 移除来源
         values.remove("sourceType")
@@ -71,7 +70,7 @@ object AntiMomentsDelete : BaseSwitchFunctionHookItem(), WeDatabaseListenerApi.I
 
     private fun appendWatermark(proto: WeProtoData, fieldNumber: Int): Boolean {
         try {
-            val json = proto.toJSON()
+            val json = proto.toJsonObject()
             val key = fieldNumber.toString()
             WeLogger.d(TAG, json.toString())
 
