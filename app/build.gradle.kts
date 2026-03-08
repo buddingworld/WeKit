@@ -85,7 +85,7 @@ configure<ApplicationExtension> {
     namespace = libs.versions.namespace.get()
     compileSdk = libs.versions.targetSdk.get().toInt()
 
-    ndkVersion = "29"
+    ndkVersion = "29.0.14206865"
 
     val commitCount = getCommitCount()
     val gitHash = getGitHash()
