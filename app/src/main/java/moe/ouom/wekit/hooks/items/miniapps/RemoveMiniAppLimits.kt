@@ -5,6 +5,7 @@ import moe.ouom.wekit.core.dsl.dexMethod
 import moe.ouom.wekit.core.model.BaseSwitchFunctionHookItem
 import moe.ouom.wekit.dexkit.intf.IDexFind
 import moe.ouom.wekit.hooks.core.annotation.HookItem
+import moe.ouom.wekit.utils.enumValueOfClass
 import org.luckypray.dexkit.DexKitBridge
 import org.luckypray.dexkit.query.enums.StringMatchType
 
@@ -16,9 +17,7 @@ object RemoveMiniAppLimits : BaseSwitchFunctionHookItem(), IDexFind {
             hook {
                 beforeIfEnabled { param ->
                     val returnType  = methodGetCopyLinkButtonState.method.returnType
-                    @Suppress("UNCHECKED_CAST")
-                    val enumClickable = java.lang.Enum.valueOf(returnType as Class<out Enum<*>?>, "SHOW_CLICKABLE")
-                    param.result = enumClickable
+                    param.result = enumValueOfClass(returnType, "SHOW_CLICKABLE")
                 }
             }
         }
