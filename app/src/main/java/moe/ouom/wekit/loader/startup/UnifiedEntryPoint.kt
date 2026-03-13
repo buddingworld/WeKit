@@ -96,7 +96,6 @@ object UnifiedEntryPoint {
                             StartupAgent.startup(
                                 modulePath,
                                 loaderService,
-                                hostClassLoader,
                                 hookBridge
                             )
                         } catch (e: Throwable) {

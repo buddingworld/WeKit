@@ -51,13 +51,11 @@ fun findNdkClang(androidHome: String, minSdk: Int, minNdk: Int = 29): String? {
         }
 }
 
-fun setCargoClang() {
+fun setCargoClang(androidHome: String) {
     val minSdk = libs.versions.minSdk.get().toInt()
     val isWindows = System.getProperty("os.name").orEmpty().contains("Windows", ignoreCase = true)
     val ext = if (isWindows) ".cmd" else ""
 
-    val androidHome = gradleLocalProperties(rootDir, providers).getProperty("sdk.dir")
-        ?: System.getenv("ANDROID_HOME")
     val clangPath = findNdkClang(androidHome, minSdk) ?: error("No NDK >= $minSdk found in $androidHome/ndk")
     logger.lifecycle("Found NDK clang: $clangPath")
 
@@ -77,12 +75,28 @@ fun setCargoClang() {
 }
 
 configure<ApplicationExtension> {
-    setCargoClang()
+    val androidHome = gradleLocalProperties(rootDir, providers).getProperty("sdk.dir")
+        ?: System.getenv("ANDROID_HOME")
+        ?: error("ANDROID_HOME / sdk.dir not set")
+    val ndkVer = libs.versions.ndk.get()
+
+    if (!File("$androidHome/ndk/$ndkVer").exists()) {
+        logger.lifecycle("NDK $ndkVer not found, installing via sdkmanager...")
+        val isWindows = System.getProperty("os.name").orEmpty().contains("Windows", ignoreCase = true)
+        val sdkmanager = "$androidHome/cmdline-tools/latest/bin/sdkmanager" + if (isWindows) ".bat" else ""
+        providers.exec { commandLine(sdkmanager, "--install", "ndk;$ndkVer") }
+        logger.lifecycle("NDK $ndkVer installed.")
+    }
+
+    if (!rootProject.file("app/src/main/rust/wekit-native/.cargo/config.toml").exists()) {
+        logger.lifecycle("Cargo config not found, configuring it...")
+        setCargoClang(androidHome)
+    }
 
     namespace = libs.versions.namespace.get()
     compileSdk = libs.versions.targetSdk.get().toInt()
 
-    ndkVersion = "29.0.14206865"
+    ndkVersion = ndkVer
 
     val commitCount = getCommitCount()
     val gitHash = getGitHash()
@@ -99,8 +113,6 @@ configure<ApplicationExtension> {
         """
     )
 
-    logger.lifecycle("git hash: $gitHash")
-
     defaultConfig {
         applicationId = libs.versions.namespace.get()
         minSdk = libs.versions.minSdk.get().toInt()
@@ -113,8 +125,7 @@ configure<ApplicationExtension> {
         buildConfigField("long", "BUILD_TIMESTAMP", "${System.currentTimeMillis()}L")
 
         ndk {
-            // noinspection ChromeOsAbiSupport
-            abiFilters += "arm64-v8a"
+            abiFilters += setOf("arm64-v8a", "x86_64")
         }
     }
 

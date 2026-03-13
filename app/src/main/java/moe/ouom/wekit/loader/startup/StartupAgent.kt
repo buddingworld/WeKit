@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
 import moe.ouom.wekit.BuildConfig
 import moe.ouom.wekit.loader.hookapi.IHookBridge
@@ -16,12 +17,12 @@ import java.lang.reflect.Field
 object StartupAgent {
 
     private val TAG = nameof(StartupAgent)
+
     private var sInitialized = false
 
     fun startup(
         modulePath: String,
         loaderService: ILoaderService,
-        hostClassLoader: ClassLoader,
         hookBridge: IHookBridge?
     ) {
         if (sInitialized) {
@@ -30,12 +31,12 @@ object StartupAgent {
         }
         sInitialized = true
 
-        if (System.getProperty(StartupAgent::class.java.name) == "true") {
+        if (System.getProperty(TAG) == "true") {
             WeLogger.e(TAG, "WeKit reloaded??")
             return
         }
 
-        System.setProperty(StartupAgent::class.java.name, "true")
+        System.setProperty(TAG, "true")
         StartupInfo.setModulePath(modulePath)
         StartupInfo.setLoaderService(loaderService)
         StartupInfo.setHookBridge(hookBridge)
@@ -43,7 +44,7 @@ object StartupAgent {
 
         ensureHiddenApiAccess()
         checkWriteXorExecuteForModulePath(modulePath)
-        val ctx = getBaseApplication(hostClassLoader)
+        val ctx = getBaseApplication()
 
         StartupHook.initializeAfterAppCreate(ctx)
     }
@@ -56,9 +57,9 @@ object StartupAgent {
         }
     }
 
-    fun getBaseApplication(classLoader: ClassLoader): Context {
+    fun getBaseApplication(): Context {
         try {
-            val tinkerAppClz = classLoader.loadClass("com.tencent.tinker.loader.app.TinkerApplication")
+            val tinkerAppClz = "com.tencent.tinker.loader.app.TinkerApplication".toClass()
             val getInstanceMethod = tinkerAppClz.getMethod("getInstance")
             val app = getInstanceMethod.invoke(null) as? Context
             if (app != null) return app
@@ -68,7 +69,7 @@ object StartupAgent {
 
         try {
             @SuppressLint("PrivateApi")
-            val activityThreadClz = classLoader.loadClass("android.app.ActivityThread")
+            val activityThreadClz = "android.app.ActivityThread".toClass()
             @SuppressLint("DiscouragedPrivateApi")
             val currentAppMethod = activityThreadClz.getDeclaredMethod("currentApplication")
             currentAppMethod.isAccessible = true
@@ -83,7 +84,7 @@ object StartupAgent {
 
     @SuppressLint("ObsoleteSdkInt")
     private fun ensureHiddenApiAccess() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && !isHiddenApiAccessible()) {
+        if (!isHiddenApiAccessible()) {
             Log.w(BuildConfig.TAG, "Hidden API access not accessible, SDK_INT is ${Build.VERSION.SDK_INT}")
             HiddenApiBypass.setHiddenApiExemptions("L")
         }

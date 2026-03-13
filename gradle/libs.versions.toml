@@ -7,6 +7,8 @@ minSdk = "29"
 targetSdk = "36"
 # noinspection UnusedVersionCatalogEntry
 jdk = "21"
+# noinspection UnusedVersionCatalogEntry
+ndk = "29.0.14206865"
 
 agp = "9.0.1"
 composeBom = "2026.02.01"
