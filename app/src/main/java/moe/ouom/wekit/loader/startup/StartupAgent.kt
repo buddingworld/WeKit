@@ -1,17 +1,23 @@
 package moe.ouom.wekit.loader.startup
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.util.Log
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
 import moe.ouom.wekit.BuildConfig
-import moe.ouom.wekit.loader.hookapi.ILoaderService
+import moe.ouom.wekit.loader.abs.ILoaderService
+import moe.ouom.wekit.loader.utils.LibXposedApiByteCodeGenerator
+import moe.ouom.wekit.loader.utils.NativeLoader
+import moe.ouom.wekit.utils.HostInfo
 import moe.ouom.wekit.utils.logging.WeLogger
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import java.io.File
 import java.lang.reflect.Field
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.deleteRecursively
 
 object StartupAgent {
 
@@ -42,7 +48,31 @@ object StartupAgent {
         checkWriteXorExecuteForModulePath(modulePath)
         val ctx = getBaseApplication()
 
-        StartupHook.initializeAfterAppCreate(ctx)
+        initializeAfterAppCreate(ctx)
+    }
+
+    @OptIn(ExperimentalPathApi::class)
+    fun initializeAfterAppCreate(ctx: Context) {
+        HostInfo.init(ctx as Application)
+        LibXposedApiByteCodeGenerator.init()
+        NativeLoader.initNative()
+        WeLauncher.init(ctx.classLoader, ctx)
+        runCatching {
+            ctx.dataDir.toPath().resolve("app_qqprotect").deleteRecursively()
+        }.onFailure(::logError)
+    }
+
+    private fun logError(th: Throwable) {
+        val msg = Log.getStackTraceString(th)
+        Log.e(BuildConfig.TAG, msg)
+        runCatching {
+            StartupInfo.getLoaderService().log(th)
+        }.onFailure {
+            if (it is NoClassDefFoundError || it is NullPointerException) {
+                Log.e("Xposed", msg)
+                Log.e("EdXposed-Bridge", msg)
+            } else throw it
+        }
     }
 
     private fun checkWriteXorExecuteForModulePath(modulePath: String) {

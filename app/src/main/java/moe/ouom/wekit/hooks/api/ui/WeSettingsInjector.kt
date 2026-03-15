@@ -11,6 +11,7 @@ import com.highcapable.kavaref.extension.toClassOrNull
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
 import dev.ujhhgtg.nameof.nameof
+import moe.ouom.wekit.BuildConfig
 import moe.ouom.wekit.core.dsl.dexMethod
 import moe.ouom.wekit.core.model.ApiHookItem
 import moe.ouom.wekit.dexkit.DexMethodDescriptor
@@ -240,7 +241,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
                         )
                         superclass()
                     }
-                    .invoke(0, "WeKit", SettingsMenuItemClickListener(activity))
+                    .invoke(0, BuildConfig.TAG, SettingsMenuItemClickListener(activity))
             }
         }
     }

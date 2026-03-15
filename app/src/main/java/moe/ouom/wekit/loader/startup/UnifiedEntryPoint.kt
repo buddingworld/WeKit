@@ -7,7 +7,7 @@ import com.highcapable.kavaref.extension.toClass
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
 import dev.ujhhgtg.nameof.nameof
-import moe.ouom.wekit.loader.hookapi.ILoaderService
+import moe.ouom.wekit.loader.abs.ILoaderService
 import moe.ouom.wekit.utils.logging.WeLogger
 
 object UnifiedEntryPoint {
@@ -15,9 +15,9 @@ object UnifiedEntryPoint {
     private val TAG = nameof(UnifiedEntryPoint)
 
     fun entry(
-        modulePath: String,
         loaderService: ILoaderService,
-        hostClassLoader: ClassLoader
+        hostClassLoader: ClassLoader,
+        modulePath: String
     ) {
         ClassLoaderProvider.classLoader = hostClassLoader
 

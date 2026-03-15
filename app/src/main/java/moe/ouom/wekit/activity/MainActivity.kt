@@ -164,7 +164,7 @@ class MainActivity : ComponentActivity() {
                     title = {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "WeKit",
+                                text = BuildConfig.TAG,
                                 style = MaterialTheme.typography.titleLarge
                             )
                             Text(

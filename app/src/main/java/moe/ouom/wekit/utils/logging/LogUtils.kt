@@ -2,7 +2,7 @@ package moe.ouom.wekit.utils.logging
 
 import de.robv.android.xposed.XposedBridge
 import moe.ouom.wekit.constants.PreferenceKeys
-import moe.ouom.wekit.loader.core.NativeLoader
+import moe.ouom.wekit.loader.utils.NativeLoader
 import moe.ouom.wekit.preferences.WePrefs
 import moe.ouom.wekit.utils.formatEpoch
 import moe.ouom.wekit.utils.PathUtils

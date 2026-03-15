@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
-import moe.ouom.wekit.loader.hookapi.ILoaderService;
+import moe.ouom.wekit.loader.abs.ILoaderService;
 
 
 public class StartupInfo {

@@ -3,8 +3,8 @@ package moe.ouom.wekit.application
 import android.app.Application
 import android.util.Log
 import moe.ouom.wekit.BuildConfig
-import moe.ouom.wekit.loader.hookapi.IClassLoaderHelper
-import moe.ouom.wekit.loader.hookapi.ILoaderService
+import moe.ouom.wekit.loader.abs.IClassLoaderHelper
+import moe.ouom.wekit.loader.abs.ILoaderService
 import moe.ouom.wekit.loader.startup.StartupInfo
 import moe.ouom.wekit.utils.HostInfo
 
@@ -20,15 +20,15 @@ class ModuleApplication : Application() {
         val apkPath = applicationInfo.sourceDir
 
         val loaderService = object : ILoaderService {
-            private var classLoaderHelper: IClassLoaderHelper? = null
-
+            override var classLoaderHelper: IClassLoaderHelper? = null
+            override val entryPointName: String = "Module"
+            override val loaderVersionName: String = BuildConfig.VERSION_NAME
+            override val loaderVersionCode: Int = BuildConfig.VERSION_CODE
+            override val mainModulePath: String = apkPath
             override fun log(msg: String) = Log.i(BuildConfig.TAG, msg).let {}
-            override fun log(tr: Throwable) = Log.e("ovom", tr.toString(), tr).let {}
+            override fun log(tr: Throwable) = Log.e(BuildConfig.TAG, tr.toString(), tr).let {}
             override fun queryExtension(key: String, vararg args: Any?) = null
-            override fun getClassLoaderHelper() = classLoaderHelper
-            override fun setClassLoaderHelper(helper: IClassLoaderHelper?) {
-                classLoaderHelper = helper
-            }
+
         }
 
         StartupInfo.setModulePath(apkPath)

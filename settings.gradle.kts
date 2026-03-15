@@ -53,4 +53,10 @@ rootProject.name = "wekit"
 
 includeBuild("build-logic")
 
-include(":app", ":libs:common:annotation-scanner", ":libs:external:nameof-kt:plugin", ":libs:external:nameof-kt:api")
+include(":app",
+    ":libs:common:annotation-scanner",
+    ":libs:external:nameof-kt:plugin",
+    ":libs:external:nameof-kt:api",
+    ":libs:common:libxposed-api",
+    ":libs:common:libxposed-service"
+)

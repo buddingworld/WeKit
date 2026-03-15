@@ -37,7 +37,7 @@ import moe.ouom.wekit.constants.PreferenceKeys
 import moe.ouom.wekit.ui.utils.showComposeDialog
 import moe.ouom.wekit.utils.formatEpoch
 
-class MainSettingsDialog(context: Context) : BasePrefDialog(context, "WeKit") {
+class MainSettingsDialog(context: Context) : BasePrefDialog(context, BuildConfig.TAG) {
 
     private fun openUrl(context: Context, url: String) {
         val intent = Intent(Intent.ACTION_VIEW)

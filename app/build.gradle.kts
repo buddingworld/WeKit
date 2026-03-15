@@ -1,4 +1,3 @@
-
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
@@ -347,12 +346,9 @@ dependencies {
     implementation(libs.silkdecoder)
 
     compileOnly(libs.legacyxposed.api)
-    compileOnly(libs.libxposed.api)
-    // 哪个智障发明的 Gradle
-    // 不是他 libxposed AndroidManifest package 定义冲突就冲突关你屁事啊
-    // 要你管吗
-    // FIXME: change this when libxposed is published to maven
-    implementation(files("../files/libxposed-service-interfaces-classes.jar"))
+    compileOnly(project(":libs:common:libxposed-api"))
+    implementation(project(":libs:common:libxposed-service"))
+    // TODO: change this when libxposed is published to maven
     implementation(libs.libxposed.service) {
         exclude(group = "com.github.libxposed.service", module = "interface")
     }

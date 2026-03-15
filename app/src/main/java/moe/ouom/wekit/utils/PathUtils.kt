@@ -1,6 +1,7 @@
 package moe.ouom.wekit.utils
 
 import android.os.Environment
+import moe.ouom.wekit.BuildConfig
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectories
@@ -14,7 +15,7 @@ object PathUtils {
         get() {
             try {
                 val directory =
-                    storageDirectory / "Android" / "data" / HostInfo.packageName / "files" / "WeKit"
+                    storageDirectory / "Android" / "data" / HostInfo.packageName / "files" / BuildConfig.TAG
                 directory.createDirectories()
                 return directory
             } catch (_: Exception) {

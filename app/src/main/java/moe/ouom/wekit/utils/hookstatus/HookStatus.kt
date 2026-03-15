@@ -6,7 +6,7 @@ import io.github.libxposed.service.XposedServiceHelper
 import io.github.libxposed.service.XposedServiceHelper.OnServiceListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import moe.ouom.wekit.BuildConfig
-import moe.ouom.wekit.loader.LoaderExtensionHelper
+import moe.ouom.wekit.utils.hookstatus.LoaderExtensionHelper
 import java.io.File
 
 /**

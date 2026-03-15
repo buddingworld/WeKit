@@ -9,6 +9,7 @@
 -keep class moe.ouom.wekit.core.model.ApiHookItem { *; }
 -keep class moe.ouom.wekit.core.model.BaseHookItem { *; }
 -keep class moe.ouom.wekit.hooks.items.scripting_kts.** { *; }
+-keep class moe.ouom.wekit.loader.** { *; }
 
 # Attributes
 -keepattributes Signature,RuntimeVisibleAnnotations,AnnotationDefault,LineNumberTable,SourceFile,*Annotation*

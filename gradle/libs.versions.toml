@@ -1,7 +1,5 @@
 [versions]
 # noinspection UnusedVersionCatalogEntry
-gif = "1.2.31"
-svg = "1.4"
 namespace = "moe.ouom.wekit"
 # noinspection UnusedVersionCatalogEntry
 minSdk = "29"
@@ -41,7 +39,7 @@ hiddenApiBypass = "6.1"
 runtime = "1.10.5"
 composeMaterial3 = "1.5.0-alpha15"
 libsu = "5.2.2"
-libxposed = "master-SNAPSHOT"
+libxposed = "rfc-SNAPSHOT"
 dexlib2 = "2.5.2"
 silkdecoder = "master-SNAPSHOT"
 aboutlibraries = "14.0.0-b02"
@@ -51,10 +49,14 @@ browser = "1.9.0"
 kyant0-backdrop = "2.0.0-alpha03"
 kyant0-shapes = "1.2.0"
 markwon = "4.6.2"
+annotation = "1.9.1"
+gif = "1.2.31"
+svg = "1.4"
 
 [libraries]
 android-tools = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanist" }
+androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "composeMaterial3" }
@@ -108,7 +110,6 @@ hiddenApiBypass = { module = "org.lsposed.hiddenapibypass:hiddenapibypass", vers
 kavaref-core = { module = "com.highcapable.kavaref:kavaref-core", version.ref = "kavaref" }
 kavaref-extension = { module = "com.highcapable.kavaref:kavaref-extension", version.ref = "kavaref" }
 libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsu" }
-libxposed-api = { module = "com.github.libxposed:api", version.ref = "libxposed" }
 libxposed-service = { module = "com.github.libxposed:service", version.ref = "libxposed" }
 
 rhino-android = { module = "io.apisense:rhino-android", version.ref = "rhino" }
