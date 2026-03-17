@@ -1,4 +1,4 @@
-# Module
+# App
 -keep class **.R$* { *; }
 -keep interface moe.ouom.wekit.dexkit.intf.IResolvesDex { *; }
 -keep class * implements moe.ouom.wekit.dexkit.intf.IResolvesDex {
@@ -37,6 +37,16 @@
     public static com.tencent.mmkv.MMKV defaultMMKV();
 }
 
+# Ktor
+-keep class io.ktor.** { *; }
+-keep class io.netty.** { *; }
+
 # Suppress warnings
 -dontwarn java.lang.reflect.AnnotatedType
 -dontwarn java.beans.**
+-dontwarn io.netty.internal.tcnative.**
+-dontwarn jdk.jfr.**
+-dontwarn org.apache.log4j.**
+-dontwarn org.apache.logging.log4j.**
+-dontwarn java.lang.management.**
+-dontwarn reactor.blockhound.**
