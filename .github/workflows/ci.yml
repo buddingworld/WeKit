@@ -106,32 +106,32 @@ jobs:
           
           apks=(artifacts/*.apk)
           
-          if [ ${#apks[@]} -eq 1 ]; then
-            # Single APK — use sendDocument (supports caption)
-            curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendDocument" \
-              -F chat_id="${CHAT_ID}" \
-              -F document=@"${apks[0]}" \
-              -F caption="${caption}" \
-              -F parse_mode=Markdown
-          else
-            # Multiple APKs — use sendMediaGroup
-            # Caption only applies to the first item in the group
-            media_json="["
-            form_args=()
-            for i in "${!apks[@]}"; do
-              apk="${apks[$i]}"
-              name="apk${i}"
-              form_args+=(-F "${name}=@${apk}")
-              if [ $i -eq 0 ]; then
-                media_json+="{\"type\":\"document\",\"media\":\"attach://${name}\",\"caption\":\"${caption}\",\"parse_mode\":\"Markdown\"}"
-              else
-                media_json+=",{\"type\":\"document\",\"media\":\"attach://${name}\"}"
-              fi
-            done
-            media_json+="]"
-          
-            curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup" \
-              -F chat_id="${CHAT_ID}" \
-              -F media="${media_json}" \
-              "${form_args[@]}"
-          fi
+          media_json=$(python3 -c "
+          import json, os, sys
+          caption = '''${{ github.event.head_commit.message || 'Manual Build' }}'''
+          sha = os.environ['SHA']
+          author = os.environ['COMMIT_AUTHOR']
+          repo = os.environ['REPO']
+          apks = sys.argv[1:]
+          caption_text = (
+          '🎉 *检测到新的 GitHub 推送！*\n'
+          f'*Commit SHA:* \`{sha}\`\n'
+          f'\`\`\`\n{caption}\n\`\`\`\n'
+          f'*提交者* \`{author}\`\n'
+          f'[查看详情](https://github.com/{repo}/commit/{sha})'
+          )
+          media = []
+          for i, apk in enumerate(apks):
+            name = f'apk{i}'
+            item = {'type': 'document', 'media': f'attach://{name}'}
+            if i == 0:
+              item['caption'] = caption_text
+              item['parse_mode'] = 'MarkdownV2'
+            media.append(item)
+            print(json.dumps(media))
+            " artifacts/*.apk)
+        
+          curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup" \
+            -F chat_id="${CHAT_ID}" \
+            -F media="${media_json}" \
+            "${form_args[@]}"
