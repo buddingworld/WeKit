@@ -222,19 +222,19 @@ object ChatToolbar : SwitchHookItem(), IResolvesDex {
     }
 
     private val NAME_TO_ICON_MAP = mapOf(
-        "拍摄"    to Icons.Default.Camera,
+        "拍摄" to Icons.Default.Camera,
         "视频通话" to Icons.Outlined.VideoChat, // because Icons.Default.VoiceChat is outlined
         "语音通话" to Icons.Outlined.VoiceChat,
-        "位置"    to Icons.Default.LocationOn,
-        "红包"    to Icons.Default.Mail,
-        "礼物"    to Icons.Default.Redeem,
-        "转账"    to Icons.Default.AttachMoney,
+        "位置" to Icons.Default.LocationOn,
+        "红包" to Icons.Default.Mail,
+        "礼物" to Icons.Default.Redeem,
+        "转账" to Icons.Default.AttachMoney,
         "语音输入" to Icons.Default.Mic,
-        "收藏"    to Icons.Default.Favorite,
-        "接龙"    to Icons.Default.FormatListNumbered,
-        "文件"    to Icons.Default.AttachFile,
-        "名片"    to Icons.Default.AccountBox,
-        "音乐"    to Icons.Default.MusicNote
+        "收藏" to Icons.Default.Favorite,
+        "接龙" to Icons.Default.FormatListNumbered,
+        "文件" to Icons.Default.AttachFile,
+        "名片" to Icons.Default.AccountBox,
+        "音乐" to Icons.Default.MusicNote
     )
 
     override fun resolveDex(dexKit: DexKitBridge): Map<String, String> {

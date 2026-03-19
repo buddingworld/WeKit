@@ -57,6 +57,7 @@ object FingerprintPay : ClickableHookItem() {
     private const val KEY_ENCRYPTED_DATA = "payment_pswd_encdata"
 
     private const val SPLIT_CHAR = ':'
+
     @Volatile
     private var isVerificationOngoing = false
 
@@ -129,7 +130,8 @@ object FingerprintPay : ClickableHookItem() {
             var plaintext by remember { mutableStateOf("") }
             var visible by remember { mutableStateOf(false) }
 
-            AlertDialogContent(title = { Text("指纹支付") },
+            AlertDialogContent(
+                title = { Text("指纹支付") },
                 text = {
                     TextField(
                         value = plaintext,
@@ -164,17 +166,19 @@ object FingerprintPay : ClickableHookItem() {
                         }
                     }) { Text("测试解密") }
                 },
-                confirmButton = { Button(onClick = {
-                    if (plaintext.length != 6) {
-                        ToastUtils.showToast("密码长度不正确!")
-                        return@Button
-                    }
-                    dismiss()
-                    encryptWithBiometric(plaintext) { encData ->
-                        WePrefs.putString(KEY_ENCRYPTED_DATA, "${encData.ciphertext}${SPLIT_CHAR}${encData.iv}")
-                        ToastUtils.showToast("支付密码加密并保存成功!")
-                    }
-                }) { Text("确定") } })
+                confirmButton = {
+                    Button(onClick = {
+                        if (plaintext.length != 6) {
+                            ToastUtils.showToast("密码长度不正确!")
+                            return@Button
+                        }
+                        dismiss()
+                        encryptWithBiometric(plaintext) { encData ->
+                            WePrefs.putString(KEY_ENCRYPTED_DATA, "${encData.ciphertext}${SPLIT_CHAR}${encData.iv}")
+                            ToastUtils.showToast("支付密码加密并保存成功!")
+                        }
+                    }) { Text("确定") }
+                })
         }
 
     }
@@ -196,7 +200,8 @@ object FingerprintPay : ClickableHookItem() {
                 override fun onAuthenticationError(code: Int, msg: CharSequence) {
                     ToastUtils.showToast("验证失败! 错因: $msg")
                     if (code == BiometricPrompt.ERROR_CANCELED ||
-                        code == BiometricPrompt.ERROR_USER_CANCELED) activity.finish()
+                        code == BiometricPrompt.ERROR_USER_CANCELED
+                    ) activity.finish()
                 }
 
                 override fun onAuthenticationFailed() {}
@@ -218,12 +223,10 @@ object FingerprintPay : ClickableHookItem() {
     fun encryptWithBiometric(plaintext: String, onSuccess: (EncryptedData) -> Unit) {
         val cipher = try {
             CryptoManager.getEncryptCipher()
-        }
-        catch (_: KeyPermanentlyInvalidatedException) {
+        } catch (_: KeyPermanentlyInvalidatedException) {
             ToastUtils.showToast("检测到新生物特征, 密钥已重置, 请在模块设置中重新加密支付密码!")
             return
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             ToastUtils.showToast("捕获到未处理的异常! 请向模块作者报告问题")
             WeLogger.e(TAG, "unhandled exception", e)
             return
@@ -245,12 +248,10 @@ object FingerprintPay : ClickableHookItem() {
         val iv = android.util.Base64.decode(encryptedData.iv, android.util.Base64.DEFAULT)
         val cipher = try {
             CryptoManager.getDecryptCipher(iv)
-        }
-        catch (_: KeyPermanentlyInvalidatedException) {
+        } catch (_: KeyPermanentlyInvalidatedException) {
             ToastUtils.showToast("检测到新生物特征, 密钥已重置, 请在模块设置中重新加密支付密码!")
             return
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             ToastUtils.showToast("捕获到未处理的异常! 请向模块作者报告问题")
             WeLogger.e(TAG, "unhandled exception", e)
             return
@@ -272,10 +273,14 @@ object FingerprintPay : ClickableHookItem() {
             showComposeDialog(context) {
                 AlertDialogContent(
                     title = { Text(text = "错误") },
-                    text = { Text(text =
-                        "Android 版本过低 (< Android 11), 无法使用指纹验证!\n" +
-                        "为追求代码简洁度与稳定性, 本项目使用 AndroidX Biometric API, 不支持 < Android 11 的设备\n" +
-                        "如确实需要此功能, 可使用第三方项目 eritpchy/FingerprintPay") },
+                    text = {
+                        Text(
+                            text =
+                                "Android 版本过低 (< Android 11), 无法使用指纹验证!\n" +
+                                        "为追求代码简洁度与稳定性, 本项目使用 AndroidX Biometric API, 不支持 < Android 11 的设备\n" +
+                                        "如确实需要此功能, 可使用第三方项目 eritpchy/FingerprintPay"
+                        )
+                    },
                     confirmButton = { Button(dismiss) { Text("关闭") } }
                 )
             }
@@ -288,10 +293,12 @@ object FingerprintPay : ClickableHookItem() {
                 AlertDialogContent(
                     title = { Text(text = "警告") },
                     text = { Text(text = "此功能可能导致账号异常, 确定要启用吗?") },
-                    confirmButton = { Button(onClick = {
+                    confirmButton = {
+                        Button(onClick = {
                             applyToggle(true)
                             dismiss()
-                        }) { Text("确定") } },
+                        }) { Text("确定") }
+                    },
                     dismissButton = { TextButton(dismiss) { Text("取消") } }
                 )
             }

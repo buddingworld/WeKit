@@ -60,13 +60,15 @@ fun setCargoClang(androidHome: String) {
     val configToml = rootProject.file("app/src/main/rust/wekit-native/.cargo/config.toml")
 
     configToml.parentFile.mkdirs()
-    configToml.writeText("""
+    configToml.writeText(
+        """
         [target.aarch64-linux-android]
         linker = "$ndkBinDir/aarch64-linux-android${minSdk}-clang$ext"
 
         [target.x86_64-linux-android]
         linker = "$ndkBinDir/x86_64-linux-android${minSdk}-clang$ext"
-    """.trimIndent())
+    """.trimIndent()
+    )
     logger.lifecycle("Written .cargo/config.toml to ${configToml.absolutePath}")
 }
 
@@ -99,7 +101,7 @@ configure<ApplicationExtension> {
 
     logger.lifecycle(
         """
-             _       __     __ __ _ __ 
+             _       __     __ __ _ __
             | |     / /__  / //_/(_) /_
             | | /| / / _ \/ ,<  / / __/
             | |/ |/ /  __/ /| |/ / /_
@@ -255,13 +257,15 @@ abstract class GenerateMethodHashesTask : DefaultTask() {
         }
 
         outputFile.parentFile.mkdirs()
-        outputFile.writeText("""
+        outputFile.writeText(
+            """
             package moe.ouom.wekit.dexkit.cache
             object GeneratedMethodHashes {
                 private val hashes = mapOf(${hashMap.entries.sortedBy { it.key }.joinToString(",") { "\"${it.key}\" to \"${it.value}\"" }})
                 fun getHash(className: String) = hashes[className] ?: ""
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 }
 
@@ -272,17 +276,17 @@ val generateMethodHashes = tasks.register<GenerateMethodHashesTask>("generateMet
 }
 
 val rustProjectDir = file("src/main/rust/wekit-native")
-val rustLibName    = "libwekit_native.so"
+val rustLibName = "libwekit_native.so"
 
 val abiToTarget = mapOf(
     "arm64-v8a" to "aarch64-linux-android",
-    "x86_64"    to "x86_64-linux-android",
+    "x86_64" to "x86_64-linux-android",
 )
 val cargoTasks = abiToTarget.map { (abi, target) ->
     tasks.register<Exec>("cargoBuild_${abi.replace('-', '_')}") {
-        group       = "rust"
+        group = "rust"
         description = "Compile Rust for $abi"
-        workingDir  = rustProjectDir
+        workingDir = rustProjectDir
         commandLine = listOf(
             "cargo", "build",
             "--release",

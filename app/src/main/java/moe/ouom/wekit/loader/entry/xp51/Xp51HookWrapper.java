@@ -17,6 +17,15 @@ public class Xp51HookWrapper {
     private static final Set<Member> sHookedMethods = ConcurrentHashMap.newKeySet();
     private static final String TAG_PREFIX = "wekit_hcb_";
 
+    public static int getHookCounter() {
+        return (int) (sNextHookId.get() - 1);
+    }
+
+    @NonNull
+    public static Set<Member> getHookedMethodsRaw() {
+        return sHookedMethods;
+    }
+
     public static class Xp51HookParam implements IHookBridge.IMemberHookParam {
 
         private XC_MethodHook.MethodHookParam mParam;
@@ -165,15 +174,6 @@ public class Xp51HookWrapper {
             mCallback.mAlive = false;
         }
 
-    }
-
-    public static int getHookCounter() {
-        return (int) (sNextHookId.get() - 1);
-    }
-
-    @NonNull
-    public static Set<Member> getHookedMethodsRaw() {
-        return sHookedMethods;
     }
 
 }

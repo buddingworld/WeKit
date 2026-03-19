@@ -13,8 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import moe.ouom.wekit.core.model.SwitchHookItem
-import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.hooks.api.ui.WeChatMessageContextMenuApi
+import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.ui.content.AlertDialogContent
 import moe.ouom.wekit.ui.utils.showComposeDialog
 import moe.ouom.wekit.utils.ModuleRes

@@ -13,7 +13,7 @@ import java.lang.reflect.Method
 @Keep
 @SuppressLint("PrivateApi")
 object FridaInjectEntry {
-    
+
     private val TAG = nameof(FridaInjectEntry)
 
     @JvmStatic

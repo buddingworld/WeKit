@@ -268,12 +268,14 @@ object TestCrash : ClickableHookItem() {
 
     private fun triggerArrayIndexOutOfBoundsException() {
         val array = arrayOf(1, 2, 3)
+
         @Suppress("UNUSED_VARIABLE", "unused")
         val value = array[10]
     }
 
     private fun triggerClassCastException() {
         val obj: Any = "String"
+
         @Suppress("UNUSED_VARIABLE", "UNCHECKED_CAST", "unused", "KotlinConstantConditions")
         val number = obj as Int
     }

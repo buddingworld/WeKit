@@ -4,8 +4,7 @@ typedef int (*UnhookFunType)(void *func);
 
 typedef void (*NativeOnModuleLoaded)(const char *name, void *handle);
 
-typedef struct
-{
+typedef struct {
     unsigned int version;
     HookFunType hook_func;
     UnhookFunType unhook_func;

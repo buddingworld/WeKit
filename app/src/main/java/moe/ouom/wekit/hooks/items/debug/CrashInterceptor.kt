@@ -11,10 +11,10 @@ import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
-import moe.ouom.wekit.utils.RuntimeConfig
 import moe.ouom.wekit.core.model.SwitchHookItem
 import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.ui.utils.CommonContextWrapper
+import moe.ouom.wekit.utils.RuntimeConfig
 import moe.ouom.wekit.utils.crash.CrashLogsManager
 import moe.ouom.wekit.utils.crash.JavaCrashHandler
 import moe.ouom.wekit.utils.logging.WeLogger
@@ -279,6 +279,7 @@ object CrashInterceptor : SwitchHookItem() {
             WeLogger.e("[CrashInterceptor] Failed to show crash detail dialog", e)
         }
     }
+
     /**
      * 提取崩溃摘要信息
      */

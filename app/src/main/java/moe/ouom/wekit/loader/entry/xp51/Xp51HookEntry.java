@@ -8,33 +8,10 @@ import moe.ouom.wekit.loader.entry.common.ModuleLoader;
 
 public class Xp51HookEntry implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
+    public static String sCurrentPackageName = null;
     private static XC_LoadPackage.LoadPackageParam sLoadPackageParam = null;
     private static StartupParam sInitZygoteStartupParam = null;
     private static String sModulePath = null;
-
-    public static String sCurrentPackageName = null;
-
-    @Override
-    public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws ReflectiveOperationException {
-        sLoadPackageParam = lpparam;
-        if (lpparam.packageName.equals(PackageNames.THIS)) {
-            Xp51HookStatusInit.init(lpparam.classLoader);
-        }
-        else if (lpparam.packageName.startsWith(PackageNames.WECHAT)) {
-            if (sInitZygoteStartupParam == null) {
-                throw new IllegalStateException("handleLoadPackage: sInitZygoteStartupParam is null");
-            }
-            sCurrentPackageName = lpparam.packageName;
-            ModuleLoader.init(lpparam.appInfo.dataDir, lpparam.classLoader,
-                    Xp51HookImpl.INSTANCE, Xp51HookImpl.INSTANCE, getModulePath(), true);
-        }
-    }
-
-    @Override
-    public void initZygote(StartupParam startupParam) {
-        sInitZygoteStartupParam = startupParam;
-        sModulePath = startupParam.modulePath;
-    }
 
     public static XC_LoadPackage.LoadPackageParam getLoadPackageParam() {
         if (sLoadPackageParam == null) {
@@ -55,5 +32,26 @@ public class Xp51HookEntry implements IXposedHookLoadPackage, IXposedHookZygoteI
             throw new IllegalStateException("InitZygoteStartupParam is null");
         }
         return sInitZygoteStartupParam;
+    }
+
+    @Override
+    public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws ReflectiveOperationException {
+        sLoadPackageParam = lpparam;
+        if (lpparam.packageName.equals(PackageNames.THIS)) {
+            Xp51HookStatusInit.init(lpparam.classLoader);
+        } else if (lpparam.packageName.startsWith(PackageNames.WECHAT)) {
+            if (sInitZygoteStartupParam == null) {
+                throw new IllegalStateException("handleLoadPackage: sInitZygoteStartupParam is null");
+            }
+            sCurrentPackageName = lpparam.packageName;
+            ModuleLoader.init(lpparam.appInfo.dataDir, lpparam.classLoader,
+                    Xp51HookImpl.INSTANCE, Xp51HookImpl.INSTANCE, getModulePath(), true);
+        }
+    }
+
+    @Override
+    public void initZygote(StartupParam startupParam) {
+        sInitZygoteStartupParam = startupParam;
+        sModulePath = startupParam.modulePath;
     }
 }

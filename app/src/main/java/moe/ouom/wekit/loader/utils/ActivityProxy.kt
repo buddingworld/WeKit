@@ -476,6 +476,7 @@ object ActivityProxy {
         @Suppress("DEPRECATION")
         @Deprecated("Deprecated")
         override fun startAllocCounting() = base.startAllocCounting()
+
         @Suppress("DEPRECATION")
         @Deprecated("Deprecated")
         override fun stopAllocCounting() = base.stopAllocCounting()

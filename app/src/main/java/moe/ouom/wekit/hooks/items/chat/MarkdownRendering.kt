@@ -42,13 +42,13 @@ import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.ext.tasklist.TaskListPlugin
 import io.noties.markwon.image.ImagesPlugin
-import moe.ouom.wekit.preferences.WePrefs
 import moe.ouom.wekit.core.dsl.dexClass
 import moe.ouom.wekit.core.model.ClickableHookItem
 import moe.ouom.wekit.dexkit.abc.IResolvesDex
-import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.hooks.api.core.WeMessageApi
 import moe.ouom.wekit.hooks.api.core.model.MessageInfo
+import moe.ouom.wekit.hooks.utils.annotation.HookItem
+import moe.ouom.wekit.preferences.WePrefs
 import moe.ouom.wekit.ui.content.AlertDialogContent
 import moe.ouom.wekit.ui.content.TextButton
 import moe.ouom.wekit.ui.utils.showComposeDialog
@@ -147,8 +147,7 @@ object MarkdownRendering : ClickableHookItem(), IResolvesDex {
                         textPaint
                     )
                     param.result = null
-                }
-                else {
+                } else {
                     val html = convertMarkdownToHtmlNative(origText)
 
                     if (html != null) {
@@ -161,8 +160,7 @@ object MarkdownRendering : ClickableHookItem(), IResolvesDex {
                             textPaint
                         )
                         param.result = null
-                    }
-                    else {
+                    } else {
                         WeLogger.e(TAG, "convertMarkdownToHtmlNative returned nullptr, falling back to original rendering")
                     }
                 }
@@ -194,23 +192,28 @@ object MarkdownRendering : ClickableHookItem(), IResolvesDex {
         maxWidth: Int,
         textPaint: TextPaint
     ) {
-        var spanned = Html.fromHtml(htmlString,
+        var spanned = Html.fromHtml(
+            htmlString,
             if (WePrefs.getBoolOrFalse(KEY_COMPACT_HTML))
                 Html.FROM_HTML_MODE_COMPACT
-        else Html.FROM_HTML_MODE_LEGACY)
+            else Html.FROM_HTML_MODE_LEGACY
+        )
 
-        if (WePrefs.getBoolOrFalse(KEY_NO_TEXT_SIZING))
-        {
+        if (WePrefs.getBoolOrFalse(KEY_NO_TEXT_SIZING)) {
             spanned = SpannableStringBuilder(spanned)
 
-            val relativeSpans = spanned.getSpans(0, spanned.length,
-                RelativeSizeSpan::class.java)
+            val relativeSpans = spanned.getSpans(
+                0, spanned.length,
+                RelativeSizeSpan::class.java
+            )
             for (span in relativeSpans) {
                 spanned.removeSpan(span)
             }
 
-            val absoluteSpans = spanned.getSpans(0, spanned.length,
-                AbsoluteSizeSpan::class.java)
+            val absoluteSpans = spanned.getSpans(
+                0, spanned.length,
+                AbsoluteSizeSpan::class.java
+            )
             for (span in absoluteSpans) {
                 spanned.removeSpan(span)
             }
@@ -303,12 +306,14 @@ object MarkdownRendering : ClickableHookItem(), IResolvesDex {
                 title = { Text("Markdown 渲染") },
                 text = {
                     var useMarkwon by
-                        remember { mutableStateOf(WePrefs.getBoolOrFalse(KEY_USE_MARKWON)) }
+                    remember { mutableStateOf(WePrefs.getBoolOrFalse(KEY_USE_MARKWON)) }
 
-                    Text("解析与渲染引擎",
+                    Text(
+                        "解析与渲染引擎",
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold)
+                        fontWeight = FontWeight.SemiBold
+                    )
                     ListItem(
                         modifier = Modifier.clickable {
                             useMarkwon = false
@@ -327,11 +332,13 @@ object MarkdownRendering : ClickableHookItem(), IResolvesDex {
                         trailingContent = { RadioButton(useMarkwon, null) })
 
                     var noTextSizing by
-                        remember { mutableStateOf(WePrefs.getBoolOrFalse(KEY_NO_TEXT_SIZING)) }
-                    Text("通用引擎设定",
+                    remember { mutableStateOf(WePrefs.getBoolOrFalse(KEY_NO_TEXT_SIZING)) }
+                    Text(
+                        "通用引擎设定",
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold)
+                        fontWeight = FontWeight.SemiBold
+                    )
                     ListItem(
                         modifier = Modifier.clickable {
                             noTextSizing = !noTextSizing
@@ -342,11 +349,13 @@ object MarkdownRendering : ClickableHookItem(), IResolvesDex {
                         trailingContent = { Switch(noTextSizing, null) })
 
                     var compactHtml by
-                        remember { mutableStateOf(WePrefs.getBoolOrFalse(KEY_COMPACT_HTML)) }
-                    Text("markdown-rs + Html 引擎设定",
+                    remember { mutableStateOf(WePrefs.getBoolOrFalse(KEY_COMPACT_HTML)) }
+                    Text(
+                        "markdown-rs + Html 引擎设定",
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold)
+                        fontWeight = FontWeight.SemiBold
+                    )
                     ListItem(
                         modifier = Modifier.clickable {
                             compactHtml = !compactHtml
@@ -368,7 +377,7 @@ object MarkdownRendering : ClickableHookItem(), IResolvesDex {
 
         classMsgInfoWrapper.find(dexKit, descriptors) {
             matcher {
-                usingEqStrings("params", "other", "null cannot be cast to non-null type com.tencent.mm.storage.MsgInfo", "msgInfo")
+                usingEqStrings("params", "other", "null cannot be cast to non-null type com.tencent.mm.storage.MsgInfo")
             }
         }
 

@@ -5,12 +5,12 @@
         android:name=".application.ModuleApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:description="@string/app_description"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/wekit"
         android:label="@string/app_name"
         android:roundIcon="@drawable/wekit"
         android:supportsRtl="true"
-        android:description="@string/app_description"
         android:theme="@style/Theme.WeKit">
 
         <activity
@@ -25,11 +25,11 @@
 
         <activity
             android:name=".activity.StubFragmentActivity"
-            android:exported="false"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:excludeFromRecents="true"
+            android:exported="false"
             android:taskAffinity=""
-            android:configChanges="orientation|screenSize|keyboardHidden" />
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
 
         <activity-alias
             android:name=".activity.MainActivityAlias"

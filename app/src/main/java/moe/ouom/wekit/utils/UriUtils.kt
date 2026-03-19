@@ -10,7 +10,8 @@ import androidx.browser.customtabs.CustomTabsIntent
 
 fun Uri.openInSystem(
     context: Context,
-    useCustomTabs: Boolean = false) {
+    useCustomTabs: Boolean = false
+) {
     if (useCustomTabs) {
         val forwardBitmap =
             BitmapFactory.decodeResource(
@@ -49,8 +50,7 @@ fun Uri.openInSystem(
             .build()
 
         intent.launchUrl(context, this)
-    }
-    else {
+    } else {
         val intent = Intent(Intent.ACTION_VIEW)
         intent.data = this
         context.startActivity(intent)

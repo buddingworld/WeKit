@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.core.content.pm.PackageInfoCompat
+import com.highcapable.kavaref.KavaRef.Companion.asResolver
+import com.highcapable.kavaref.extension.toClass
 import moe.ouom.wekit.constants.PackageNames
 import moe.ouom.wekit.utils.logging.WeLogger
 
@@ -24,23 +26,19 @@ object HostInfo {
     private lateinit var _info: HostInfoImpl
 
     val info: HostInfoImpl get() = _info
-
-    @JvmStatic
     val application: Application get() = _info.application
     val appInfo: ApplicationInfo get() = application.applicationInfo
     val packageName: String get() = _info.packageName
     val versionCode32: Int get() = _info.versionCode32
     val versionCode: Int get() = versionCode32
     val isModule: Boolean get() = _info.hostSpecies == HostSpecies.WeKit
-
-    @JvmStatic
     val isHost: Boolean get() = !isModule
 
     val isHostGooglePlay: Boolean by lazy {
         runCatching {
-            Class.forName("com.tencent.mm.boot.BuildConfig")
-                .getField("BUILD_TAG")
-                .get(null) as? String
+            "com.tencent.mm.boot.BuildConfig".toClass().asResolver()
+                .firstField { name = "BUILD_TAG" }
+                .get() as? String?
         }.getOrNull()?.contains("GP", ignoreCase = true) ?: false
     }
 

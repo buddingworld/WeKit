@@ -49,8 +49,8 @@ abstract class BaseHookItem {
 
     inline fun Executable.hookBefore(
         crossinline action: HookAction
-    ): XC_MethodHook.Unhook {
-        return XposedBridge.hookMethod(
+    ) {
+        XposedBridge.hookMethod(
             this,
             object :
                 XC_MethodHook(WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50)) {
@@ -64,14 +64,14 @@ abstract class BaseHookItem {
     @JvmName("hookBefore2")
     inline fun MethodResolver<*>.hookBefore(
         crossinline action: HookAction
-    ): XC_MethodHook.Unhook {
+    ) {
         return this.self.hookBefore(action)
     }
 
     @JvmName("hookBefore3")
     inline fun ConstructorResolver<*>.hookBefore(
         crossinline action: HookAction
-    ): XC_MethodHook.Unhook {
+    ) {
         return this.self.hookBefore(action)
     }
 
@@ -81,8 +81,8 @@ abstract class BaseHookItem {
 
     inline fun Executable.hookAfter(
         crossinline action: HookAction
-    ): XC_MethodHook.Unhook {
-        return XposedBridge.hookMethod(
+    ) {
+        XposedBridge.hookMethod(
             this,
             object :
                 XC_MethodHook(WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50)) {
@@ -96,14 +96,14 @@ abstract class BaseHookItem {
     @JvmName("hookAfter2")
     inline fun MethodResolver<*>.hookAfter(
         crossinline action: HookAction
-    ): XC_MethodHook.Unhook {
+    ) {
         return this.self.hookAfter(action)
     }
 
     @JvmName("hookAfter3")
     inline fun ConstructorResolver<*>.hookAfter(
         crossinline action: HookAction
-    ): XC_MethodHook.Unhook {
+    ) {
         return this.self.hookAfter(action)
     }
 
@@ -113,13 +113,13 @@ abstract class BaseHookItem {
 
     inline fun DexMethodDelegate.hookBefore(
         crossinline action: HookAction
-    ): XC_MethodHook.Unhook {
+    ) {
         return this.method.hookBefore(action)
     }
 
     inline fun DexMethodDelegate.hookAfter(
         crossinline action: HookAction
-    ): XC_MethodHook.Unhook {
+    ) {
         return this.method.hookAfter(action)
     }
 

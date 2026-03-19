@@ -9,7 +9,8 @@ import kotlin.io.path.div
 object ModulePaths {
 
     val internalStorage: Path by lazy {
-        Path(Environment.getExternalStorageDirectory().absolutePath) }
+        Path(Environment.getExternalStorageDirectory().absolutePath)
+    }
 
     val data: Path by lazy {
         (internalStorage / "Android" / "data" / HostInfo.packageName / "files" / BuildConfig.TAG)

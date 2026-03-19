@@ -159,6 +159,7 @@ object CrashLogsViewer : ClickableHookItem() {
                                                 copyTextToClipboard(context, summary)
                                                 ToastUtils.showToast(context, "简易信息已复制")
                                             }
+
                                             2 -> copyLogToClipboard(context, logFile)
                                             3 -> shareLog(context, logFile)
                                             4 -> confirmDeleteLog(context, logFile)
@@ -375,10 +376,12 @@ object CrashLogsViewer : ClickableHookItem() {
                     when {
                         line.startsWith("Crash Time:") || line.startsWith("Crash Type:") ->
                             append(line).append("\n")
+
                         line.contains("Exception Stack Trace") -> {
                             foundException = true
                             append("\n异常信息:\n")
                         }
+
                         foundException -> {
                             if (line.trim().isNotEmpty() && !line.contains("====")) {
                                 append(line).append("\n")

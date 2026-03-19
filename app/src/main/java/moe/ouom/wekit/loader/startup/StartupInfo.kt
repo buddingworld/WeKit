@@ -11,5 +11,7 @@ object StartupInfo {
     private var _modulePath: String? = null
     var modulePath: String
         get() = _modulePath ?: error("Module path is null")
-        set(value) { _modulePath = value }
+        set(value) {
+            _modulePath = value
+        }
 }

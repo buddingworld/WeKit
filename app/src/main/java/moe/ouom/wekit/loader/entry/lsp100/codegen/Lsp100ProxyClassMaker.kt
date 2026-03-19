@@ -109,7 +109,9 @@ class Lsp100ProxyClassMaker private constructor() {
         private var sLoadClassException: Throwable? = null
 
         @JvmStatic
-        fun setWrapperMethod(method: Method) { sWrapperMethod = method }
+        fun setWrapperMethod(method: Method) {
+            sWrapperMethod = method
+        }
 
 //        @JvmStatic
 //        fun getWrapperMethod(): Method? = sWrapperMethod

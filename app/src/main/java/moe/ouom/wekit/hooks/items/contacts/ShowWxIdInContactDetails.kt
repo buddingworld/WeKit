@@ -7,9 +7,9 @@ import android.content.Context
 import android.widget.Toast
 import dev.ujhhgtg.nameof.nameof
 import moe.ouom.wekit.core.model.SwitchHookItem
-import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.hooks.api.ui.WeChatContactDetailsApi
 import moe.ouom.wekit.hooks.api.ui.WeChatContactDetailsApi.ContactInfoItem
+import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.utils.logging.WeLogger
 
 @HookItem(

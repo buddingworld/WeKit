@@ -7,10 +7,10 @@ import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
 import moe.ouom.wekit.core.model.SwitchHookItem
-import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.hooks.api.core.WeDatabaseApi
 import moe.ouom.wekit.hooks.api.core.WeDatabaseListenerApi
 import moe.ouom.wekit.hooks.api.ui.WeMomentsContextMenuApi
+import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.ui.utils.CommonContextWrapper
 import moe.ouom.wekit.utils.ModuleRes
 import moe.ouom.wekit.utils.logging.WeLogger

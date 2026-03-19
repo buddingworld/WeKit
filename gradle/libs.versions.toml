@@ -113,7 +113,7 @@ hiddenApiBypass = { module = "org.lsposed.hiddenapibypass:hiddenapibypass", vers
 kavaref-core = { module = "com.highcapable.kavaref:kavaref-core", version.ref = "kavaref" }
 kavaref-extension = { module = "com.highcapable.kavaref:kavaref-extension", version.ref = "kavaref" }
 libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsu" }
-libxposed-service = { module = "com.github.libxposed:service", version.ref = "libxposed" }
+libxposed-service = { module = "io.github.libxposed:service", version.ref = "libxposed" }
 
 rhino-android = { module = "io.apisense:rhino-android", version.ref = "rhino" }
 ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }

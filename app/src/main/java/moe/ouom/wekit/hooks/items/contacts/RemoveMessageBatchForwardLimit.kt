@@ -4,8 +4,8 @@ import android.content.Intent
 import de.robv.android.xposed.XC_MethodHook
 import dev.ujhhgtg.nameof.nameof
 import moe.ouom.wekit.core.model.SwitchHookItem
-import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.hooks.api.ui.WeStartActivityApi
+import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.utils.logging.WeLogger
 
 @HookItem(path = "联系人与群组/移除消息批量转发限制", desc = "移除消息多选目标的 9 个数量限制")

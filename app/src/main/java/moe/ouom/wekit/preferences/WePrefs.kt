@@ -54,11 +54,13 @@ abstract class WePrefs protected constructor() : SharedPreferences, SharedPrefer
 
     override fun registerOnSharedPreferenceChangeListener(
         listener: OnSharedPreferenceChangeListener
-    ) { }
+    ) {
+    }
 
     override fun unregisterOnSharedPreferenceChangeListener(
         listener: OnSharedPreferenceChangeListener
-    ) { }
+    ) {
+    }
 
     abstract val isReadOnly: Boolean
 

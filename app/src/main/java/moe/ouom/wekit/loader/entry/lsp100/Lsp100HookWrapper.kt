@@ -39,6 +39,7 @@ object Lsp100HookWrapper {
 
     class CallbackListHolder {
         val lock = Any()
+
         @Volatile
         var callbacks: Array<CallbackWrapper> = emptyArray()
     }
@@ -118,17 +119,20 @@ object Lsp100HookWrapper {
         var callbacks: Array<CallbackWrapper> = emptyArray()
         var extras: Array<Any?>? = null
 
-        override val member: Member get() = checkLifecycle().run {
-            if (isAfter) after!!.member else before!!.member
-        }
+        override val member: Member
+            get() = checkLifecycle().run {
+                if (isAfter) after!!.member else before!!.member
+            }
 
-        override val thisObject: Any? get() = checkLifecycle().run {
-            if (isAfter) after!!.thisObject else before!!.thisObject
-        }
+        override val thisObject: Any?
+            get() = checkLifecycle().run {
+                if (isAfter) after!!.thisObject else before!!.thisObject
+            }
 
-        override val args: Array<Any?> get() = checkLifecycle().run {
-            if (isAfter) after!!.args else before!!.args
-        }
+        override val args: Array<Any?>
+            get() = checkLifecycle().run {
+                if (isAfter) after!!.args else before!!.args
+            }
 
         override var result: Any?
             get() = checkLifecycle().run { if (isAfter) after!!.result else null }

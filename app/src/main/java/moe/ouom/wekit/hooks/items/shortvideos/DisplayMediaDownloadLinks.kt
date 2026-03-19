@@ -6,8 +6,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import de.robv.android.xposed.XC_MethodHook
 import moe.ouom.wekit.core.model.SwitchHookItem
-import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.hooks.api.ui.WeShortVideosShareMenuApi
+import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.utils.HostInfo
 import moe.ouom.wekit.utils.ModuleRes
 import moe.ouom.wekit.utils.ToastUtils

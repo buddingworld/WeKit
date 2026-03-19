@@ -105,16 +105,14 @@ object McpServer : ClickableHookItem() {
             )
         ) { req ->
             val args = req.arguments ?: return@addTool mcpTextResult("Arguments are empty")
-            val type = args["type"]?.jsonPrimitive?.content ?:
-                return@addTool mcpTextResult("Invalid type", true)
-            val convId = args["conv-id"]?.jsonPrimitive?.content ?:
-                return@addTool mcpTextResult("Invalid conversation ID", true)
-            val content = args["content"]?.jsonPrimitive?.content ?:
-                return@addTool mcpTextResult("Invalid content", true)
+            val type = args["type"]?.jsonPrimitive?.content ?: return@addTool mcpTextResult("Invalid type", true)
+            val convId = args["conv-id"]?.jsonPrimitive?.content ?: return@addTool mcpTextResult("Invalid conversation ID", true)
+            val content = args["content"]?.jsonPrimitive?.content ?: return@addTool mcpTextResult("Invalid content", true)
             when (type) {
                 "text" ->
                     if (!WeMessageApi.sendText(convId, content))
                         return@addTool mcpTextResult("Failed to send message", true)
+
                 else -> return@addTool mcpTextResult("Unsupported type: $type", true)
             }
             mcpTextResult("Sent successfully")
@@ -125,27 +123,32 @@ object McpServer : ClickableHookItem() {
             description = "List all contacts",
             inputSchema = ToolSchema(
                 properties = buildJsonObject {
-                    addField("type",
-                        "Type of contacts to list; can be 'all', 'friends', 'groups', 'official_accounts'")
+                    addField(
+                        "type",
+                        "Type of contacts to list; can be 'all', 'friends', 'groups', 'official_accounts'"
+                    )
                 },
                 required = listOf("type")
             )
         ) { req ->
-            val type = req.arguments?.get("type")?.jsonPrimitive?.content ?:
-                return@addTool mcpTextResult("Invalid type")
+            val type = req.arguments?.get("type")?.jsonPrimitive?.content ?: return@addTool mcpTextResult("Invalid type")
             when (type) {
                 "all" -> mcpTextsResult(WeDatabaseApi.getContacts().map {
                     "WxId='${it.wxId}',Nickname='${it.nickname}'"
                 })
+
                 "friends" -> mcpTextsResult(WeDatabaseApi.getFriends().map {
                     "WxId='${it.wxId}',Nickname='${it.nickname}',CustomWxid='${it.customWxid}',RemarkName='${it.remarkName}'"
                 })
+
                 "groups" -> mcpTextsResult(WeDatabaseApi.getGroups().map {
                     "WxId='${it.wxId}',Nickname='${it.nickname}'"
                 })
+
                 "official_accounts" -> mcpTextsResult(WeDatabaseApi.getOfficialAccounts().map {
                     "WxId='${it.wxId}',Nickname='${it.nickname}'"
                 })
+
                 else -> mcpTextResult("Unsupported type: $type")
             }
         }
@@ -155,12 +158,18 @@ object McpServer : ClickableHookItem() {
             description = "List partial messages of specific conversation; latest messages first",
             inputSchema = ToolSchema(
                 properties = buildJsonObject {
-                    addField("conv-id",
-                        "Conversation ID of target")
-                    addField("page-index",
-                        "Page index; defaults to 1, starts from 1", "integer")
-                    addField("page-size",
-                        "Page size; defaults to 20", "integer")
+                    addField(
+                        "conv-id",
+                        "Conversation ID of target"
+                    )
+                    addField(
+                        "page-index",
+                        "Page index; defaults to 1, starts from 1", "integer"
+                    )
+                    addField(
+                        "page-size",
+                        "Page size; defaults to 20", "integer"
+                    )
                 },
                 required = listOf("conv-id")
             )
@@ -207,8 +216,7 @@ object McpServer : ClickableHookItem() {
                 required = listOf("conv-id")
             )
         ) { req ->
-            val groupId = req.arguments?.get("conv-id")?.jsonPrimitive?.content ?:
-                return@addTool mcpTextResult("Invalid group ID", true)
+            val groupId = req.arguments?.get("conv-id")?.jsonPrimitive?.content ?: return@addTool mcpTextResult("Invalid group ID", true)
             val members = WeDatabaseApi.getGroupMembers(groupId)
             mcpTextsResult(members.map {
                 "WxId='${it.wxId}',Nickname='${it.nickname}',CustomWxid='${it.customWxid}',RemarkName='${it.remarkName}'"
@@ -243,8 +251,7 @@ object McpServer : ClickableHookItem() {
                 if (official != null) {
                     return@addTool mcpTextResult("WxId=${official.wxId}")
                 }
-            }
-            else {
+            } else {
                 val members = WeDatabaseApi.getGroupMembers(groupId)
                 val member = members.find { it.nickname == displayName || it.remarkName == displayName }
                 if (member != null) {
@@ -314,8 +321,7 @@ object McpServer : ClickableHookItem() {
                 authenticate { credential ->
                     if (credential.token == MCP_AUTH_TOKEN) {
                         UserIdPrincipal("mcp-client")
-                    }
-                    else {
+                    } else {
                         null
                     }
                 }
@@ -431,17 +437,21 @@ object McpServer : ClickableHookItem() {
     override fun onClick(context: Context) {
         showComposeDialog(context) {
             var authToken by remember { mutableStateOf(MCP_AUTH_TOKEN) }
-            AlertDialogContent(title = { Text("MCP 服务器") },
+            AlertDialogContent(
+                title = { Text("MCP 服务器") },
                 text = {
-                    TextField(value = authToken,
+                    TextField(
+                        value = authToken,
                         onValueChange = { authToken = it },
                         label = { Text("认证令牌") })
                 },
                 dismissButton = { TextButton(dismiss) { Text("取消") } },
-                confirmButton = { Button(onClick = {
-                    WePrefs.putString(KEY_MCP_AUTH_TOKEN, authToken)
-                    dismiss()
-                }) { Text("确定") } })
+                confirmButton = {
+                    Button(onClick = {
+                        WePrefs.putString(KEY_MCP_AUTH_TOKEN, authToken)
+                        dismiss()
+                    }) { Text("确定") }
+                })
         }
     }
 }

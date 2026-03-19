@@ -31,7 +31,7 @@ class ModuleApplication : Application() {
 
         }
 
-        StartupInfo.modulePath= apkPath
+        StartupInfo.modulePath = apkPath
         StartupInfo.loaderService = loaderService
     }
 }

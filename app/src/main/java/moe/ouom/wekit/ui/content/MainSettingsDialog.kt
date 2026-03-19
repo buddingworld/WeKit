@@ -150,16 +150,21 @@ class MainSettingsDialog(context: Context) : BasePrefDialog(context, BuildConfig
                         showComposeDialog(context) {
                             AlertDialogContent(
                                 title = { Text("检查更新失败") },
-                                text = { Text(
-                                    "错误信息: ${e.message}\n" +
-                                    "是否尝试直接下载并安装最新版本?") },
+                                text = {
+                                    Text(
+                                        "错误信息: ${e.message}\n" +
+                                                "是否尝试直接下载并安装最新版本?"
+                                    )
+                                },
                                 dismissButton = { TextButton(dismiss) { Text("取消") } },
-                                confirmButton = { Button(onClick = {
-                                    dismiss()
-                                    CoroutineScope(Dispatchers.Main).launch {
-                                        UpdateDownloader.downloadAndInstall(context, UpdateChecker.DOWNLOAD_URL)
-                                    }
-                                }) { Text("确定") } }
+                                confirmButton = {
+                                    Button(onClick = {
+                                        dismiss()
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            UpdateDownloader.downloadAndInstall(context, UpdateChecker.DOWNLOAD_URL)
+                                        }
+                                    }) { Text("确定") }
+                                }
                             )
                         }
                         return@launch
@@ -171,18 +176,23 @@ class MainSettingsDialog(context: Context) : BasePrefDialog(context, BuildConfig
                     showComposeDialog(context) {
                         AlertDialogContent(
                             title = { Text("检测到新版本") },
-                            text = { Text(
-                                "当前版本: ${BuildConfig.GIT_HASH} → 新版本: ${update.latestSha}\n" +
-                                "提交消息:\n" +
-                                "${update.commitMessage.prependIndent("  ")}\n" +
-                                "是否下载并安装?") },
+                            text = {
+                                Text(
+                                    "当前版本: ${BuildConfig.GIT_HASH} → 新版本: ${update.latestSha}\n" +
+                                            "提交消息:\n" +
+                                            "${update.commitMessage.prependIndent("  ")}\n" +
+                                            "是否下载并安装?"
+                                )
+                            },
                             dismissButton = { TextButton(dismiss) { Text("取消") } },
-                            confirmButton = { Button(onClick = {
-                                dismiss()
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    UpdateDownloader.downloadAndInstall(context, update.downloadUrl)
-                                }
-                            }) { Text("确定") } }
+                            confirmButton = {
+                                Button(onClick = {
+                                    dismiss()
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        UpdateDownloader.downloadAndInstall(context, update.downloadUrl)
+                                    }
+                                }) { Text("确定") }
+                            }
                         )
                     }
                 }

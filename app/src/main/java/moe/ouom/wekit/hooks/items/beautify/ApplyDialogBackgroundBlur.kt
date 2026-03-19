@@ -44,10 +44,12 @@ object ApplyDialogBackgroundBlur : ClickableHookItem(), IResolvesDex {
     private val classMmQuickDialog by dexClass()
 
     override fun onEnable() {
-        listOf(classMmAlertDialog.clazz,
+        listOf(
+            classMmAlertDialog.clazz,
             classMmProgressDialog.clazz,
             classMmQuickDialog.clazz,
-            "com.tencent.mm.ui.halfscreen.HalfScreenTransparentActivity".toClass()).forEach {
+            "com.tencent.mm.ui.halfscreen.HalfScreenTransparentActivity".toClass()
+        ).forEach {
             it.asResolver()
                 .firstMethod {
                     name = "onCreate"
@@ -56,8 +58,7 @@ object ApplyDialogBackgroundBlur : ClickableHookItem(), IResolvesDex {
                     val thiz = param.thisObject
                     if (thiz is Dialog) {
                         thiz.window?.let { w -> applyBlur(w) }
-                    }
-                    else if (thiz is Activity) {
+                    } else if (thiz is Activity) {
                         thiz.window?.let { w -> applyBlur(w) }
                     }
                 }

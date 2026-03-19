@@ -72,7 +72,8 @@ object DetectDeletedFriends : ClickableHookItem(), IWePacketInterceptor {
 
         val selfWxId = WeApi.selfWxId
         val friends = WeDatabaseApi.getFriends().filter { c ->
-            c.type != 2051 && c.type != 2049 && c.wxId.startsWith("wxid_") && c.wxId != selfWxId }
+            c.type != 2051 && c.type != 2049 && c.wxId.startsWith("wxid_") && c.wxId != selfWxId
+        }
 
         showComposeDialog(context) {
             var phase by phaseState
@@ -83,8 +84,10 @@ object DetectDeletedFriends : ClickableHookItem(), IWePacketInterceptor {
                     CoroutineScope(Dispatchers.IO).launch {
                         val abnormalFriends = mutableListOf<AbnormalFriend>()
                         for (friend in friends) {
-                            WePacketHelper.sendCgi("/cgi-bin/mmpay-bin/beforetransfer", 2783, 0, 0,
-                                """{"2":"${friend.customWxid}"}""") {
+                            WePacketHelper.sendCgi(
+                                "/cgi-bin/mmpay-bin/beforetransfer", 2783, 0, 0,
+                                """{"2":"${friend.customWxid}"}"""
+                            ) {
                                 // status is always success
                                 onSuccess { json, _ ->
                                     val jsonObj = Json.parseToJsonElement(json).jsonObject
@@ -159,6 +162,7 @@ object DetectDeletedFriends : ClickableHookItem(), IWePacketInterceptor {
                             TextButton(dismiss) { Text("取消") }
                         }
                     }
+
                     is DialogPhase.Scanning -> null
                     is DialogPhase.Done -> null
                 },

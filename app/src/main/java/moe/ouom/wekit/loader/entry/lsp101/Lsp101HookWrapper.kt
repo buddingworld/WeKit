@@ -40,6 +40,7 @@ object Lsp101HookWrapper {
 
     class CallbackListHolder {
         val lock = Any()
+
         // sorted by priority, descending
         @Volatile
         var callbacks: Array<CallbackWrapper> = emptyArray()
@@ -130,21 +131,35 @@ object Lsp101HookWrapper {
         var chain: XposedInterface.Chain? = null
 
         override val member: Member
-            get() { checkLifecycle(); return memberCompat!! }
+            get() {
+                checkLifecycle(); return memberCompat!!
+            }
 
         override val thisObject: Any?
-            get() { checkLifecycle(); return thisObjectCompat }
+            get() {
+                checkLifecycle(); return thisObjectCompat
+            }
 
         override val args: Array<Any?>
-            get() { checkLifecycle(); return argsCompat!! }
+            get() {
+                checkLifecycle(); return argsCompat!!
+            }
 
         override var result: Any? = null
-            get() { checkLifecycle(); return field }
-            set(value) { checkLifecycle(); field = value; skipOriginal = true }
+            get() {
+                checkLifecycle(); return field
+            }
+            set(value) {
+                checkLifecycle(); field = value; skipOriginal = true
+            }
 
         override var throwable: Throwable? = null
-            get() { checkLifecycle(); return field }
-            set(value) { checkLifecycle(); field = value; skipOriginal = true }
+            get() {
+                checkLifecycle(); return field
+            }
+            set(value) {
+                checkLifecycle(); field = value; skipOriginal = true
+            }
 
         override var extra: Any?
             get() {

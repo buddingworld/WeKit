@@ -11,10 +11,10 @@ import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
-import moe.ouom.wekit.utils.RuntimeConfig
 import moe.ouom.wekit.core.model.SwitchHookItem
 import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.ui.utils.CommonContextWrapper
+import moe.ouom.wekit.utils.RuntimeConfig
 import moe.ouom.wekit.utils.crash.CrashLogsManager
 import moe.ouom.wekit.utils.crash.NativeCrashHandler
 import moe.ouom.wekit.utils.logging.WeLogger

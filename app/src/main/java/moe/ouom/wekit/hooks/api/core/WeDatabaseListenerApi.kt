@@ -239,32 +239,32 @@ object WeDatabaseListenerApi : ApiHookItem() {
                 "com.tencent.wcdb.support.CancellationSignal"
             )
         }.hookBefore { param ->
-                try {
-                    if (queryListeners.isEmpty()) return@hookBefore
+            try {
+                if (queryListeners.isEmpty()) return@hookBefore
 
-                    val sql = param.args[1] as? String ?: return@hookBefore
-                    var currentSql = sql
+                val sql = param.args[1] as? String ?: return@hookBefore
+                var currentSql = sql
 
-                    logWithStack(
-                        "rawQueryWithFactory",
-                        param.args[3] as? String ?: "N/A",
-                        param.args
-                    )
+                logWithStack(
+                    "rawQueryWithFactory",
+                    param.args[3] as? String ?: "N/A",
+                    param.args
+                )
 
-                    queryListeners.forEach { listener ->
-                        listener.onQuery(currentSql)?.let { currentSql = it }
-                    }
-
-                    if (currentSql != sql) {
-                        param.args[1] = currentSql
-                        WeLogger.d(
-                            TAG,
-                            "[rawQueryWithFactory] SQL modified: $sql -> $currentSql, stack=${WeLogger.getStackTraceString()}"
-                        )
-                    }
-                } catch (e: Throwable) {
-                    WeLogger.e(TAG, "Old version query dispatch failed", e)
+                queryListeners.forEach { listener ->
+                    listener.onQuery(currentSql)?.let { currentSql = it }
                 }
+
+                if (currentSql != sql) {
+                    param.args[1] = currentSql
+                    WeLogger.d(
+                        TAG,
+                        "[rawQueryWithFactory] SQL modified: $sql -> $currentSql, stack=${WeLogger.getStackTraceString()}"
+                    )
+                }
+            } catch (e: Throwable) {
+                WeLogger.e(TAG, "Old version query dispatch failed", e)
             }
+        }
     }
 }

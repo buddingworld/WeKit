@@ -10,10 +10,10 @@ import moe.ouom.wekit.core.dsl.dexClass
 import moe.ouom.wekit.core.dsl.dexMethod
 import moe.ouom.wekit.core.model.SwitchHookItem
 import moe.ouom.wekit.dexkit.abc.IResolvesDex
-import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.hooks.api.core.WeServiceApi
 import moe.ouom.wekit.hooks.api.core.model.MessageType
 import moe.ouom.wekit.hooks.api.ui.WeChatMessageContextMenuApi
+import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.utils.HostInfo
 import moe.ouom.wekit.utils.ModuleRes
 import moe.ouom.wekit.utils.ToastUtils

@@ -13,6 +13,7 @@ object Lsp100ExtCmd {
                 Lsp100ProxyClassMaker.setWrapperMethod((arg!![0] as java.lang.reflect.Method?)!!)
                 return true
             }
+
             "GetLoadPackageParam", "GetInitZygoteStartupParam" -> return null
             else -> return null
         }

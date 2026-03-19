@@ -113,6 +113,7 @@ class DexMethodDescriptor : Serializable {
                         list.add(s.substring(i, j + 1))
                         i = j + 1
                     }
+
                     '[' -> {
                         var j = i
                         while (j < s.length && s[j] == '[') j++
@@ -120,6 +121,7 @@ class DexMethodDescriptor : Serializable {
                         list.add(s.substring(i, j + 1))
                         i = j + 1
                     }
+
                     else -> {
                         list.add(c.toString())
                         i++

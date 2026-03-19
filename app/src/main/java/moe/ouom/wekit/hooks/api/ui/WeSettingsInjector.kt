@@ -42,6 +42,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
     private val classSettingItemClassesProvider by dexClass()
     private val classBaseSettingItem by dexClass()
     private val classSettingLocation by dexClass()
+    private val methodSettingGroupAccountInfoReturns1 by dexMethod()
 
     private val TAG = nameof(WeSettingsInjector)
 
@@ -148,7 +149,8 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
 
         methodSettingGroupPluginOnClick.find(dexKit, descriptors) {
             matcher {
-                declaredClass = "com.tencent.mm.plugin.setting.ui.setting_new.settings.other.SettingGroupPlugin"
+                declaredClass =
+                    "com.tencent.mm.plugin.setting.ui.setting_new.settings.other.SettingGroupPlugin"
                 usingEqStrings("MicroMsg.SettingGroupPlugin", "openLiteApp query:%s")
             }
         }
@@ -181,6 +183,14 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
         classSettingLocation.find(dexKit, descriptors) {
             matcher {
                 usingEqStrings("SettingLocation(parentGroup=", ", frontItem=")
+            }
+        }
+
+        methodSettingGroupAccountInfoReturns1.find(dexKit, descriptors) {
+            matcher {
+                declaredClass = "com.tencent.mm.plugin.setting.ui.setting_new.settings.SettingGroupAccountInfo"
+                usingNumbers(1)
+                returnType = "int"
             }
         }
 
@@ -236,20 +246,21 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
 
         WeLogger.i(TAG, "injected settings")
 
-        clsSettingsUi.asResolver().firstMethod { name = "onPreferenceTreeClick" } .hookBefore { param ->
-            if (param.args.size < 2) return@hookBefore
-            val preference = param.args[1] ?: return@hookBefore
+        clsSettingsUi.asResolver().firstMethod { name = "onPreferenceTreeClick" }
+            .hookBefore { param ->
+                if (param.args.size < 2) return@hookBefore
+                val preference = param.args[1] ?: return@hookBefore
 
-            val key = getKeyMethod.invoke(preference) as? String
+                val key = getKeyMethod.invoke(preference) as? String
 
-            if (KEY_WEKIT_ENTRY == key) {
-                val activity = param.thisObject as Activity
+                if (KEY_WEKIT_ENTRY == key) {
+                    val activity = param.thisObject as Activity
 
-                openSettingsDialog(activity)
+                    openSettingsDialog(activity)
 
-                param.result = true
+                    param.result = true
+                }
             }
-        }
     }
 
 //    private fun tryHookNewSettingsMethod1() {
@@ -283,30 +294,49 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
         cacheDir: Path,
     ): Class<*> {
         val baseClass = classBaseSettingItem.clazz
-        val settingGroupMainClass = "com.tencent.mm.plugin.setting.ui.setting_new.settings.SettingGroupMain".toClass()
-        val settingGroupAccountInfoClass = "com.tencent.mm.plugin.setting.ui.setting_new.settings.SettingGroupAccountInfo".toClass()
+        val settingGroupMainClass =
+            "com.tencent.mm.plugin.setting.ui.setting_new.settings.SettingGroupMain".toClass()
+        val settingGroupAccountInfoClass =
+            "com.tencent.mm.plugin.setting.ui.setting_new.settings.SettingGroupAccountInfo".toClass()
         settingGroupAccountInfoClass.declaredMethods
             .apply {
                 val mGetClass = this.first { m -> m.returnType == Class::class.java }.name // C6
-                val mGetSomeInt = this.first { m -> m.returnType == Int::class.javaPrimitiveType }.name // K6
+                val mReturns1 = methodSettingGroupAccountInfoReturns1.method.name // K6
                 val mOnClick = this.first { m -> m.parameterCount == 3 }.name // Q6
                 val mGetStringId = this.last { m -> m.returnType == String::class.java }.name // w6
-                val mGetSettingLocation = this.last { m -> m.returnType == classSettingLocation.clazz }.name // x6
-                val mGetNameResId = this.last { m -> m.returnType == Int::class.javaPrimitiveType }.name // z6
-                WeLogger.d(TAG, "resolved all method names: $mGetClass, $mGetSomeInt, $mOnClick, $mGetStringId, $mGetSettingLocation, $mGetNameResId")
+                val mGetSettingLocation =
+                    this.last { m -> m.returnType == classSettingLocation.clazz }.name // x6
+                val mGetNameResId =
+                    this.last { m ->
+                        m.returnType == Int::class.javaPrimitiveType &&
+                        m.name != methodSettingGroupAccountInfoReturns1.method.name }.name // z6
+                // non-play 8069: C6, K6, Q6, w6, x6, z6
+                // play 8068: E6, M6, T6, z6, B6, D6
+                WeLogger.d(
+                    TAG,
+                    "resolved all method names: $mGetClass, $mReturns1, $mOnClick, $mGetStringId, $mGetSettingLocation, $mGetNameResId"
+                )
 
                 val handler = InvocationHandler { proxy, method, args ->
                     when (method.name) {
                         mGetClass -> return@InvocationHandler settingGroupMainClass
-                        mGetSomeInt -> return@InvocationHandler 1
-                        mOnClick -> { openSettingsDialog(args[0] as Context) }
+                        mReturns1 -> return@InvocationHandler 1
+                        mOnClick -> {
+                            openSettingsDialog(args[0] as Context)
+                        }
+
                         mGetStringId -> return@InvocationHandler "SettingGroup_Main_Other_WeKit"
                         mGetSettingLocation -> return@InvocationHandler classSettingLocation.clazz.createInstance(
                             settingGroupMainClass,
                             "com.tencent.mm.plugin.setting.ui.setting_new.settings.SettingAdditionHeaderSearch".toClass()
                         )
+
                         mGetNameResId -> return@InvocationHandler WEKIT_SETTING_ITEM_NAME_RES_ID
-                        else -> return@InvocationHandler ProxyBuilder.callSuper(proxy, method, *args)
+                        else -> return@InvocationHandler ProxyBuilder.callSuper(
+                            proxy,
+                            method,
+                            *args
+                        )
                     }
                 }
 
@@ -330,7 +360,9 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
     private lateinit var customSettingItemClass: Class<*>
 
     private fun tryHookNewSettingsMethod2() {
-        val settingGroupMainClass = "com.tencent.mm.plugin.setting.ui.setting_new.settings.SettingGroupMain".toClassOrNull() ?: return
+        val settingGroupMainClass =
+            "com.tencent.mm.plugin.setting.ui.setting_new.settings.SettingGroupMain".toClassOrNull()
+                ?: return
 
         if (!::customSettingItemClass.isInitialized)
             customSettingItemClass = createSettingItemClass(
@@ -350,7 +382,8 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
             }
 
         // create dependency chain
-        "com.tencent.mm.plugin.setting.ui.setting_new.settings.SettingGroupPersonalInfo".toClass().asResolver()
+        "com.tencent.mm.plugin.setting.ui.setting_new.settings.SettingGroupPersonalInfo".toClass()
+            .asResolver()
             .firstMethod {
                 returnType = classSettingLocation.clazz
             }
@@ -366,22 +399,21 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
             .hookAfter { param ->
                 val map = param.result as? Map<*, *>? ?: return@hookAfter
                 val originalSet = map.values.first() as LinkedHashSet<*>
-                val newSet = originalSet + customSettingItemClass
-                param.result = mapOf(map.keys.first() to newSet)
+                param.result = mapOf(map.keys.first() to originalSet + customSettingItemClass)
             }
 
         // inject into page
         "com.tencent.mm.plugin.setting.ui.setting_new.base.BaseSettingPrefUI"
             .toClass().asResolver().firstMethod { name = "superImportUIComponents" }
             .hookAfter { param ->
-            if (param.thisObject.javaClass.name
-                != "com.tencent.mm.plugin.setting.ui.setting_new.MainSettingsUI"
-            ) return@hookAfter
+                if (param.thisObject.javaClass.name
+                    != "com.tencent.mm.plugin.setting.ui.setting_new.MainSettingsUI"
+                ) return@hookAfter
 
-            @Suppress("UNCHECKED_CAST")
-            val settingItemClasses = param.args[0] as HashSet<Class<*>>
-            settingItemClasses.add(customSettingItemClass)
-        }
+                @Suppress("UNCHECKED_CAST")
+                val settingItemClasses = param.args[0] as HashSet<Class<*>>
+                settingItemClasses.add(customSettingItemClass)
+            }
     }
 
 //    private fun tryHookNewSettingsMethod3() {

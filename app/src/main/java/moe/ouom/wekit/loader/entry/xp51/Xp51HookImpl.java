@@ -68,8 +68,7 @@ public class Xp51HookImpl implements IHookBridge, ILoaderService {
 
     @SneakyThrows
     @Nullable
-    public Object invokeOriginalMethod(@NonNull Method method, @Nullable Object thisObject, @NonNull Object[] args)
-    {
+    public Object invokeOriginalMethod(@NonNull Method method, @Nullable Object thisObject, @NonNull Object[] args) {
         Objects.requireNonNull(method, "method");
         Objects.requireNonNull(args, "args");
         return XposedBridge.invokeOriginalMethod(method, thisObject, args);
@@ -77,8 +76,7 @@ public class Xp51HookImpl implements IHookBridge, ILoaderService {
 
     @SneakyThrows
     @Override
-    public <T> void invokeOriginalConstructor(@NonNull Constructor<T> ctor, @NonNull T thisObject, @NonNull Object[] args)
-    {
+    public <T> void invokeOriginalConstructor(@NonNull Constructor<T> ctor, @NonNull T thisObject, @NonNull Object[] args) {
         Objects.requireNonNull(ctor, "ctor");
         Objects.requireNonNull(thisObject, "thisObject");
         Objects.requireNonNull(args, "args");
@@ -145,15 +143,15 @@ public class Xp51HookImpl implements IHookBridge, ILoaderService {
         XposedBridge.log(tr);
     }
 
-    @Override
-    public void setClassLoaderHelper(@Nullable IClassLoaderHelper helper) {
-        mClassLoaderHelper = helper;
-    }
-
     @Nullable
     @Override
     public IClassLoaderHelper getClassLoaderHelper() {
         return mClassLoaderHelper;
+    }
+
+    @Override
+    public void setClassLoaderHelper(@Nullable IClassLoaderHelper helper) {
+        mClassLoaderHelper = helper;
     }
 
     @Override

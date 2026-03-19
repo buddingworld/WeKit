@@ -3,8 +3,8 @@ package moe.ouom.wekit.hooks.items.contacts
 import moe.ouom.wekit.core.dsl.dexMethod
 import moe.ouom.wekit.core.model.SwitchHookItem
 import moe.ouom.wekit.dexkit.abc.IResolvesDex
-import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.hooks.api.core.WeDatabaseApi
+import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import org.luckypray.dexkit.DexKitBridge
 
 @HookItem(
