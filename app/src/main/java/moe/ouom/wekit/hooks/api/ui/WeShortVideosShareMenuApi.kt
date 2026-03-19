@@ -2,6 +2,7 @@ package moe.ouom.wekit.hooks.api.ui
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
+import android.view.ContextMenu
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import de.robv.android.xposed.XC_MethodHook
 import moe.ouom.wekit.core.dsl.dexMethod
@@ -46,80 +47,107 @@ object WeShortVideosShareMenuApi : ApiHookItem(), IResolvesDex {
         )
     }
 
-    private val methodCreateMenu by dexMethod()
-    private val methodSelectMenuItem by dexMethod()
+    private val methodCreateMenu1 by dexMethod()
+    private val methodOnSelectMenuItem1 by dexMethod()
+    private val methodCreateMenu2 by dexMethod()
+    private val methodOnSelectMenuItem2 by dexMethod()
 
     override fun onEnable() {
-        methodCreateMenu.hookBefore { param ->
-            val menu = param.args[0]
-            for (provider in providers) {
-                try {
-                    for (item in provider.getMenuItems(param)) {
-                        menu.asResolver()
-                            .firstMethod {
-                                parameters(Int::class, CharSequence::class, Drawable::class)
-                            }
-                            .invoke(item.id, item.text, item.drawable.value)
-                    }
-                } catch (ex: Exception) {
-                    WeLogger.e(
-                        TAG,
-                        "provider ${provider.javaClass.name} threw while providing menu items",
-                        ex
-                    )
-                }
-            }
+        methodCreateMenu1.hookBefore { param ->
+            val menu = param.args[0] as ContextMenu
+            handleCreateMenu(param, menu)
         }
 
-        methodSelectMenuItem.hookBefore { param ->
+        methodOnSelectMenuItem1.hookBefore { param ->
             val menuItem = param.args[0] as android.view.MenuItem
-            val itemId = menuItem.itemId
-
             val baseFinderFeed = param.thisObject.asResolver()
                 .firstField {
                     type = "com.tencent.mm.plugin.finder.model.BaseFinderFeed"
                 }
                 .get()!!
-            val finderItem = baseFinderFeed.asResolver()
-                .firstField {
-                    name = "feedObject"
-                    superclass()
-                }
-                .get()!!
-            val mediaType = finderItem.asResolver()
-                .firstMethod {
-                    name = "getMediaType"
-                }
-                .invoke()!! as Int
-            val mediaList = finderItem.asResolver()
-                .firstMethod {
-                    name = "getMediaList"
-                }
-                .invoke() as LinkedList<*>
-            val mediaJsonList = mediaList.map { media ->
-                media.asResolver()
-                    .firstMethod {
-                        name = "toJSON"
-                        superclass()
-                    }.invoke()!! as JSONObject
-            }
+            handleOnSelectMenuItem(param, menuItem, baseFinderFeed)
+        }
 
-            for (provider in providers) {
-                try {
-                    for (item in provider.getMenuItems(param)) {
-                        if (item.id == itemId) {
-                            item.onClick(param, mediaType, mediaJsonList)
-                            param.result = null
-                            return@hookBefore
+        methodCreateMenu2.hookBefore { param ->
+            val menu = param.args[1] as ContextMenu
+            handleCreateMenu(param, menu)
+        }
+
+        methodOnSelectMenuItem2.hookBefore { param ->
+            val menuItem = param.args[1] as android.view.MenuItem
+            val baseFinderFeed = param.args[0]
+            handleOnSelectMenuItem(param, menuItem, baseFinderFeed)
+        }
+    }
+
+    private fun handleCreateMenu(
+        param: XC_MethodHook.MethodHookParam,
+        menu: ContextMenu
+    ) {
+        for (provider in providers) {
+            try {
+                for (item in provider.getMenuItems(param)) {
+                    menu.asResolver()
+                        .firstMethod {
+                            parameters(Int::class, CharSequence::class, Drawable::class)
                         }
-                    }
-                } catch (ex: Exception) {
-                    WeLogger.e(
-                        TAG,
-                        "provider ${provider.javaClass.name} threw while handling click event",
-                        ex
-                    )
+                        .invoke(item.id, item.text, item.drawable.value)
                 }
+            } catch (ex: Exception) {
+                WeLogger.e(
+                    TAG,
+                    "provider ${provider.javaClass.name} threw while providing menu items",
+                    ex
+                )
+            }
+        }
+    }
+
+    private fun handleOnSelectMenuItem(
+        param: XC_MethodHook.MethodHookParam,
+        menuItem: android.view.MenuItem,
+        baseFinderFeed: Any
+    ) {
+        val itemId = menuItem.itemId
+        val finderItem = baseFinderFeed.asResolver()
+            .firstField {
+                name = "feedObject"
+                superclass()
+            }
+            .get()!!
+        val mediaType = finderItem.asResolver()
+            .firstMethod {
+                name = "getMediaType"
+            }
+            .invoke()!! as Int
+        val mediaList = finderItem.asResolver()
+            .firstMethod {
+                name = "getMediaList"
+            }
+            .invoke() as LinkedList<*>
+        val mediaJsonList = mediaList.map { media ->
+            media.asResolver()
+                .firstMethod {
+                    name = "toJSON"
+                    superclass()
+                }.invoke()!! as JSONObject
+        }
+
+        for (provider in providers) {
+            try {
+                for (item in provider.getMenuItems(param)) {
+                    if (item.id == itemId) {
+                        item.onClick(param, mediaType, mediaJsonList)
+                        param.result = null
+                        return
+                    }
+                }
+            } catch (ex: Exception) {
+                WeLogger.e(
+                    TAG,
+                    "provider ${provider.javaClass.name} threw while handling click event",
+                    ex
+                )
             }
         }
     }
@@ -127,7 +155,7 @@ object WeShortVideosShareMenuApi : ApiHookItem(), IResolvesDex {
     override fun resolveDex(dexKit: DexKitBridge): Map<String, String> {
         val descriptors = mutableMapOf<String, String>()
 
-        methodCreateMenu.find(dexKit, descriptors) {
+        methodCreateMenu1.find(dexKit, descriptors) {
             searchPackages("com.tencent.mm.plugin.finder.feed")
             matcher {
                 name = "onCreateMMMenu"
@@ -135,11 +163,29 @@ object WeShortVideosShareMenuApi : ApiHookItem(), IResolvesDex {
             }
         }
 
-        methodSelectMenuItem.find(dexKit, descriptors) {
+        methodOnSelectMenuItem1.find(dexKit, descriptors) {
             searchPackages("com.tencent.mm.plugin.finder.feed")
             matcher {
                 name = "onMMMenuItemSelected"
                 usingEqStrings("[getMoreMenuItemSelectedListener] feed ")
+            }
+        }
+
+        methodCreateMenu2.find(dexKit, descriptors) {
+            searchPackages("com.tencent.mm.plugin.finder.feed")
+            matcher {
+                usingEqStrings("feed", "menu", "sheet", "holder", "KEY_FINDER_SELF_FLAG")
+            }
+        }
+
+        methodOnSelectMenuItem2.find(dexKit, descriptors) {
+            searchPackages("com.tencent.mm.plugin.finder.feed")
+            matcher {
+                declaredClass {
+                    usingEqStrings("Finder.FinderLoaderFeedUIContract.Presenter")
+                }
+
+                usingEqStrings("getMoreMenuItemSelectedListener feed ")
             }
         }
 

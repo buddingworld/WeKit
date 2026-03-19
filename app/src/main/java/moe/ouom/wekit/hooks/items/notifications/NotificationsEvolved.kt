@@ -27,8 +27,8 @@ import moe.ouom.wekit.hooks.api.core.WeDatabaseApi
 import moe.ouom.wekit.hooks.api.core.WeMessageApi
 import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.utils.HostInfo
+import moe.ouom.wekit.utils.KnownPaths
 import moe.ouom.wekit.utils.LruCache
-import moe.ouom.wekit.utils.ModulePaths
 import moe.ouom.wekit.utils.logging.WeLogger
 import moe.ouom.wekit.utils.replaceEmojis
 import moe.ouom.wekit.utils.replaceRichContent
@@ -41,7 +41,7 @@ import kotlin.io.path.writeBytes
 
 @HookItem(
     path = "通知/通知进化",
-    desc = "让应用的新消息通知更易用\n1. '快速回复' 按钮\n2. '标记为已读' 按钮\n3. 使用原生对话样式 (MessagingStyle)"
+    desc = "让应用的新消息通知更易用\n1. 「快速回复」按钮\n2. 「标记为已读」按钮\n3. 使用原生对话样式 (MessagingStyle)"
 )
 object NotificationsEvolved : SwitchHookItem() {
 
@@ -60,7 +60,7 @@ object NotificationsEvolved : SwitchHookItem() {
 
     private lateinit var meAvatarIcon: Icon
 
-    private val meAvatarPath by lazy { ModulePaths.data / "me_avatar" }
+    private val meAvatarPath by lazy { KnownPaths.modulePata / "me_avatar" }
 
     private val notificationReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {

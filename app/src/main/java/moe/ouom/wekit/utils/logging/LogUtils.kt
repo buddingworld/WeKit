@@ -1,6 +1,6 @@
 package moe.ouom.wekit.utils.logging
 
-import moe.ouom.wekit.utils.ModulePaths
+import moe.ouom.wekit.utils.KnownPaths
 import moe.ouom.wekit.utils.createDirectoriesNoThrow
 import moe.ouom.wekit.utils.formatEpoch
 import java.nio.file.Path
@@ -11,7 +11,7 @@ import kotlin.io.path.exists
 
 object LogUtils {
 
-    private val rootDir: Path by lazy { (ModulePaths.data / "logs").createDirectoriesNoThrow() }
+    private val rootDir: Path by lazy { (KnownPaths.modulePata / "logs").createDirectoriesNoThrow() }
 
     private val runLogDirectory: Path by lazy { (rootDir / "run").createDirectoriesNoThrow() }
 
@@ -19,7 +19,7 @@ object LogUtils {
 
     /**
      * 获取堆栈跟踪
-     * 
+     *
      * @param throwable new Throwable || Exception
      * @return 堆栈跟踪
      */
@@ -37,7 +37,7 @@ object LogUtils {
 
     /**
      * 记录运行日志 确保能走到那一行代码
-     * 
+     *
      * @param tag(文件名) 内容
      */
     fun addRunLog(tag: String, content: Any?) {

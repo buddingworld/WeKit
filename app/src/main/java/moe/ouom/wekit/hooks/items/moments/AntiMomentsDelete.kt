@@ -10,13 +10,13 @@ import moe.ouom.wekit.utils.logging.WeLogger
 
 @HookItem(
     path = "朋友圈/拦截朋友圈删除",
-    desc = "移除删除标志并注入 '[拦截删除]' 标记"
+    desc = "拦截他人朋友圈删除并添加标记"
 )
 object AntiMomentsDelete : SwitchHookItem(), WeDatabaseListenerApi.IUpdateListener {
 
     private val TAG = nameof(AntiMomentsDelete)
     private const val TBL_SNS_INFO = "SnsInfo"
-    private const val DEFAULT_WATERMARK = "[拦截删除]"
+    private const val DEFAULT_MARK = "[拦截删除]"
 
     override fun onUpdate(table: String, values: ContentValues): Boolean {
         if (!isEnabled) return false
@@ -79,10 +79,10 @@ object AntiMomentsDelete : SwitchHookItem(), WeDatabaseListenerApi.IUpdateListen
             val currentVal = json.get(key)
 
             if (currentVal is String) {
-                if (currentVal.contains(DEFAULT_WATERMARK)) {
+                if (currentVal.contains(DEFAULT_MARK)) {
                     return false
                 }
-                val newVal = "$DEFAULT_WATERMARK $currentVal "
+                val newVal = "$DEFAULT_MARK $currentVal "
                 proto.setLenUtf8(fieldNumber, 0, newVal)
                 return true
             }

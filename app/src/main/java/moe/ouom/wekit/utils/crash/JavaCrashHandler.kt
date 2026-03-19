@@ -19,7 +19,7 @@ class JavaCrashHandler(context: Context) : Thread.UncaughtExceptionHandler {
 
     /**
      * 获取崩溃日志管理器
-     * 
+     *
      * @return 崩溃日志管理器
      */
     val crashLogsManager: CrashLogsManager = CrashLogsManager()
@@ -30,7 +30,6 @@ class JavaCrashHandler(context: Context) : Thread.UncaughtExceptionHandler {
      */
     fun install() {
         Thread.setDefaultUncaughtExceptionHandler(this)
-        WeLogger.i(TAG, "Java crash handler installed")
     }
 
     /**
@@ -39,7 +38,6 @@ class JavaCrashHandler(context: Context) : Thread.UncaughtExceptionHandler {
     fun uninstall() {
         if (defaultHandler != null) {
             Thread.setDefaultUncaughtExceptionHandler(defaultHandler)
-            WeLogger.i(TAG, "Java crash handler uninstalled")
         }
     }
 

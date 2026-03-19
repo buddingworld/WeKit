@@ -55,13 +55,11 @@ object CrashInterceptor : SwitchHookItem() {
             javaCrashHandler = JavaCrashHandler(appContext!!)
             javaCrashHandler?.install()
 
-            WeLogger.i("CrashInterceptor", "Crash interceptor installed successfully")
-
             // 检查是否有待处理的崩溃
             checkPendingCrash()
 
         } catch (e: Throwable) {
-            WeLogger.e("[CrashInterceptor] Failed to install crash interceptor", e)
+            WeLogger.e(TAG, "Failed to install crash interceptor", e)
         }
     }
 

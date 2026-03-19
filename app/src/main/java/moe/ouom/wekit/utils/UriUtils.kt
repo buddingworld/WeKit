@@ -7,17 +7,13 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
+import moe.ouom.wekit.constants.PackageNames
 
 fun Uri.openInSystem(
     context: Context,
     useCustomTabs: Boolean = false
 ) {
     if (useCustomTabs) {
-        val forwardBitmap =
-            BitmapFactory.decodeResource(
-                ModuleRes.resources,
-                ModuleRes.getId("forward_24px", "drawable")
-            )
         val pendingIntent = PendingIntent.getActivity(
             context,
             0,
@@ -41,12 +37,21 @@ fun Uri.openInSystem(
             .setBookmarksButtonEnabled(true)
             .setDownloadButtonEnabled(true)
             .setColorScheme(CustomTabsIntent.COLOR_SCHEME_SYSTEM)
-            .setActionButton(
-                forwardBitmap,
-                "转发",
-                pendingIntent,
-                true
-            )
+            .apply {
+                if (context.packageName.startsWith(PackageNames.WECHAT)) {
+                    val forwardBitmap =
+                        BitmapFactory.decodeResource(
+                            ModuleRes.resources,
+                            ModuleRes.getId("forward_24px", "drawable")
+                        )
+                    setActionButton(
+                        forwardBitmap,
+                        "转发",
+                        pendingIntent,
+                        true
+                    )
+                }
+            }
             .build()
 
         intent.launchUrl(context, this)

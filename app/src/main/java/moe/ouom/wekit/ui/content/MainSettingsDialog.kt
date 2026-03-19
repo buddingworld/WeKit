@@ -1,7 +1,6 @@
 package moe.ouom.wekit.ui.content
 
 import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -41,16 +40,11 @@ import moe.ouom.wekit.ui.utils.showComposeDialog
 import moe.ouom.wekit.utils.ToastUtils
 import moe.ouom.wekit.utils.formatEpoch
 import moe.ouom.wekit.utils.logging.WeLogger
+import moe.ouom.wekit.utils.openInSystem
 import moe.ouom.wekit.utils.updates.UpdateChecker
 import moe.ouom.wekit.utils.updates.UpdateDownloader
 
 class MainSettingsDialog(context: Context) : BasePrefDialog(context, BuildConfig.TAG) {
-
-    private fun openUrl(context: Context, url: String) {
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = url.toUri()
-        context.startActivity(intent)
-    }
 
     // 定义优先级 映射关系 (值 -> 显示文本)
     private val priorityMap = mapOf(
@@ -234,13 +228,13 @@ class MainSettingsDialog(context: Context) : BasePrefDialog(context, BuildConfig
             title = "GitHub",
             summary = "修改于 Ujhhgtg/WeKit (原始: cwuom/WeKit)",
             iconName = "ic_github",
-            onClick = { openUrl(context, "https://github.com/Ujhhgtg/WeKit") }
+            onClick = { "https://github.com/Ujhhgtg/WeKit".toUri().openInSystem(context, true) }
         )
         addPreference(
             title = "Telegram",
             summary = "@ujhhgtg_wekit_ci",
             iconName = "ic_telegram",
-            onClick = { openUrl(context, "https://t.me/ujhhgtg_wekit_ci") }
+            onClick = { "https://t.me/ujhhgtg_wekit_ci".toUri().openInSystem(context, true) }
         )
     }
 }

@@ -1,23 +1,26 @@
 package moe.ouom.wekit.hooks.items.chat
 
-import android.content.ContentValues
-import android.os.Environment
-import android.provider.MediaStore
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.condition.type.Modifiers
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import moe.ouom.wekit.core.dsl.dexClass
 import moe.ouom.wekit.core.model.SwitchHookItem
 import moe.ouom.wekit.dexkit.abc.IResolvesDex
 import moe.ouom.wekit.hooks.api.core.model.MessageType
 import moe.ouom.wekit.hooks.api.ui.WeChatMessageContextMenuApi
 import moe.ouom.wekit.hooks.utils.annotation.HookItem
-import moe.ouom.wekit.utils.HostInfo
+import moe.ouom.wekit.utils.KnownPaths
 import moe.ouom.wekit.utils.ModuleRes
 import moe.ouom.wekit.utils.ToastUtils
 import moe.ouom.wekit.utils.logging.WeLogger
 import org.luckypray.dexkit.DexKitBridge
+import kotlin.io.path.div
+import kotlin.io.path.outputStream
 
 @HookItem(path = "聊天/贴纸保存到本地", desc = "在贴纸消息菜单添加保存按钮, 允许将图片保存到本地")
 object SaveStickersToLocalStorage : SwitchHookItem(), IResolvesDex,
@@ -83,32 +86,21 @@ object SaveStickersToLocalStorage : SwitchHookItem(), IResolvesDex,
                     }
                     .invoke(bytes) as ByteArray
 
-                val resolver = HostInfo.application.contentResolver
                 val fileName = "sticker_${System.currentTimeMillis()}.gif"
-                val contentValues = ContentValues().apply {
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                    put(MediaStore.MediaColumns.MIME_TYPE, "image/gif")
-                    put(
-                        MediaStore.MediaColumns.RELATIVE_PATH,
-                        Environment.DIRECTORY_PICTURES + "/WeKit"
-                    )
-                    put(MediaStore.Images.Media.IS_PENDING, 1)
-                }
-                val imageUri =
-                    resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-                imageUri?.let { uri ->
-                    try {
-                        resolver.openOutputStream(uri)?.use { outputStream ->
-                            outputStream.write(bytes)
+                CoroutineScope(Dispatchers.IO).launch {
+                    runCatching {
+                        (KnownPaths.downloads / fileName).outputStream().use { out ->
+                            out.write(bytes)
                         }
-                        contentValues.clear()
-                        contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
-                        resolver.update(uri, contentValues, null, null)
-
-                        ToastUtils.showToast("已将贴纸保存到 /sdcard/Pictures/WeKit/$fileName")
-                    } catch (e: Exception) {
-                        WeLogger.e(TAG, "failed to save sticker to local storage", e)
-                        resolver.delete(uri, null, null)
+                    }.onSuccess {
+                        withContext(Dispatchers.Main) {
+                            ToastUtils.showToast("已将贴纸保存到 /sdcard/Download/WeKit/$fileName")
+                        }
+                    }.onFailure { e ->
+                        WeLogger.e(TAG, "failed to save sticker $fileName", e)
+                        withContext(Dispatchers.Main) {
+                            ToastUtils.showToast("贴纸保存失败! 查看日志以了解错误详情")
+                        }
                     }
                 }
             }

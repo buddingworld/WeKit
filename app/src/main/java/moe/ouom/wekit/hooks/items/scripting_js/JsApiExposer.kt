@@ -7,7 +7,7 @@ import com.google.gson.reflect.TypeToken
 import dev.ujhhgtg.nameof.nameof
 import moe.ouom.wekit.hooks.api.core.WeApi
 import moe.ouom.wekit.hooks.api.core.WeMessageApi
-import moe.ouom.wekit.utils.ModulePaths
+import moe.ouom.wekit.utils.KnownPaths
 import moe.ouom.wekit.utils.createDirectoriesNoThrow
 import moe.ouom.wekit.utils.logging.WeLogger
 import okhttp3.FormBody
@@ -145,7 +145,7 @@ object JsApiExposer {
                     }
 
                     return try {
-                        val cacheDir = (ModulePaths.cache / "javascript_http_api").createDirectoriesNoThrow()
+                        val cacheDir = (KnownPaths.moduleCache / "javascript_http_api").createDirectoriesNoThrow()
 
                         // drop cache if size too large
                         if (cacheDir.fileSize() / 1024 / 1024 >= MAX_CACHE_SIZE_IN_MIB) {
@@ -493,7 +493,7 @@ object JsApiExposer {
     private val storage = ConcurrentHashMap<String, Any?>()
 
     private val DATA_DIR_PATH by lazy {
-        (ModulePaths.data / "data").createDirectoriesNoThrow()
+        (KnownPaths.modulePata / "data").createDirectoriesNoThrow()
     }
 
     private val storageFile get() = DATA_DIR_PATH.resolve("javascript_storage_api.json")

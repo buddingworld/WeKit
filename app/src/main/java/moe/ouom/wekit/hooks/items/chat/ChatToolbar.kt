@@ -138,7 +138,7 @@ object ChatToolbar : SwitchHookItem(), IResolvesDex {
                     }
                 }
 
-                WeLogger.i(TAG, "populated tool list with ${tools.size} items")
+                WeLogger.d(TAG, "populated tool list with ${tools.size} items")
                 toolsState.value = tools
 
                 // rate limit this since this method is called REALLY frequently

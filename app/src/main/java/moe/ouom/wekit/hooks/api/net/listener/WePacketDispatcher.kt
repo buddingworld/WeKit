@@ -54,7 +54,7 @@ object WePacketDispatcher : ApiHookItem(), IResolvesDex {
                         val lastTime = recentRequests[key]
                         if (lastTime != null && currentTime - lastTime < 500) {
                             // 直接返回，不执行任何请求处理
-                            WeLogger.i(TAG, "request skipped (duplicate): $uri")
+                            WeLogger.d(TAG, "request skipped (duplicate): $uri")
                             return@hookBefore
                         }
                         // 更新缓存

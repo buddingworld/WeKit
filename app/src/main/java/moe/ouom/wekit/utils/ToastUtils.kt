@@ -10,12 +10,12 @@ object ToastUtils {
     private val TAG = nameof(ToastUtils)
 
     fun showToast(ctx: Context?, msg: String?) {
-        WeLogger.i(TAG, "showToast: $msg")
+        WeLogger.d(TAG, "showToast: $msg")
         Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
     }
 
     fun showToast(msg: String?) {
-        WeLogger.i(TAG, "showToast: $msg")
+        WeLogger.d(TAG, "showToast: $msg")
         try {
             Toast.makeText(HostInfo.application, msg, Toast.LENGTH_SHORT).show()
         } catch (e: NullPointerException) {

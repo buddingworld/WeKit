@@ -39,7 +39,7 @@ import moe.ouom.wekit.ui.content.AlertDialogContent
 import moe.ouom.wekit.ui.content.TextButton
 import moe.ouom.wekit.ui.utils.showComposeDialog
 import moe.ouom.wekit.utils.HostInfo
-import moe.ouom.wekit.utils.ModulePaths
+import moe.ouom.wekit.utils.KnownPaths
 import moe.ouom.wekit.utils.ToastUtils
 import moe.ouom.wekit.utils.logging.WeLogger
 import org.luckypray.dexkit.DexKitBridge
@@ -239,7 +239,7 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
     private val classEmojiInfoStorage by dexClass()
     private val methodSaveEmojiThumb by dexMethod()
 
-    private val stickersDir: Path by lazy { ModulePaths.data / "stickers" }
+    private val stickersDir: Path by lazy { KnownPaths.modulePata / "stickers" }
 
     private val emojiMgrImpl: Any by lazy {
         WeServiceApi.emojiFeatureService.asResolver()

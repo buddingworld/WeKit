@@ -22,7 +22,7 @@ object WeLauncher {
     fun init(cl: ClassLoader, context: Context) {
         val processType = TargetProcessUtils.getCurrentProcessType()
         val currentProcessName = TargetProcessUtils.getCurrentProcessName()
-        WeLogger.i(TAG, "launching in processName=$currentProcessName, type=$processType")
+        WeLogger.d(TAG, "launching in processName=$currentProcessName, type=$processType")
 
         ParcelableFixer.init(cl, WeLauncher::class.java.classLoader!!)
 

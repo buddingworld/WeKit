@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 AppContent(
-                    onUrlClick = { url -> url.toUri().openInSystem(this) }
+                    onUrlClick = { url -> url.toUri().openInSystem(this, true) }
                 )
             }
         }

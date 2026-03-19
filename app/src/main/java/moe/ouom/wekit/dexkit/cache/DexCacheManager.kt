@@ -5,7 +5,7 @@ import moe.ouom.wekit.constants.PreferenceKeys
 import moe.ouom.wekit.core.model.BaseHookItem
 import moe.ouom.wekit.dexkit.abc.IResolvesDex
 import moe.ouom.wekit.preferences.WePrefs
-import moe.ouom.wekit.utils.ModulePaths
+import moe.ouom.wekit.utils.KnownPaths
 import moe.ouom.wekit.utils.createDirectoriesNoThrow
 import moe.ouom.wekit.utils.logging.WeLogger
 import org.json.JSONObject
@@ -32,7 +32,7 @@ object DexCacheManager {
     private const val HOST_VERSION_FILE = "host_version.txt"
     private const val CACHE_FILE_SUFFIX = ".json"
     private val cacheDir: Path by lazy {
-        (ModulePaths.data / CACHE_DIR_NAME).createDirectoriesNoThrow()
+        (KnownPaths.modulePata / CACHE_DIR_NAME).createDirectoriesNoThrow()
     }
     private var currentHostVersion: String = ""
 

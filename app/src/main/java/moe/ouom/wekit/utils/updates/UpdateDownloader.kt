@@ -6,7 +6,7 @@ import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import moe.ouom.wekit.constants.PackageNames
-import moe.ouom.wekit.utils.ModulePaths
+import moe.ouom.wekit.utils.KnownPaths
 import okhttp3.Request
 import java.io.IOException
 import java.nio.file.Path
@@ -19,7 +19,7 @@ object UpdateDownloader {
 
     suspend fun downloadAndInstall(context: Context, url: String, onProgress: (Int) -> Unit = {}) =
         withContext(Dispatchers.IO) {
-            val cacheDir = ModulePaths.cache / "updates"
+            val cacheDir = KnownPaths.moduleCache / "updates"
             cacheDir.createDirectories()
             val zipFile = cacheDir / "update.zip"
             val apkFile = cacheDir / "update.apk"

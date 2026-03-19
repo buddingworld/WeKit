@@ -45,7 +45,7 @@ import moe.ouom.wekit.ui.utils.MainActivityLifecycleOwnerProvider
 import moe.ouom.wekit.ui.utils.setLifecycleOwner
 import org.luckypray.dexkit.DexKitBridge
 
-@HookItem(path = "聊天/对话分组", desc = "向主页顶部添加 Tab 栏, 将对话分组\n建议同时启用 '界面美化/隐藏主页下滑「最近」页'")
+@HookItem(path = "聊天/对话分组", desc = "向主页顶部添加 Tab 栏, 将对话分组\n建议同时启用「界面美化/隐藏主页下滑「最近」页」")
 object ConversationGrouping : SwitchHookItem(), IResolvesDex {
 
     override fun onEnable() {

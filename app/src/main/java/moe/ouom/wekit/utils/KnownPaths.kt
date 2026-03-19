@@ -3,22 +3,26 @@ package moe.ouom.wekit.utils
 import android.os.Environment
 import moe.ouom.wekit.BuildConfig
 import java.nio.file.Path
-import kotlin.io.path.Path
 import kotlin.io.path.div
 
-object ModulePaths {
+object KnownPaths {
 
     val internalStorage: Path by lazy {
-        Path(Environment.getExternalStorageDirectory().absolutePath)
+        Environment.getExternalStorageDirectory().toPath()
     }
 
-    val data: Path by lazy {
+    val modulePata by lazy {
         (internalStorage / "Android" / "data" / HostInfo.packageName / "files" / BuildConfig.TAG)
             .createDirectoriesNoThrow()
     }
 
-    val cache: Path by lazy {
+    val moduleCache by lazy {
         (internalStorage / "Android" / "data" / HostInfo.packageName / "cache" / BuildConfig.TAG)
+            .createDirectoriesNoThrow()
+    }
+
+    val downloads by lazy {
+        (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toPath() / "WeKit")
             .createDirectoriesNoThrow()
     }
 }

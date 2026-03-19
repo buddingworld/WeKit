@@ -1,11 +1,12 @@
 package moe.ouom.wekit.hooks.items.chat
 
-import android.content.ContentValues
-import android.os.Environment
-import android.provider.MediaStore
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import moe.ouom.wekit.core.dsl.dexClass
 import moe.ouom.wekit.core.dsl.dexMethod
 import moe.ouom.wekit.core.model.SwitchHookItem
@@ -14,7 +15,7 @@ import moe.ouom.wekit.hooks.api.core.WeServiceApi
 import moe.ouom.wekit.hooks.api.core.model.MessageType
 import moe.ouom.wekit.hooks.api.ui.WeChatMessageContextMenuApi
 import moe.ouom.wekit.hooks.utils.annotation.HookItem
-import moe.ouom.wekit.utils.HostInfo
+import moe.ouom.wekit.utils.KnownPaths
 import moe.ouom.wekit.utils.ModuleRes
 import moe.ouom.wekit.utils.ToastUtils
 import moe.ouom.wekit.utils.logging.WeLogger
@@ -22,10 +23,9 @@ import org.luckypray.dexkit.DexKitBridge
 import xyz.xxin.silkdecoder.SilkDecoder
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
-import java.nio.file.Path
 import kotlin.io.path.Path
-import kotlin.io.path.extension
-import kotlin.io.path.inputStream
+import kotlin.io.path.div
+import kotlin.io.path.nameWithoutExtension
 
 @HookItem(
     path = "聊天/语音保存到本地",
@@ -82,63 +82,38 @@ object SaveVoicesToLocalStorage : SwitchHookItem(), IResolvesDex,
 
     override fun getMenuItems(): List<WeChatMessageContextMenuApi.MenuItem> {
         return listOf(
-            @Suppress("UNCHECKED_CAST")
             WeChatMessageContextMenuApi.MenuItem(
                 777003,
                 "存本地",
                 lazy { ModuleRes.getDrawable("download_24px") },
                 { msgInfo -> msgInfo.isType(MessageType.VOICE) }
             ) { _, _, msgInfo ->
-                val encPath = msgInfo.imagePath
+                CoroutineScope(Dispatchers.IO).launch {
+                    val encPath = msgInfo.imagePath
+                    var service: Any? = null
+                    if (!Modifier.isStatic(methodGetAmrFullPath.method.modifiers)) {
+                        service =
+                            WeServiceApi.getServiceByClass(methodGetAmrFullPath.method.declaringClass)
+                    }
+                    val amrPath =
+                        Path(methodGetAmrFullPath.method.invoke(service, null, encPath, true) as String)
+                    val mp3Name = amrPath.nameWithoutExtension + ".mp3"
+                    val mp3Path = KnownPaths.downloads / mp3Name
 
-                var service: Any? = null
-                if (!Modifier.isStatic(methodGetAmrFullPath.method.modifiers)) {
-                    service =
-                        WeServiceApi.getServiceByClass(methodGetAmrFullPath.method.declaringClass)
-                }
-                val amrPath =
-                    Path(methodGetAmrFullPath.method.invoke(service, null, encPath, true) as String)
-                val mp3Path = amrPath.resolveSibling(amrPath.fileName.toString() + ".mp3")
-                SilkDecoder.decodeToMp3(amrPath.toString(), mp3Path.toString())
-                saveAudio(mp3Path)
-                WeLogger.d(TAG, "mp3: $mp3Path")
-            }
-        )
-    }
-
-    private fun saveAudio(sourceFile: Path) {
-        val extension = sourceFile.extension
-        val resolver = HostInfo.application.contentResolver
-        val fileName = "voice_${System.currentTimeMillis()}.$extension"
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-            put(MediaStore.MediaColumns.MIME_TYPE, "audio/$extension")
-            put(
-                MediaStore.MediaColumns.RELATIVE_PATH,
-                Environment.DIRECTORY_MUSIC + "/WeKit"
-            )
-            put(MediaStore.Audio.Media.IS_PENDING, 1)
-        }
-
-        val audioUri = resolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues)
-
-        audioUri?.let { uri ->
-            try {
-                resolver.openOutputStream(uri)?.use { outputStream ->
-                    sourceFile.inputStream().use { inputStream ->
-                        inputStream.copyTo(outputStream)
+                    runCatching {
+                        SilkDecoder.decodeToMp3(amrPath.toString(), mp3Path.toString())
+                    }.onSuccess {
+                        withContext(Dispatchers.Main) {
+                            ToastUtils.showToast("已将语音保存到 /sdcard/Download/WeKit/$mp3Name")
+                        }
+                    }.onFailure { e ->
+                        WeLogger.e(TAG, "failed to save voice $mp3Name", e)
+                        withContext(Dispatchers.Main) {
+                            ToastUtils.showToast("语音保存失败! 查看日志以了解错误详情")
+                        }
                     }
                 }
-
-                contentValues.clear()
-                contentValues.put(MediaStore.Audio.Media.IS_PENDING, 0)
-                resolver.update(uri, contentValues, null, null)
-
-                ToastUtils.showToast("已将语音保存到 /sdcard/Music/WeKit/$fileName")
-            } catch (e: Exception) {
-                WeLogger.e(TAG, "failed to save voice message", e)
-                resolver.delete(uri, null, null)
             }
-        }
+        )
     }
 }

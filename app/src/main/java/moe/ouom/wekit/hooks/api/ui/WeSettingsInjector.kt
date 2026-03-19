@@ -18,7 +18,7 @@ import moe.ouom.wekit.dexkit.DexMethodDescriptor
 import moe.ouom.wekit.dexkit.abc.IResolvesDex
 import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.ui.content.MainSettingsDialog
-import moe.ouom.wekit.utils.ModulePaths
+import moe.ouom.wekit.utils.KnownPaths
 import moe.ouom.wekit.utils.createDirectoriesNoThrow
 import moe.ouom.wekit.utils.logging.WeLogger
 import org.luckypray.dexkit.DexKitBridge
@@ -364,7 +364,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
 
         if (!::customSettingItemClass.isInitialized)
             customSettingItemClass = createSettingItemClass(
-                (ModulePaths.data / "generated_proxy_classes").createDirectoriesNoThrow()
+                (KnownPaths.modulePata / "generated_proxy_classes").createDirectoriesNoThrow()
             )
 
         // a simple way to inject string resource

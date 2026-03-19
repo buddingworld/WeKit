@@ -43,10 +43,13 @@ object HookItemsLoader {
         val allDexResolvingItems = allHookItems.filterIsInstance<IResolvesDex>()
         val outdatedItems = DexCacheManager.getOutdatedItems(allDexResolvingItems)
         val validItems = allDexResolvingItems.filterNot { outdatedItems.contains(it) }
-        WeLogger.i(
-            TAG,
-            "found ${validItems.size} valid items, ${outdatedItems.size} outdated items"
-        )
+
+        if (outdatedItems.isNotEmpty())
+            WeLogger.i(
+                TAG,
+                "found ${validItems.size} valid items, ${outdatedItems.size} outdated items"
+            )
+
         val corruptedItems = loadDescriptorsFromCache(validItems)
         val allBrokenItems = (outdatedItems + corruptedItems).distinct()
 
