@@ -104,7 +104,7 @@ fun debugViewTree(view: View, connector: String = "", indent: String = "") {
     } else "NO_ID"
     WeLogger.d(
         nameof(::debugViewTree),
-        "$indent$connector${view::class.simpleName} [$idStr / ${view.id}]"
+        "$indent$connector${view.javaClass.name} [ID: $idStr / ${view.id}] [TAG: ${view.tag?.javaClass?.name ?: "null"}]"
     )
     if (view is ViewGroup) {
         val children = (0 until view.childCount).mapNotNull { view.getChildAt(it) }

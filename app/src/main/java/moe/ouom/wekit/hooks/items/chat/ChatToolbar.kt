@@ -1,7 +1,6 @@
 package moe.ouom.wekit.hooks.items.chat
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
@@ -18,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Favorite
@@ -57,6 +57,7 @@ import moe.ouom.wekit.ui.utils.MainActivityLifecycleOwnerProvider
 import moe.ouom.wekit.ui.utils.findViewByChildIndexes
 import moe.ouom.wekit.ui.utils.iterable
 import moe.ouom.wekit.ui.utils.setLifecycleOwner
+import moe.ouom.wekit.utils.RuntimeConfig
 import moe.ouom.wekit.utils.logging.WeLogger
 import moe.ouom.wekit.utils.now
 import org.luckypray.dexkit.DexKitBridge
@@ -155,10 +156,10 @@ object ChatToolbar : SwitchHookItem(), IResolvesDex {
                 val linearLayout = chatFooter.findViewByChildIndexes<LinearLayout>(0, 1)!!
                 if (linearLayout.findViewWithTag<ComposeView>(VIEW_TAG) != null) return@hookAfter
 
-                val context = linearLayout.context
+                val context = RuntimeConfig.getLauncherUiActivity()!!
                 val lifecycleOwner = MainActivityLifecycleOwnerProvider.lifecycleOwner
                 linearLayout.setLifecycleOwner(lifecycleOwner)
-                (context as Activity).window.decorView.setLifecycleOwner(lifecycleOwner)
+                context.window.decorView.setLifecycleOwner(lifecycleOwner)
 
                 linearLayout.addView(ComposeView(context).apply {
                     tag = VIEW_TAG
@@ -221,18 +222,19 @@ object ChatToolbar : SwitchHookItem(), IResolvesDex {
     }
 
     private val NAME_TO_ICON_MAP = mapOf(
-        "拍摄" to Icons.Default.Camera,
+        "拍摄"    to Icons.Default.Camera,
         "视频通话" to Icons.Outlined.VideoChat, // because Icons.Default.VoiceChat is outlined
         "语音通话" to Icons.Outlined.VoiceChat,
-        "位置" to Icons.Default.LocationOn,
-        "红包" to Icons.Default.Mail,
-        "礼物" to Icons.Default.Redeem,
-        "转账" to Icons.Default.AttachMoney,
+        "位置"    to Icons.Default.LocationOn,
+        "红包"    to Icons.Default.Mail,
+        "礼物"    to Icons.Default.Redeem,
+        "转账"    to Icons.Default.AttachMoney,
         "语音输入" to Icons.Default.Mic,
-        "收藏" to Icons.Default.Favorite,
-        "接龙" to Icons.Default.FormatListNumbered,
-        "名片" to Icons.Default.AccountBox,
-        "音乐" to Icons.Default.MusicNote
+        "收藏"    to Icons.Default.Favorite,
+        "接龙"    to Icons.Default.FormatListNumbered,
+        "文件"    to Icons.Default.AttachFile,
+        "名片"    to Icons.Default.AccountBox,
+        "音乐"    to Icons.Default.MusicNote
     )
 
     override fun resolveDex(dexKit: DexKitBridge): Map<String, String> {

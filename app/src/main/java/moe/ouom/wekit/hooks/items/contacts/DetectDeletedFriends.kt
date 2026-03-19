@@ -43,7 +43,8 @@ import kotlin.time.Duration.Companion.seconds
 @HookItem(path = "联系人与群组/检测单向删除好友", desc = "批量扫描全部好友, 检测是否被对方单向删除")
 object DetectDeletedFriends : ClickableHookItem(), IWePacketInterceptor {
 
-    override fun noSwitchWidget(): Boolean = true
+    override val noSwitchWidget: Boolean
+        get() = true
 
     private val TAG = nameof(DetectDeletedFriends)
 

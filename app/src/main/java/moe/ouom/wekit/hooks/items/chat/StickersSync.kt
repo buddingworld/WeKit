@@ -46,6 +46,7 @@ import org.luckypray.dexkit.DexKitBridge
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.createDirectories
+import kotlin.io.path.div
 import kotlin.io.path.extension
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.nameWithoutExtension
@@ -107,10 +108,6 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
     private val stickerPacks: List<StickerPack> by lazy {
         runBlocking {
             val dir = stickersDir
-            if (dir == null) {
-                WeLogger.e(TAG, "could not get stickers directory, skipped")
-                return@runBlocking emptyList<StickerPack>()
-            }
 
             safeShowToast("正在加载贴纸包...")
 
@@ -242,8 +239,7 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
     private val classEmojiInfoStorage by dexClass()
     private val methodSaveEmojiThumb by dexMethod()
 
-    private val stickersDir: Path?
-        get() = ModulePaths.data?.resolve("stickers")
+    private val stickersDir: Path by lazy { ModulePaths.data / "stickers" }
 
     private val emojiMgrImpl: Any by lazy {
         WeServiceApi.emojiFeatureService.asResolver()

@@ -6,6 +6,7 @@ import moe.ouom.wekit.core.dsl.dexMethod
 import moe.ouom.wekit.core.model.SwitchHookItem
 import moe.ouom.wekit.dexkit.abc.IResolvesDex
 import moe.ouom.wekit.hooks.utils.annotation.HookItem
+import moe.ouom.wekit.utils.enumValueOfClass
 import org.luckypray.dexkit.DexKitBridge
 
 @HookItem(path = "聊天/引用消息直达", desc = "点击被引用消息时直接跳转至对应消息")
@@ -46,8 +47,7 @@ object QuotedMessageDirectJump : SwitchHookItem(), IResolvesDex {
                 longValue,
                 stringValue,
                 msgQuoteItem,
-                classEnumQuoteJumpToPositionSource.clazz.asResolver() // java doesn't implicitly cast integer to the upper enum type, so we still have to locate the enum class
-                    .firstMethod { name = "valueOf" }.invoke("QuoteLongClickFromQuoteView")
+                enumValueOfClass(classEnumQuoteJumpToPositionSource.clazz, "QuoteLongClickFromQuoteView")
             )
             param.result = null
         }

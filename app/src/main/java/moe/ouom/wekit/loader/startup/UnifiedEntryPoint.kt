@@ -2,13 +2,14 @@ package moe.ouom.wekit.loader.startup
 
 import android.app.Application
 import android.app.Instrumentation
+import android.util.Log
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.ClassLoaderProvider
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
+import moe.ouom.wekit.BuildConfig
 import moe.ouom.wekit.loader.abc.ILoaderService
 import moe.ouom.wekit.utils.hookAfterDirectly
-import moe.ouom.wekit.utils.logging.WeLogger
 
 object UnifiedEntryPoint {
 
@@ -39,7 +40,7 @@ object UnifiedEntryPoint {
                                 modulePath,
                                 loaderService
                             )
-                        }.onFailure { e -> WeLogger.e(TAG, "StartupAgent failed", e) }
+                        }.onFailure { e -> Log.e(BuildConfig.TAG, "$TAG: StartupAgent failed", e) }
                     }
             }
     }

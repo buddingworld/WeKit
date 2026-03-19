@@ -1,35 +1,21 @@
 package moe.ouom.wekit.utils.logging
 
 import moe.ouom.wekit.utils.ModulePaths
+import moe.ouom.wekit.utils.createDirectoriesNoThrow
 import moe.ouom.wekit.utils.formatEpoch
 import java.nio.file.Path
 import kotlin.io.path.appendText
-import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
+import kotlin.io.path.div
 import kotlin.io.path.exists
 
 object LogUtils {
 
-    private val rootDir: Path?
-        get() {
-            return ModulePaths.data?.resolve("logs")?.apply {
-                createDirectories()
-            }
-        }
+    private val rootDir: Path by lazy { (ModulePaths.data / "logs").createDirectoriesNoThrow() }
 
-    private val runLogDirectory: Path?
-        get() {
-            return rootDir?.resolve("run")?.apply {
-                createDirectories()
-            }
-        }
+    private val runLogDirectory: Path by lazy { (rootDir / "run").createDirectoriesNoThrow() }
 
-    private val errorLogDirectory: Path?
-        get() {
-            return rootDir?.resolve("error")?.apply {
-                createDirectories()
-            }
-        }
+    private val errorLogDirectory: Path by lazy { (rootDir / "error").createDirectoriesNoThrow() }
 
     /**
      * 获取堆栈跟踪
@@ -67,7 +53,6 @@ object LogUtils {
 
     private fun addLog(fileName: String, desc: String?, content: Any?, isError: Boolean) {
         val directory = if (isError) errorLogDirectory else runLogDirectory
-        if (directory == null) return
 
         val path = directory.resolve("$fileName.log")
         val stringBuffer = StringBuilder(time)

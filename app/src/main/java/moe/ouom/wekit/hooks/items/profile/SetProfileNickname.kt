@@ -77,5 +77,6 @@ object SetProfileNickname : ClickableHookItem() {
         return input.replace("\"", "\\\"")
     }
 
-    override fun noSwitchWidget(): Boolean = true
+    override val noSwitchWidget: Boolean
+        get() = true
 }

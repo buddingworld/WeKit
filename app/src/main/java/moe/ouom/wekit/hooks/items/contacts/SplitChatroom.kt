@@ -30,15 +30,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
-import moe.ouom.wekit.utils.RuntimeConfig
 import moe.ouom.wekit.core.model.ClickableHookItem
-import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.hooks.api.core.WeDatabaseApi
 import moe.ouom.wekit.hooks.api.core.model.WeGroup
+import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.ui.content.AlertDialogContent
 import moe.ouom.wekit.ui.content.Button
 import moe.ouom.wekit.ui.content.TextButton
 import moe.ouom.wekit.ui.utils.showComposeDialog
+import moe.ouom.wekit.utils.RuntimeConfig
 import moe.ouom.wekit.utils.ToastUtils
 import moe.ouom.wekit.utils.logging.WeLogger
 
@@ -87,7 +87,7 @@ object SplitChatroom : ClickableHookItem() {
             val rawId = chatroomId.substringBefore("@")
             val targetSplitId = "${rawId}@@chatroom"
 
-            WeLogger.i(TAG, "Launching ChattingUI for chatroom: $chatroomId")
+            WeLogger.i(TAG, "launching ChattingUI for chatroom: $chatroomId")
 
             intent.putExtra("Chat_User", targetSplitId)
             intent.putExtra("Chat_Mode", 1)
@@ -98,7 +98,8 @@ object SplitChatroom : ClickableHookItem() {
         }
     }
 
-    override fun noSwitchWidget(): Boolean = true
+    override val noSwitchWidget: Boolean
+        get() = true
 }
 
 // ---------------------------------------------------------------------------

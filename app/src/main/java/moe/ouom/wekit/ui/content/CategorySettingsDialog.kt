@@ -75,7 +75,7 @@ class CategorySettingsDialog(
             rowKey = nextKey("cl_${item.path}"),
             title = title,
             summary = summary,
-            showSwitch = !item.noSwitchWidget(),
+            showSwitch = !item.noSwitchWidget,
             configKey = configKey,
             initialChecked = initialChecked,
             onBeforeToggle = { checked ->

@@ -568,19 +568,14 @@ object WeMessageApi : ApiHookItem(), IResolvesDex {
      */
     @SuppressLint("DiscouragedPrivateApi")
     private fun initUnsafe() {
-        try {
-            val unsafeClass = Class.forName("sun.misc.Unsafe")
-            val theUnsafeField = unsafeClass.getDeclaredField("theUnsafe")
-            theUnsafeField.isAccessible = true
-            unsafeInstance = theUnsafeField.get(null)
-            allocateInstanceMethod = unsafeClass.getMethod(
-                "allocateInstance",
-                Class::class.java
-            )
-            WeLogger.i(TAG, "Unsafe 能力已就绪")
-        } catch (e: Exception) {
-            WeLogger.e(TAG, "Unsafe 获取失败", e)
-        }
+        val unsafeClass = Class.forName("sun.misc.Unsafe")
+        val theUnsafeField = unsafeClass.getDeclaredField("theUnsafe")
+        theUnsafeField.isAccessible = true
+        unsafeInstance = theUnsafeField.get(null)
+        allocateInstanceMethod = unsafeClass.getMethod(
+            "allocateInstance",
+            Class::class.java
+        )
     }
 
     /**

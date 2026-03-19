@@ -66,12 +66,9 @@ object WePacketHelper : ApiHookItem(), IResolvesDex {
     private val TAG = nameof(WePacketHelper)
 
     override fun onEnable() {
-
         // 映射业务请求类
         cgiReqClassMap[522] = classNewSendMsgReq.clazz
         cgiReqClassMap[681] = classOplogReq.clazz
-
-        WeLogger.i(TAG, "initialized")
     }
 
     @SuppressLint("NonUniqueDexKitData")

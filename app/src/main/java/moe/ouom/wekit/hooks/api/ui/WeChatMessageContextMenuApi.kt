@@ -97,30 +97,6 @@ object WeChatMessageContextMenuApi : ApiHookItem(), IResolvesDex {
                     superclass()
                 }
                 .get()!!
-//                    val apiManager = chattingContext.asResolver()
-//                        .firstField {
-//                            type = WeServiceApi.methodApiManagerGetApi.method.declaringClass
-//                        }
-//                        .get()!!
-//                    val api = WeServiceApi.methodApiManagerGetApi.method.invoke(
-//                        apiManager,
-//                        classChattingMessBox.clazz.interfaces[0]
-//                    )
-//                    val chattingContext2 = api.asResolver()
-//                        .firstField {
-//                            type = WeMessageApi.classChattingContext.clazz
-//                            superclass()
-//                        }
-//                        .get()!!
-//                    val apiManager2 = chattingContext2.asResolver()
-//                        .firstField {
-//                            type = WeServiceApi.methodApiManagerGetApi.method.declaringClass
-//                        }
-//                        .get()!!
-//                    val api2 = WeServiceApi.methodApiManagerGetApi.method.invoke(
-//                        apiManager2,
-//                        WeMessageApi.classChattingDataAdapter.clazz.interfaces[0]
-//                    )
             val tag = currentView!!.tag
 
             val msgInfo = tag.asResolver()
@@ -132,11 +108,6 @@ object WeChatMessageContextMenuApi : ApiHookItem(), IResolvesDex {
                 .invoke()!!
 
             val menuItem = param.args[0] as android.view.MenuItem
-//                    val msgInfo = api2.asResolver()
-//                        .firstMethod {
-//                            name = "getItem"
-//                        }
-//                        .invoke(menuItem.groupId)!!
             val msgInfoWrapper = MessageInfo(msgInfo)
             try {
                 for (item in menuItems.values.flatten()) {

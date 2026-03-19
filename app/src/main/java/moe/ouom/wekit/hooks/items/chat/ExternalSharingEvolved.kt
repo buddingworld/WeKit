@@ -9,11 +9,10 @@ import moe.ouom.wekit.core.model.SwitchHookItem
 import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.utils.HostInfo
 
-@HookItem(path = "聊天/分享进化", desc = "让应用的系统分享菜单更易用 (没写完)")
+@HookItem(path = "聊天/分享进化", desc = "让应用的系统分享菜单更易用")
 object ExternalSharingEvolved : SwitchHookItem() {
 
     override fun onEnable() {
-
         val ctx = HostInfo.application
 
         val sm =
@@ -44,6 +43,6 @@ object ExternalSharingEvolved : SwitchHookItem() {
             .setLongLived(true)
             .build()
 
-        sm.addDynamicShortcuts(listOf(shortcut))
+        sm.dynamicShortcuts = listOf(shortcut)
     }
 }

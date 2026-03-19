@@ -1,10 +1,11 @@
 package moe.ouom.wekit.loader.entry.common
 
+import android.util.Log
 import dev.ujhhgtg.nameof.nameof
+import moe.ouom.wekit.BuildConfig
 import moe.ouom.wekit.loader.abc.IHookBridge
 import moe.ouom.wekit.loader.abc.ILoaderService
 import moe.ouom.wekit.loader.startup.UnifiedEntryPoint
-import moe.ouom.wekit.utils.logging.WeLogger
 
 object ModuleLoader {
 
@@ -12,7 +13,7 @@ object ModuleLoader {
     private var isInitialized = false
 
     @JvmStatic
-    fun initialize(
+    fun init(
         hostDataDir: String,
         hostClassLoader: ClassLoader,
         loaderService: ILoaderService,
@@ -23,7 +24,7 @@ object ModuleLoader {
         if (isInitialized) return
         isInitialized = true
 
-        WeLogger.i(TAG, "initializing from entry point ${loaderService.entryPointName}")
+        Log.i(BuildConfig.TAG, "$TAG: initializing from entry point ${loaderService.entryPointName}")
         UnifiedEntryPoint.entry(loaderService, hostClassLoader, modulePath)
     }
 }

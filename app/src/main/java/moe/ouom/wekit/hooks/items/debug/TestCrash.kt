@@ -291,5 +291,6 @@ object TestCrash : ClickableHookItem() {
         recursiveMethod()
     }
 
-    override fun noSwitchWidget(): Boolean = true
+    override val noSwitchWidget: Boolean
+        get() = true
 }

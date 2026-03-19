@@ -61,7 +61,7 @@ object FridaInjectEntry {
             setXblService(xblService)
         }
         val cl = findHostClassLoader()
-        ModuleLoader.initialize(hostDataDir.absolutePath, cl, FridaStartupImpl, null, modulePath.absolutePath, false)
+        ModuleLoader.init(hostDataDir.absolutePath, cl, FridaStartupImpl, null, modulePath.absolutePath, false)
     }
 
     private fun findHostClassLoader(): ClassLoader {

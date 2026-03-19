@@ -2,15 +2,12 @@ package moe.ouom.wekit.core.model
 
 import android.content.Context
 import moe.ouom.wekit.preferences.WePrefs
-import moe.ouom.wekit.utils.TargetProcessUtils
 import moe.ouom.wekit.utils.logging.WeLogger
 
 abstract class SwitchHookItem : BaseHookItem() {
 
-    val targetProcess: Int = targetProcess()
-
-    private var _isEnabled: Boolean = false
-    var isEnabled: Boolean
+    private var _isEnabled = false
+    var isEnabled
         get() = _isEnabled
         set(value) {
             if (_isEnabled == value) return
@@ -18,12 +15,8 @@ abstract class SwitchHookItem : BaseHookItem() {
             if (!value) {
                 if (isLoaded) {
                     WeLogger.i("disabling $path...")
-                    try {
-                        disable()
-                        isLoaded = false
-                    } catch (e: Throwable) {
-                        WeLogger.e("failed to disable $path", e)
-                    }
+                    disable()
+                    isLoaded = false
                 }
             } else {
                 WeLogger.i("enabling $path...")
@@ -38,8 +31,6 @@ abstract class SwitchHookItem : BaseHookItem() {
 
     private var isLoaded: Boolean = false
     private var toggleCompletionCallback: Runnable? = null
-
-    open fun targetProcess(): Int = TargetProcessUtils.PROC_MAIN
 
     open fun onBeforeToggle(newState: Boolean, context: Context): Boolean = true
 

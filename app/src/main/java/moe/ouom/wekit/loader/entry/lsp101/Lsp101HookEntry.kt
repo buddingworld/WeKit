@@ -24,7 +24,7 @@ class Lsp101HookEntry(private val self: XposedModule) : Lsp10xHookEntryHandler {
         if (packageName.startsWith(PackageNames.WECHAT)) {
             if (param.isFirstPackage()) {
                 val ai = param.applicationInfo
-                ModuleLoader.initialize(
+                ModuleLoader.init(
                     ai.dataDir,
                     param.classLoader,
                     Lsp101HookImpl.INSTANCE,

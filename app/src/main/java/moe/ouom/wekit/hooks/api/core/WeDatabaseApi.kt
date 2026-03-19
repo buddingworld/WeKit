@@ -222,71 +222,40 @@ object WeDatabaseApi : ApiHookItem(), IResolvesDex {
     override fun onEnable() {
         methodGetStorage.method.hookAfter { param ->
             if (::dbInstance.isInitialized) return@hookAfter
-            val storageObj = param.result ?: return@hookAfter
 
+            val storageObj = param.result ?: return@hookAfter
             initializeDatabase(storageObj)
         }
-
-//        "com.tencent.wcdb.database.SQLiteDatabase".toClass().asResolver()
-//            .firstMethod { name = "open" }
-//            .hookBefore { param ->
-//                val keyBytes = param.args[0] as? ByteArray
-//                val cipherSpec = param.args[1] ?: return@hookBefore
-//
-//                val dbPath = param.thisObject.asResolver().firstMethod { name = "getPath" }.invoke()!! as String
-//
-//                if (keyBytes != null) {
-//                    val hexOfBytes = keyBytes.joinToString("") { "%02x".format(it) }
-//                    val asAscii = String(keyBytes, Charsets.UTF_8)
-//                    WeLogger.d(TAG, "WCDB path=$dbPath")
-//                    WeLogger.d(TAG, "WCDB key_hex=$hexOfBytes")
-//                    WeLogger.d(TAG, "WCDB key_ascii=$asAscii")
-//                }
-//
-//                cipherSpec.asResolver().apply {
-//                    val pageSize = firstField { name = "pageSize" }.get()!! as Int
-//                    val kdfIter = firstField { name = "kdfIteration" }.get()!! as Int
-//                    val hmacAlgo = firstField { name = "hmacAlgorithm" }.get()!! as Int
-//                    val kdfAlgo = firstField { name = "kdfAlgorithm" }.get()!! as Int
-//                    val hmacEnabled = firstField { name = "hmacEnabled" }.get()!! as Boolean
-//                    WeLogger.d(TAG, "WCDB pageSize=$pageSize kdfIter=$kdfIter hmacAlgo=$hmacAlgo kdfAlgo=$kdfAlgo hmacEnabled=$hmacEnabled")
-//                }
-//            }
     }
 
     @Synchronized
     private fun initializeDatabase(storageObj: Any): Boolean {
-        return runCatching {
-            // 在 Storage 中寻找 Wrapper
-            val wrapperObj = storageObj.asResolver()
-                .firstField {
-                    type = classSqliteDbWrapper.clazz
-                }.get()!!
+        // 在 Storage 中寻找 Wrapper
+        val wrapperObj = storageObj.asResolver()
+            .firstField {
+                type = classSqliteDbWrapper.clazz
+            }.get() ?: return false
 
-            // 获取 DB 实例
-            this.dbInstance = wrapperObj.asResolver()
-                .firstMethod {
-                    parameterCount = 0
-                    returnType = "com.tencent.wcdb.database.SQLiteDatabase"
-                }.invoke()!!
+        // 获取 DB 实例
+        this.dbInstance = wrapperObj.asResolver()
+            .firstMethod {
+                parameterCount = 0
+                returnType = "com.tencent.wcdb.database.SQLiteDatabase"
+            }.invoke()!!
 
-            rawQueryMethod = dbInstance.asResolver()
-                .firstMethod {
-                    name = "rawQuery"
-                    parameterCount = 2
-                }.self
+        rawQueryMethod = dbInstance.asResolver()
+            .firstMethod {
+                name = "rawQuery"
+                parameterCount = 2
+            }.self
 
-            execStatementMethod = dbInstance.asResolver()
-                .firstMethod {
-                    name = "execSQL"
-                    parameters(String::class)
-                }.self
+        execStatementMethod = dbInstance.asResolver()
+            .firstMethod {
+                name = "execSQL"
+                parameters(String::class)
+            }.self
 
-            return true
-        }
-            .onSuccess { WeLogger.i(TAG, "db init success") }
-            .onFailure { e -> WeLogger.e("exception during db init", e) }
-            .getOrDefault(false)
+        return true
     }
 
     fun executeQuery(sql: String, args: Array<Any>? = null): List<Map<String, Any?>> {

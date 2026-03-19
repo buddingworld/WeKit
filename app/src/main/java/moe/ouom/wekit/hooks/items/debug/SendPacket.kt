@@ -119,5 +119,6 @@ object SendPacket : ClickableHookItem() {
         }
     }
 
-    override fun noSwitchWidget(): Boolean = true
+    override val noSwitchWidget: Boolean
+        get() = true
 }

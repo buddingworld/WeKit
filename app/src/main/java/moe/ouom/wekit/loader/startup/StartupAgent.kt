@@ -27,10 +27,7 @@ object StartupAgent {
         modulePath: String,
         loaderService: ILoaderService
     ) {
-        if (sInitialized) {
-            WeLogger.w(TAG, "already initialized")
-            return
-        }
+        if (sInitialized) return
         sInitialized = true
 
         StartupInfo.modulePath = modulePath
@@ -41,6 +38,7 @@ object StartupAgent {
 
         val ctx = getBaseApplication()
         HostInfo.init(ctx)
+        // from this point onward, WeLogger can be called
         LibXposedApiByteCodeGenerator.init()
         NativeLoader.init(ctx)
         WeLauncher.init(ctx.classLoader, ctx)
@@ -52,7 +50,7 @@ object StartupAgent {
     private fun checkWriteXorExecuteForModulePath(modulePath: String) {
         val moduleFile = File(modulePath)
         if (moduleFile.canWrite()) {
-            WeLogger.w(TAG, "Module path is writable: $modulePath\nThis may cause issues on Android 15+, please check your Xposed framework")
+            WeLogger.w(TAG, "module path is writable: $modulePath\nThis may cause issues on Android 15+, please check your Xposed framework")
         }
     }
 

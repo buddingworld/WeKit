@@ -8,6 +8,7 @@ import dev.ujhhgtg.nameof.nameof
 import moe.ouom.wekit.hooks.api.core.WeApi
 import moe.ouom.wekit.hooks.api.core.WeMessageApi
 import moe.ouom.wekit.utils.ModulePaths
+import moe.ouom.wekit.utils.createDirectoriesNoThrow
 import moe.ouom.wekit.utils.logging.WeLogger
 import okhttp3.FormBody
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -33,7 +34,6 @@ import kotlin.io.path.deleteRecursively
 import kotlin.io.path.div
 import kotlin.io.path.exists
 import kotlin.io.path.fileSize
-import kotlin.io.path.isDirectory
 import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -145,17 +145,15 @@ object JsApiExposer {
                     }
 
                     return try {
-                        val cacheDir = ModulePaths.cache/"javascript_http_api"
+                        val cacheDir = (ModulePaths.cache / "javascript_http_api").createDirectoriesNoThrow()
 
-                        if (cacheDir.isDirectory()) {
-                            // drop cache if size too large
-                            if (cacheDir.fileSize() / 1024 / 1024 >= MAX_CACHE_SIZE_IN_MIB) {
-                                WeLogger.w(
-                                    TAG,
-                                    "http.download cache size too large, dropping cache..."
-                                )
-                                cacheDir.deleteRecursively()
-                            }
+                        // drop cache if size too large
+                        if (cacheDir.fileSize() / 1024 / 1024 >= MAX_CACHE_SIZE_IN_MIB) {
+                            WeLogger.w(
+                                TAG,
+                                "http.download cache size too large, dropping cache..."
+                            )
+                            cacheDir.deleteRecursively()
                         }
                         cacheDir.createDirectories()
 
@@ -495,7 +493,7 @@ object JsApiExposer {
     private val storage = ConcurrentHashMap<String, Any?>()
 
     private val DATA_DIR_PATH by lazy {
-        ModulePaths.data!!.resolve("data").apply { createDirectories() }
+        (ModulePaths.data / "data").createDirectoriesNoThrow()
     }
 
     private val storageFile get() = DATA_DIR_PATH.resolve("javascript_storage_api.json")

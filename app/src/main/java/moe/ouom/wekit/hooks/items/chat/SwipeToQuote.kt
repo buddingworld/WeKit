@@ -8,10 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Interpolator
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import de.robv.android.xposed.XC_MethodHook
 import moe.ouom.wekit.core.dsl.dexClass
+import moe.ouom.wekit.core.dsl.dexMethod
 import moe.ouom.wekit.core.model.SwitchHookItem
 import moe.ouom.wekit.dexkit.abc.IResolvesDex
 import moe.ouom.wekit.hooks.api.core.WeMessageApi
@@ -19,7 +19,6 @@ import moe.ouom.wekit.hooks.api.core.WeServiceApi
 import moe.ouom.wekit.hooks.api.core.model.MessageInfo
 import moe.ouom.wekit.hooks.api.ui.WeChatMessageViewApi
 import moe.ouom.wekit.hooks.utils.annotation.HookItem
-import moe.ouom.wekit.ui.utils.findViewWhich
 import moe.ouom.wekit.utils.LruCache
 import org.luckypray.dexkit.DexKitBridge
 import kotlin.math.PI
@@ -49,29 +48,19 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
         msgInfo: MessageInfo
     ) {
         if (cache[msgInfo.talker to msgInfo.id] == true) return
-
-        val viewGroup = view as? ViewGroup? ?: return
-
-        // this is actually a lot faster than findViewByIdStr, specifically ~8x times faster,
-        // since it avoids resource table lookup, and the predicate is specific enough
-        val messageView =
-            viewGroup.findViewWhich<LinearLayout> { view ->
-                view::class == LinearLayout::class && view.id != View.NO_ID
-            }!!
-
-        attachSwipeGesture(messageView, chattingContext, msgInfo)
+        attachSwipeGesture(view, chattingContext, msgInfo)
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun attachSwipeGesture(
-        messageView: ViewGroup,
+        originalView: View,
         chattingContext: Any,
         msgInfo: MessageInfo
     ) {
         var startX = 0f
         var startY = 0f
         var isDragging = false
-        val triggerThreshold = dpToPx(messageView.context, 60).toFloat()
+        val triggerThreshold = dpToPx(originalView.context, 60).toFloat()
         var triggered = false
 
         ViewGroup::class.asResolver()
@@ -80,7 +69,7 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
             }
             .hookAfter { param ->
                 val v = param.thisObject as ViewGroup
-                if (v !== messageView) return@hookAfter
+                if (v !== originalView) return@hookAfter
 
                 val event = param.args[0] as MotionEvent
 
@@ -121,7 +110,7 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
         }
             .hookAfter { param ->
                 val v = param.thisObject as View
-                if (v !== messageView) return@hookAfter
+                if (v !== originalView) return@hookAfter
 
                 val event = param.args[0] as MotionEvent
 
@@ -149,7 +138,7 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
                                 .setInterpolator(SpringInterpolator())
                                 .start()
 
-                            if (triggered) onSwipeLeft(chattingContext, msgInfo)
+                            if (triggered) onSwipeLeft(originalView, chattingContext)
 
                             v.parent?.requestDisallowInterceptTouchEvent(false)
                             isDragging = false
@@ -184,7 +173,10 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
         }
     }
 
-    private fun onSwipeLeft(chattingContext: Any, msgInfo: MessageInfo) {
+    private fun onSwipeLeft(
+        originalView: View,
+        chattingContext: Any
+    ) {
         val apiMan = chattingContext.asResolver()
             .firstField { type = WeServiceApi.methodApiManagerGetApi.method.declaringClass }
             .get()!!
@@ -199,10 +191,16 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
                 }
                 returnType = Boolean::class
             }.self
+        val chatHolder = originalView.tag.asResolver()
+            .firstField {
+                name = "chatHolder"
+                superclass()
+            }.get()!!
+        val msgInfo = methodGetMsgInfo.method.invoke(null, chatHolder, chattingContext)
         if (quoteMethod.parameterCount == 1) {
-            quoteMethod.invoke(chatFooter, msgInfo.instance)
+            quoteMethod.invoke(chatFooter, msgInfo)
         } else {
-            quoteMethod.invoke(chatFooter, msgInfo.instance, null)
+            quoteMethod.invoke(chatFooter, msgInfo, null)
         }
     }
 
@@ -210,6 +208,7 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
         (dp * context.resources.displayMetrics.density).toInt()
 
     private val classChattingUiFootComponent by dexClass()
+    private val methodGetMsgInfo by dexMethod()
 
     override fun resolveDex(dexKit: DexKitBridge): Map<String, String> {
         val descriptors = mutableMapOf<String, String>()
@@ -221,6 +220,13 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
                     "MicroMsg.ChattingUI.FootComponent",
                     "onNotifyChange event %s talker %s"
                 )
+            }
+        }
+
+        methodGetMsgInfo.find(dexKit, descriptors) {
+            searchPackages("com.tencent.mm.ui.chatting.viewitems")
+            matcher {
+                usingEqStrings("ItemDataTag", "getCurrentMsg2 err")
             }
         }
 

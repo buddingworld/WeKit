@@ -48,7 +48,7 @@ class JavaCrashHandler(context: Context) : Thread.UncaughtExceptionHandler {
         if (isHandling) {
             WeLogger.e(
                 TAG,
-                "Recursive crash detected, delegating to default handler"
+                "recursive crash detected, delegating to default handler"
             )
             defaultHandler?.uncaughtException(thread, throwable)
             return
@@ -73,24 +73,24 @@ class JavaCrashHandler(context: Context) : Thread.UncaughtExceptionHandler {
             // 保存崩溃日志（标记为Java崩溃）
             val logPath = crashLogsManager.saveCrashLog(crashInfo, true)
             if (logPath != null) {
-                WeLogger.i(TAG, "Java crash log saved to: $logPath")
+                WeLogger.i(TAG, "java crash log saved to: $logPath")
             } else {
-                WeLogger.e(TAG, "Failed to save Java crash log")
+                WeLogger.e(TAG, "failed to save Java crash log")
             }
 
-            WeLogger.e(TAG, "Crash details", throwable)
+            WeLogger.e(TAG, "crash details", throwable)
         } catch (e: Throwable) {
-            WeLogger.e(TAG, "Error while handling crash", e)
+            WeLogger.e(TAG, "error while handling crash", e)
         } finally {
             isHandling = false
 
             // 调用默认处理器，让应用正常崩溃
             if (defaultHandler != null) {
-                WeLogger.i(TAG, "Delegating to default handler")
+                WeLogger.i(TAG, "delegating to default handler")
                 defaultHandler.uncaughtException(thread, throwable)
             } else {
                 // 如果没有默认处理器，手动终止进程
-                WeLogger.e(TAG, "No default handler, killing process")
+                WeLogger.e(TAG, "no default handler, killing process")
                 Process.killProcess(Process.myPid())
             }
         }

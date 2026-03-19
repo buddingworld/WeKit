@@ -19,13 +19,13 @@ import moe.ouom.wekit.dexkit.abc.IResolvesDex
 import moe.ouom.wekit.hooks.utils.annotation.HookItem
 import moe.ouom.wekit.ui.content.MainSettingsDialog
 import moe.ouom.wekit.utils.ModulePaths
+import moe.ouom.wekit.utils.createDirectoriesNoThrow
 import moe.ouom.wekit.utils.logging.WeLogger
 import org.luckypray.dexkit.DexKitBridge
 import org.luckypray.dexkit.query.enums.StringMatchType
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Modifier
 import java.nio.file.Path
-import kotlin.io.path.createDirectories
 import kotlin.io.path.div
 
 @SuppressLint("DiscouragedApi", "StaticFieldLeak")
@@ -334,7 +334,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
 
         if (!::customSettingItemClass.isInitialized)
             customSettingItemClass = createSettingItemClass(
-                (ModulePaths.data!! / "generated_proxy_classes").also { it.createDirectories() }
+                (ModulePaths.data / "generated_proxy_classes").createDirectoriesNoThrow()
             )
 
         // a simple way to inject string resource

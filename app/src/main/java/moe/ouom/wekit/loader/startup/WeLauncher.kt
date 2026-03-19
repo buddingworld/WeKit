@@ -25,7 +25,6 @@ object WeLauncher {
         WeLogger.i(TAG, "launching in processName=$currentProcessName, type=$processType")
 
         ParcelableFixer.init(cl, WeLauncher::class.java.classLoader!!)
-        WeLogger.i(TAG, "ParcelableFixer installed")
 
         val pi = context.packageManager.getPackageInfo(context.packageName, 0)
         DexCacheManager.init(requireNotNull(pi.versionName))
@@ -33,11 +32,8 @@ object WeLauncher {
         if (processType == TargetProcessUtils.PROC_MAIN) {
             val appContext = context.applicationContext ?: context
             ActivityProxy.initForStubActivity(appContext)
-            WeLogger.i(TAG, "ActivityProxy installed")
 
             initMainProcessHooks()
-        } else {
-            WeLogger.i(TAG, "skipping UI hooks for non-main process: $currentProcessName")
         }
 
         runCatching {
@@ -46,8 +42,6 @@ object WeLauncher {
     }
 
     private fun initMainProcessHooks() {
-        WeLogger.i(TAG, "Initializing Main Process Hooks...")
-
         val launcherUiClass = LAUNCHER_UI_CLASS_NAME.toClass()
 
         XposedHelpers.findAndHookMethod(launcherUiClass, "onResume", object : XC_MethodHook() {

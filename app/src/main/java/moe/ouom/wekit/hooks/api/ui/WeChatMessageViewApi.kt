@@ -29,9 +29,6 @@ object WeChatMessageViewApi : ApiHookItem(), IResolvesDex {
     fun addListener(listener: ICreateViewListener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener)
-            WeLogger.i(TAG, "listener added, current listener count: ${listeners.size}")
-        } else {
-            WeLogger.w(TAG, "listener already exists, ignored")
         }
     }
 

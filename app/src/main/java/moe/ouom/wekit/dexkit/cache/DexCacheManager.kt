@@ -1,17 +1,17 @@
 package moe.ouom.wekit.dexkit.cache
 
 import dev.ujhhgtg.nameof.nameof
-import moe.ouom.wekit.preferences.WePrefs
 import moe.ouom.wekit.constants.PreferenceKeys
 import moe.ouom.wekit.core.model.BaseHookItem
 import moe.ouom.wekit.dexkit.abc.IResolvesDex
+import moe.ouom.wekit.preferences.WePrefs
 import moe.ouom.wekit.utils.ModulePaths
+import moe.ouom.wekit.utils.createDirectoriesNoThrow
 import moe.ouom.wekit.utils.logging.WeLogger
 import org.json.JSONObject
 import org.luckypray.dexkit.DexKitBridge
 import java.nio.file.Path
 import java.security.MessageDigest
-import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.div
 import kotlin.io.path.exists
@@ -31,13 +31,12 @@ object DexCacheManager {
     private const val CACHE_DIR_NAME = "dex_cache"
     private const val HOST_VERSION_FILE = "host_version.txt"
     private const val CACHE_FILE_SUFFIX = ".json"
-    private lateinit var cacheDir: Path
+    private val cacheDir: Path by lazy {
+        (ModulePaths.data / CACHE_DIR_NAME).createDirectoriesNoThrow()
+    }
     private var currentHostVersion: String = ""
 
     fun init(hostVersion: String) {
-        cacheDir = ModulePaths.data!! / CACHE_DIR_NAME
-        cacheDir.createDirectories()
-
         currentHostVersion = hostVersion
 
         // 检查宿主版本是否变化

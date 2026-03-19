@@ -84,7 +84,7 @@ object NativeCrashInterceptor : SwitchHookItem() {
             if (!isMainProcess()) {
                 WeLogger.d(
                     TAG,
-                    "Skipping pending crash check in non-main process"
+                    "skipping pending crash check in non-main process"
                 )
                 return
             }

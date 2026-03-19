@@ -83,9 +83,6 @@ object AddMainScreenFab : SwitchHookItem() {
     fun addProvider(provider: IMenuItemsProvider) {
         if (!providers.contains(provider)) {
             providers.add(provider)
-            WeLogger.i(TAG, "provider added, current provider count: ${providers.size}")
-        } else {
-            WeLogger.w(TAG, "provider already exists, ignored")
         }
     }
 

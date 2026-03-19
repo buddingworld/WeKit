@@ -81,8 +81,8 @@ object CrashInterceptor : SwitchHookItem() {
             // 只检查Java崩溃
             if (manager.hasPendingJavaCrash()) {
                 WeLogger.i(
-                    "CrashInterceptor",
-                    "Pending Java crash detected, will show dialog when Activity is ready"
+                    TAG,
+                    "pending Java crash detected, will show dialog when Activity is ready"
                 )
                 hasPendingCrashToShow = true
                 showToast("检测到上次 Java 崩溃,正在准备崩溃报告...")

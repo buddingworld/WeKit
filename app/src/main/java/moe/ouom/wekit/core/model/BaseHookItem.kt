@@ -8,6 +8,7 @@ import moe.ouom.wekit.constants.PreferenceKeys
 import moe.ouom.wekit.core.dsl.DexMethodDelegate
 import moe.ouom.wekit.preferences.WePrefs
 import moe.ouom.wekit.utils.HookAction
+import moe.ouom.wekit.utils.TargetProcessUtils
 import moe.ouom.wekit.utils.logging.WeLogger
 import java.lang.reflect.Executable
 
@@ -17,19 +18,23 @@ abstract class BaseHookItem {
 
     var description: String = ""
 
+    open val targetProcess = TargetProcessUtils.PROC_MAIN
+
     var hasEnabled: Boolean = false
         private set
 
-    fun enable() {
+    fun enable(process: Int = 1) {
         if (hasEnabled) return
+        if (process != targetProcess) return
         runCatching {
             hasEnabled = true
             onEnable()
         }.onFailure { e -> WeLogger.e("failed to enable item", e) }
     }
 
-    fun disable() {
+    fun disable(process: Int = 1) {
         if (!hasEnabled) return
+        if (process != targetProcess) return
         runCatching {
             hasEnabled = false
             onDisable()

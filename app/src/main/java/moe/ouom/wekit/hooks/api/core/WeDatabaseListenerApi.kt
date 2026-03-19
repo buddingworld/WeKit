@@ -3,6 +3,7 @@ package moe.ouom.wekit.hooks.api.core
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
+import com.highcapable.kavaref.extension.VariousClass
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
 import moe.ouom.wekit.constants.PreferenceKeys
@@ -53,14 +54,6 @@ object WeDatabaseListenerApi : ApiHookItem() {
         if (listener is IQueryListener) {
             queryListeners.add(listener)
             addedTypes.add("QUERY")
-        }
-
-        // 只有实现了至少一个接口才打印日志
-        if (addedTypes.isNotEmpty()) {
-            WeLogger.i(
-                TAG,
-                "listener added: ${listener.javaClass.simpleName} [${addedTypes.joinToString()}]"
-            )
         }
     }
 
@@ -125,105 +118,80 @@ object WeDatabaseListenerApi : ApiHookItem() {
     // ==================== Insert Hook ====================
 
     private fun hookDatabaseInsert() {
-        try {
-            val clsDb = DB_CLASS_NAME.toClass()
-            clsDb.asResolver()
-                .firstMethod {
-                    name = "insertWithOnConflict"
-                    parameters(String::class, String::class, ContentValues::class, Int::class)
-                }.hookAfter { param ->
-                    try {
-                        if (insertListeners.isEmpty()) return@hookAfter
+        val clsDb = DB_CLASS_NAME.toClass()
+        clsDb.asResolver()
+            .firstMethod {
+                name = "insertWithOnConflict"
+                parameters(String::class, String::class, ContentValues::class, Int::class)
+            }.hookAfter { param ->
+                try {
+                    if (insertListeners.isEmpty()) return@hookAfter
 
-                        val table = param.args[0] as String
-                        val values = param.args[2] as ContentValues
-                        val result = param.result
+                    val table = param.args[0] as String
+                    val values = param.args[2] as ContentValues
+                    val result = param.result
 
-                        logWithStack("Insert", table, param.args, result)
-                        insertListeners.forEach { it.onInsert(table, values) }
-                    } catch (e: Throwable) {
-                        WeLogger.e(TAG, "Insert dispatch failed", e)
-                    }
+                    logWithStack("Insert", table, param.args, result)
+                    insertListeners.forEach { it.onInsert(table, values) }
+                } catch (e: Throwable) {
+                    WeLogger.e(TAG, "Insert dispatch failed", e)
                 }
-            WeLogger.i(TAG, "Insert hook success")
-        } catch (e: Throwable) {
-            WeLogger.e(TAG, "Hook insert failed", e)
-        }
+            }
     }
 
     // ==================== Update Hook ====================
 
     private fun hookDatabaseUpdate() {
-        try {
-            val isPlay = HostInfo.isHostGooglePlay
-            val version = HostInfo.versionCode
-            val isNewVersion = (!isPlay && version >= WeChatVersion.MM_8_0_43) ||
-                    (isPlay && version >= WeChatVersion.MM_8_0_48_PLAY)
+        val clsDb = VariousClass(DB_COMPAT_CLASS_NAME, DB_CLASS_NAME).load()
 
-            val clsName =
-                if (isNewVersion) DB_COMPAT_CLASS_NAME else DB_CLASS_NAME
-            val clsDb = clsName.toClass()
+        clsDb.asResolver()
+            .firstMethod {
+                name = "updateWithOnConflict"
+                parameters(
+                    String::class,
+                    ContentValues::class,
+                    String::class,
+                    Array<String>::class,
+                    Int::class
+                )
+            }
+            .hookBefore { param ->
+                try {
+                    if (updateListeners.isEmpty()) return@hookBefore
 
-            clsDb.asResolver()
-                .firstMethod {
-                    name = "updateWithOnConflict"
-                    parameters(
-                        String::class,
-                        ContentValues::class,
-                        String::class,
-                        Array<String>::class,
-                        Int::class
-                    )
-                }
-                .hookBefore { param ->
-                    try {
-                        if (updateListeners.isEmpty()) return@hookBefore
+                    val table = param.args[0] as String
+                    val values = param.args[1] as ContentValues
 
-                        val table = param.args[0] as String
-                        val values = param.args[1] as ContentValues
-                        param.args[2] as? String
-                        @Suppress("UNCHECKED_CAST")
-                        param.args[3] as? Array<String>
+                    logWithStack("Update", table, param.args)
 
-                        logWithStack("Update", table, param.args)
+                    // 如果有任何一个监听器返回 true，则阻止更新
+                    val shouldBlock = updateListeners.any { it.onUpdate(table, values) }
 
-                        // 如果有任何一个监听器返回 true，则阻止更新
-                        val shouldBlock = updateListeners.any { it.onUpdate(table, values) }
-
-                        if (shouldBlock) {
-                            param.result = 0 // 返回0表示没有行被更新
-                            WeLogger.d(
-                                TAG,
-                                "[Update] 被监听器阻止, table=$table, stack=${WeLogger.getStackTraceString()}"
-                            )
-                        }
-                    } catch (e: Throwable) {
-                        WeLogger.e(TAG, "Update dispatch failed", e)
+                    if (shouldBlock) {
+                        param.result = 0 // 返回0表示没有行被更新
+                        WeLogger.d(
+                            TAG,
+                            "[Update] 被监听器阻止, table=$table, stack=${WeLogger.getStackTraceString()}"
+                        )
                     }
+                } catch (e: Throwable) {
+                    WeLogger.e(TAG, "Update dispatch failed", e)
                 }
-            WeLogger.i(TAG, "Update hook success")
-        } catch (e: Throwable) {
-            WeLogger.e(TAG, "Hook update failed", e)
-        }
+            }
     }
 
     // ==================== Query Hook ====================
 
     private fun hookDatabaseQuery() {
-        try {
-            val isPlay = HostInfo.isHostGooglePlay
-            val version = HostInfo.versionCode
-            val isNewVersion = (!isPlay && version >= WeChatVersion.MM_8_0_43) ||
-                    (isPlay && version >= WeChatVersion.MM_8_0_48_PLAY)
+        val isPlay = HostInfo.isHostGooglePlay
+        val version = HostInfo.versionCode
+        val isNewVersion = (!isPlay && version >= WeChatVersion.MM_8_0_43) ||
+                (isPlay && version >= WeChatVersion.MM_8_0_48_PLAY)
 
-            if (isNewVersion) {
-                hookNewQueryMethod()
-            } else {
-                hookOldQueryMethod()
-            }
-            WeLogger.i(TAG, "Query hook success")
-        } catch (e: Throwable) {
-            WeLogger.e(TAG, "Hook query failed", e)
+        if (isNewVersion) {
+            hookNewQueryMethod()
+        } else {
+            hookOldQueryMethod()
         }
     }
 

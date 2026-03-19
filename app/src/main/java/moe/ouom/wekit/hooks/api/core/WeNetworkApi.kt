@@ -24,17 +24,10 @@ object WeNetworkApi : ApiHookItem(), IResolvesDex {
     @Volatile
     private var methodSend: Method? = null
 
-    private var isInitialized = false
-
     /**
      * 供外部调用的通用发包方法
      */
     fun sendRequest(netScene: Any) {
-        if (!isInitialized) {
-            WeLogger.e(TAG, "not initialized yet!")
-            return
-        }
-
         try {
             // 获取 NetSceneQueue 实例
             val queueObj = methodGetMgr?.invoke(null) ?: return
@@ -150,13 +143,9 @@ object WeNetworkApi : ApiHookItem(), IResolvesDex {
 
     override fun onEnable() {
         methodGetMgr = methodGetNetSceneQueue.method
-
-        isInitialized = true
-        WeLogger.i(TAG, "initialized")
     }
 
     override fun onDisable() {
-        isInitialized = false
         methodGetMgr = null
 
         // 重置缓存，防止持有旧 ClassLoader 的引用
