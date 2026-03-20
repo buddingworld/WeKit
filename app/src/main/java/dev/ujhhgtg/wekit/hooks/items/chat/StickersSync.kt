@@ -21,13 +21,13 @@ import com.highcapable.kavaref.extension.createInstance
 import com.highcapable.kavaref.extension.isSubclassOf
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
+import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
 import dev.ujhhgtg.wekit.dexkit.dsl.dexConstructor
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
-import dev.ujhhgtg.wekit.hooks.core.ClickableHookItem
-import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.hooks.api.core.WeDatabaseApi
 import dev.ujhhgtg.wekit.hooks.api.core.WeServiceApi
+import dev.ujhhgtg.wekit.hooks.core.ClickableHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.TextButton
@@ -140,7 +140,8 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
                             val images = packDir.walk()
                                 .filter { it.isRegularFile() &&
                                         it.extension.lowercase() in ALLOWED_STICKER_EXTENSIONS &&
-                                        it.name != ".pack_icon.png"
+                                        it.name != ".pack_icon.png" &&
+                                        !(it.extension.lowercase() == "webp" && it.resolveSibling("${it.nameWithoutExtension}.png").isRegularFile())
                                 }
                                 .toList()
 
