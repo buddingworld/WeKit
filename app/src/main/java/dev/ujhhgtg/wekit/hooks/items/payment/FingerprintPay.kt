@@ -47,7 +47,6 @@ import dev.ujhhgtg.wekit.utils.EncryptedData
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.ToastUtils
 import dev.ujhhgtg.wekit.utils.logging.WeLogger
-import kotlin.time.TimeSource
 
 
 @HookItem(path = "红包与支付/指纹支付", desc = "使用指纹快捷确认支付")
@@ -67,8 +66,9 @@ object FingerprintPay : ClickableHookItem() {
         }
 
         listOf("com.tencent.mm.framework.app.UIPageFragmentActivity",
-            "com.tencent.mm.plugin.lite.ui.WxaLiteAppTransparentLiteUI").forEach {
-            it.toClass().asResolver()
+            "com.tencent.mm.plugin.lite.ui.WxaLiteAppTransparentLiteUI"
+        ).forEach { className ->
+            className.toClass().asResolver()
             .apply {
                 firstMethod { name = "onResume" }
                     .hookBefore { param ->
@@ -77,16 +77,13 @@ object FingerprintPay : ClickableHookItem() {
 
                         val activity = param.thisObject as Activity
 
-                        val mark = TimeSource.Monotonic.markNow()
                         val root = activity.findViewById<ViewGroup>(android.R.id.content)
-                        val searchedView = root.findViewByChildIndexes<ViewGroup>(0, 0, 2, 0, 2)!!
+                        val searchedView = root.findViewByChildIndexes<ViewGroup>(0, 0, 2, 0, 2) ?: return@hookBefore
                         val myKeyboardWindow = searchedView.findViewWhich<LinearLayout> { view ->
                             view.javaClass.name == "com.tenpay.android.wechat.MyKeyboardWindow"
                         } ?: return@hookBefore
                         val digitViews = myKeyboardWindow.findViewsWhich<TextView> { it is TextView }
                         val orderedDigits = listOf(digitViews.last()) + digitViews.dropLast(1)
-                        val elapsed = mark.elapsedNow()
-                        WeLogger.d(TAG, "took $elapsed to locate all views")
 
                         val rawEncData = WePrefs.getString(KEY_ENCRYPTED_DATA) ?: run {
                             ToastUtils.showToast("支付密码未设置, 指纹支付不会生效!")
