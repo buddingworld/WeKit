@@ -68,9 +68,8 @@ object DetectDeletedFriends : ClickableHookItem() {
     override fun onClick(context: Context) {
         val phaseState = mutableStateOf<DialogPhase>(DialogPhase.Idle)
 
-        val selfWxId = WeApi.selfWxId
         val friends = WeDatabaseApi.getFriends().filter { c ->
-            c.type != 2051 && c.type != 2049 && c.wxId.startsWith("wxid_") && c.wxId != selfWxId
+            c.type != 2051 && c.type != 2049 && c.wxId.startsWith("wxid_") && c.wxId != WeApi.selfWxId
         }.take(10)
 
         showComposeDialog(context) {

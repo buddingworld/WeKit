@@ -9,10 +9,10 @@ import com.highcapable.kavaref.extension.createInstance
 import com.highcapable.kavaref.extension.toClass
 import de.robv.android.xposed.XposedHelpers
 import dev.ujhhgtg.nameof.nameof
+import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
-import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.XmlUtils.extractXmlAttr
 import dev.ujhhgtg.wekit.utils.XmlUtils.extractXmlTag
@@ -643,7 +643,7 @@ object WeMessageApi : ApiHookItem(), IResolvesDex {
                     taskClass,
                     imgPath,
                     0,
-                    getSelfCustomWxId(),
+                    selfCustomWxId,
                     toUser,
                     paramsObj
                 )
@@ -701,7 +701,7 @@ object WeMessageApi : ApiHookItem(), IResolvesDex {
     /** 发送私有路径下的语音文件 */
     fun sendVoice(toUser: String, path: String, durationMs: Int): Boolean {
         return try {
-            val selfWxid = getSelfCustomWxId()
+            val selfWxid = selfCustomWxId
 
             // 获取 Service 实例
             val serviceInterface = voiceServiceInterfaceClass
@@ -802,9 +802,10 @@ object WeMessageApi : ApiHookItem(), IResolvesDex {
         }
     }
 
-    fun getSelfCustomWxId(): String {
-        return getSelfAliasMethod?.invoke(null) as? String ?: ""
-    }
+    val selfCustomWxId: String
+        get() {
+            return getSelfAliasMethod?.invoke(null) as? String ?: ""
+        }
 
     private fun bindServiceFramework() {
         getServiceMethod = classServiceManager.asResolver()

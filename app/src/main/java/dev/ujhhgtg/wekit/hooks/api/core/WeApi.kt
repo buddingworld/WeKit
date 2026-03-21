@@ -4,17 +4,25 @@ import dev.ujhhgtg.wekit.utils.RuntimeConfig
 
 object WeApi {
 
-    /**
-     * 获取当前登录的微信 ID
-     */
+    private var _selfWxId: String = ""
     val selfWxId: String
-        get() = RuntimeConfig.loggedInWxId
+        get() {
+            if (_selfWxId.isEmpty()) {
+                val result = RuntimeConfig.loggedInWxId
+                if (result.isNotEmpty()) _selfWxId = result
+                return result
+            }
+            return _selfWxId
+        }
 
-    /**
-     * 获取自己的微信号
-     */
+    private var _selfCustomWxId: String = ""
     val selfCustomWxId: String
         get() {
-            return WeMessageApi.getSelfCustomWxId()
+            if (_selfCustomWxId.isEmpty()) {
+                val result = WeMessageApi.selfCustomWxId
+                if (result.isNotEmpty()) _selfCustomWxId = result
+                return result
+            }
+            return _selfCustomWxId
         }
 }
