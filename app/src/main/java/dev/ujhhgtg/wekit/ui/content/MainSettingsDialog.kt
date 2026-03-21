@@ -28,6 +28,29 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
+import com.composables.icons.materialsymbols.MaterialSymbols
+import com.composables.icons.materialsymbols.outlined.Account_circle
+import com.composables.icons.materialsymbols.outlined.Block
+import com.composables.icons.materialsymbols.outlined.Bug_report
+import com.composables.icons.materialsymbols.outlined.Build_circle
+import com.composables.icons.materialsymbols.outlined.Camera
+import com.composables.icons.materialsymbols.outlined.Chat
+import com.composables.icons.materialsymbols.outlined.Contacts
+import com.composables.icons.materialsymbols.outlined.Delete_forever
+import com.composables.icons.materialsymbols.outlined.Download
+import com.composables.icons.materialsymbols.outlined.Imagesearch_roller
+import com.composables.icons.materialsymbols.outlined.Lightbulb_2
+import com.composables.icons.materialsymbols.outlined.List_alt
+import com.composables.icons.materialsymbols.outlined.Low_priority
+import com.composables.icons.materialsymbols.outlined.Movie
+import com.composables.icons.materialsymbols.outlined.Notifications
+import com.composables.icons.materialsymbols.outlined.Package_2
+import com.composables.icons.materialsymbols.outlined.Payments
+import com.composables.icons.materialsymbols.outlined.Terminal
+import com.composables.icons.materialsymbols.outlined.Update
+import com.composables.icons.materialsymbols.outlined.Upload
+import com.composables.icons.materialsymbols.outlined.Volunteer_activism
+import com.composables.icons.materialsymbols.outlined.Wand_stars
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import dev.ujhhgtg.wekit.BuildConfig
@@ -82,22 +105,22 @@ class MainSettingsDialog(context: Context) : BasePrefsDialog(context, BuildConfi
     override fun initPreferences() {
         addCategory("功能")
         val categories = listOf(
-            "聊天" to "chat_24px",
-            "联系人与群组" to "contacts_24px",
-            "红包与支付" to "payments_24px",
-            "朋友圈" to "camera_24px",
-            "系统与隐私" to "wand_stars_24px",
-            "通知" to "notifications_24px",
-            "界面美化" to "imagesearch_roller_24px",
-            "小程序" to "package_2_24px",
-            "视频号" to "movie_24px",
-            "个人资料" to "account_circle_24px",
-            "调试" to "bug_report_24px",
-            "脚本" to "terminal_24px",
+            "聊天" to MaterialSymbols.Outlined.Chat,
+            "联系人与群组" to MaterialSymbols.Outlined.Contacts,
+            "红包与支付" to MaterialSymbols.Outlined.Payments,
+            "朋友圈" to MaterialSymbols.Outlined.Camera,
+            "系统与隐私" to MaterialSymbols.Outlined.Wand_stars,
+            "通知" to MaterialSymbols.Outlined.Notifications,
+            "界面美化" to MaterialSymbols.Outlined.Imagesearch_roller,
+            "小程序" to MaterialSymbols.Outlined.Package_2,
+            "视频号" to MaterialSymbols.Outlined.Movie,
+            "个人资料" to MaterialSymbols.Outlined.Account_circle,
+            "调试" to MaterialSymbols.Outlined.Bug_report,
+            "脚本" to MaterialSymbols.Outlined.Terminal
         )
-        categories.forEach { (name, iconName) ->
+        categories.forEach { (name, icon) ->
             addPreference(
-                title = name, iconName = iconName,
+                title = name, icon = icon,
                 onClick = {
                     CategorySettingsDialog(context, name).show()
                 })
@@ -108,21 +131,21 @@ class MainSettingsDialog(context: Context) : BasePrefsDialog(context, BuildConfi
             key = PreferenceKeys.ENABLE_LOG,
             title = "日志记录",
             summary = "反馈问题前必须开启日志记录",
-            iconName = "list_alt_24px"
+            icon = MaterialSymbols.Outlined.List_alt
         )
 
         addSwitchPreference(
             key = PreferenceKeys.VERBOSE_LOG,
             title = "详细日志",
             summary = "输出高频日志 (这可能会暴露你的隐私信息）",
-            iconName = "frame_bug_24px"
+            icon = "frame_bug_24px"
         )
 
         val dependentKey = addSwitchPreference(
             key = PreferenceKeys.DB_VERBOSE_LOG,
             title = "数据库详细日志",
             summary = "输出完整的数据库插入事件详情（ContentValues）",
-            iconName = "database_upload_24px"
+            icon = "database_upload_24px"
         )
 
         // 数据库详细日志依赖于详细日志
@@ -144,21 +167,21 @@ class MainSettingsDialog(context: Context) : BasePrefsDialog(context, BuildConfi
             summary = "当前设定", // 当配置的值不在 map 中时，会显示 "当前设定: [值]"
             options = priorityMap,
             defaultValue = 50,
-            iconName = "low_priority_24px"
+            icon = MaterialSymbols.Outlined.Low_priority
         )
 
         addSwitchPreference(
             key = PreferenceKeys.NO_DEX_RESOLVE,
             title = "禁用版本适配",
             summary = "开启后不会弹出 DEX 查找对话框，未适配功能将不会被加载",
-            iconName = "block_24px"
+            icon = MaterialSymbols.Outlined.Block
         )
 
         addCategory("备份与恢复")
         addPreference(
             title = "导出配置",
             summary = "将模块配置导出为 JSON",
-            iconName = "upload_24px",
+            icon = MaterialSymbols.Outlined.Upload,
             onClick = {
                 StubFragmentActivity.launch(HostInfo.application) {
                     val exportLauncher = registerForActivityResult(
@@ -213,7 +236,7 @@ class MainSettingsDialog(context: Context) : BasePrefsDialog(context, BuildConfi
         addPreference(
             title = "导入配置",
             summary = "从 JSON 导入模块配置; JSON 中的配置将会与现有配置合并, 覆盖所有已存在的配置",
-            iconName = "download_24px",
+            icon = MaterialSymbols.Outlined.Download,
             onClick = {
                 StubFragmentActivity.launch(HostInfo.application) {
                     val importLauncher = registerForActivityResult(
@@ -267,7 +290,7 @@ class MainSettingsDialog(context: Context) : BasePrefsDialog(context, BuildConfi
         addPreference(
             title = "清除配置",
             summary = "清除全部模块配置 (警告: 此操作不可逆!)",
-            iconName = "delete_forever_24px",
+            icon = MaterialSymbols.Outlined.Delete_forever,
             onClick = {
                 if (!confirmDeletion) {
                     showToast("再次点击以确认清除!")
@@ -286,7 +309,7 @@ class MainSettingsDialog(context: Context) : BasePrefsDialog(context, BuildConfi
         addPreference(
             title = "版本 (点击检查更新)",
             summary = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
-            iconName = "update_24px",
+            icon = MaterialSymbols.Outlined.Update,
             onClick = {
                 CoroutineScope(Dispatchers.Main).launch {
                     showToastSuspend("正在检查更新...")
@@ -345,11 +368,11 @@ class MainSettingsDialog(context: Context) : BasePrefsDialog(context, BuildConfi
         )
         addPreference("构建时间",
             formatEpoch(BuildConfig.BUILD_TIMESTAMP, true),
-            iconName = "build_circle_24px")
+            icon = MaterialSymbols.Outlined.Build_circle)
         addPreference(
             "提示",
             "牙膏要一点一点挤, 显卡要一刀一刀切, PPT 要一张一张放, 代码要一行一行写, 单个功能预计自出现在 commit 之日起, 三年内开发完毕",
-            iconName = "lightbulb_2_24px"
+            icon = MaterialSymbols.Outlined.Lightbulb_2
         )
         addPreference(
             "捐赠",
@@ -361,12 +384,12 @@ class MainSettingsDialog(context: Context) : BasePrefsDialog(context, BuildConfi
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 })
             },
-            iconName = "volunteer_activism_24px"
+            icon = MaterialSymbols.Outlined.Volunteer_activism
         )
         addPreference(
             title = "开放源代码许可",
             summary = "本项目使用的开放源代码库许可",
-            iconName = "license_24px",
+            icon = "license_24px",
             onClick = {
                 showComposeDialog(context) {
                     Surface(
@@ -392,13 +415,13 @@ class MainSettingsDialog(context: Context) : BasePrefsDialog(context, BuildConfi
         addPreference(
             title = "GitHub",
             summary = "修改于 Ujhhgtg/WeKit (原始: cwuom/WeKit)",
-            iconName = "ic_github",
+            icon = "github_24px",
             onClick = { "https://github.com/Ujhhgtg/WeKit".toUri().openInSystem(context, true) }
         )
         addPreference(
             title = "Telegram",
             summary = "@ujhhgtg_wekit_ci",
-            iconName = "ic_telegram",
+            icon = "telegram_24px",
             onClick = { "https://t.me/ujhhgtg_wekit_ci".toUri().openInSystem(context, true) }
         )
     }

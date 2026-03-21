@@ -16,21 +16,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.AttachMoney
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FormatListNumbered
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Mail
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Redeem
-import androidx.compose.material.icons.outlined.VideoChat
-import androidx.compose.material.icons.outlined.VoiceChat
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Icon
@@ -44,14 +29,29 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.core.view.children
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.composables.icons.materialsymbols.MaterialSymbols
+import com.composables.icons.materialsymbols.outlined.Account_box
+import com.composables.icons.materialsymbols.outlined.Attach_file
+import com.composables.icons.materialsymbols.outlined.Attach_money
+import com.composables.icons.materialsymbols.outlined.Camera
+import com.composables.icons.materialsymbols.outlined.Favorite
+import com.composables.icons.materialsymbols.outlined.Format_list_numbered
+import com.composables.icons.materialsymbols.outlined.Location_on
+import com.composables.icons.materialsymbols.outlined.Mail
+import com.composables.icons.materialsymbols.outlined.Mic
+import com.composables.icons.materialsymbols.outlined.Music_note
+import com.composables.icons.materialsymbols.outlined.Photo_library
+import com.composables.icons.materialsymbols.outlined.Redeem
+import com.composables.icons.materialsymbols.outlined.Video_chat
+import com.composables.icons.materialsymbols.outlined.Voice_chat
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.createInstance
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
-import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
-import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
+import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.HookItem
+import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.ui.utils.AppTheme
 import dev.ujhhgtg.wekit.ui.utils.LifecycleOwnerProvider
 import dev.ujhhgtg.wekit.ui.utils.findViewByChildIndexes
@@ -150,7 +150,6 @@ object ChatToolbar : SwitchHookItem(), IResolvesDex {
             .firstConstructor {
                 parameters(Context::class, AttributeSet::class, Int::class)
             }
-            .self
             .hookAfter { param ->
                 val lifecycleOwner = LifecycleOwnerProvider.lifecycleOwner
 
@@ -181,7 +180,7 @@ object ChatToolbar : SwitchHookItem(), IResolvesDex {
                                 // workaroung for weird WeChat bug where 'Album' doesn't display, so I have to render it manually
 
                                 item {
-                                    FeatureChip("相册", Icons.Default.PhotoLibrary) {
+                                    FeatureChip("相册", MaterialSymbols.Outlined.Photo_library) {
                                         tools[0].second.let {
                                             it.onClickListener.onItemClick(
                                                 it.gridView,
@@ -194,7 +193,7 @@ object ChatToolbar : SwitchHookItem(), IResolvesDex {
                                 }
 
                                 item {
-                                    FeatureChip("系统拍摄", Icons.Default.Camera) {
+                                    FeatureChip("系统拍摄", MaterialSymbols.Outlined.Camera) {
                                         tools[0].second.onLongClickListener.onItemLongClick(
                                             null,
                                             null,
@@ -223,19 +222,19 @@ object ChatToolbar : SwitchHookItem(), IResolvesDex {
     }
 
     private val NAME_TO_ICON_MAP = mapOf(
-        "拍摄" to Icons.Default.Camera,
-        "视频通话" to Icons.Outlined.VideoChat, // because Icons.Default.VoiceChat is outlined
-        "语音通话" to Icons.Outlined.VoiceChat,
-        "位置" to Icons.Default.LocationOn,
-        "红包" to Icons.Default.Mail,
-        "礼物" to Icons.Default.Redeem,
-        "转账" to Icons.Default.AttachMoney,
-        "语音输入" to Icons.Default.Mic,
-        "收藏" to Icons.Default.Favorite,
-        "接龙" to Icons.Default.FormatListNumbered,
-        "文件" to Icons.Default.AttachFile,
-        "名片" to Icons.Default.AccountBox,
-        "音乐" to Icons.Default.MusicNote
+        "拍摄" to MaterialSymbols.Outlined.Camera,
+        "视频通话" to MaterialSymbols.Outlined.Video_chat,
+        "语音通话" to MaterialSymbols.Outlined.Voice_chat,
+        "位置" to MaterialSymbols.Outlined.Location_on,
+        "红包" to MaterialSymbols.Outlined.Mail,
+        "礼物" to MaterialSymbols.Outlined.Redeem,
+        "转账" to MaterialSymbols.Outlined.Attach_money,
+        "语音输入" to MaterialSymbols.Outlined.Mic,
+        "收藏" to MaterialSymbols.Outlined.Favorite,
+        "接龙" to MaterialSymbols.Outlined.Format_list_numbered,
+        "文件" to MaterialSymbols.Outlined.Attach_file,
+        "名片" to MaterialSymbols.Outlined.Account_box,
+        "音乐" to MaterialSymbols.Outlined.Music_note
     )
 
     override fun resolveDex(dexKit: DexKitBridge): Map<String, String> {

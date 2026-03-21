@@ -88,3 +88,24 @@ fun IconButton(
         content = content
     )
 }
+
+@Composable
+fun FilledIconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shapes: IconButtonShapes = IconButtonDefaults.shapes(),
+    colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
+    interactionSource: MutableInteractionSource? = null,
+    content: @Composable () -> Unit
+) {
+    androidx.compose.material3.FilledIconButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        shapes = shapes,
+        colors = colors,
+        interactionSource = interactionSource,
+        content = content
+    )
+}

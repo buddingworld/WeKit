@@ -21,9 +21,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,11 +35,14 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
+import com.composables.icons.materialsymbols.MaterialSymbols
+import com.composables.icons.materialsymbols.outlined.Language
+import com.composables.icons.materialsymbols.outlined.Open_in_new
 import de.robv.android.xposed.XC_MethodHook
 import dev.ujhhgtg.nameof.nameof
-import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.hooks.api.ui.WeStartActivityApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
+import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
@@ -185,7 +185,7 @@ object LinkExternalAppJump : SwitchHookItem(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Default.OpenInNew,
+                imageVector = MaterialSymbols.Outlined.Open_in_new,
                 contentDescription = null,
                 modifier = Modifier
                     .size(40.dp)
@@ -217,7 +217,7 @@ object LinkExternalAppJump : SwitchHookItem(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Default.Language,
+                imageVector = MaterialSymbols.Outlined.Language,
                 contentDescription = null,
                 modifier = Modifier
                     .size(40.dp)

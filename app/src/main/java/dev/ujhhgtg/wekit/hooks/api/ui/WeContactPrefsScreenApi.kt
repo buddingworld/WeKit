@@ -7,6 +7,7 @@ import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.condition.type.Modifiers
 import com.highcapable.kavaref.extension.isSubclassOf
 import com.highcapable.kavaref.extension.toClass
+import dev.ujhhgtg.nameof.nameof
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.logging.WeLogger
@@ -30,7 +31,7 @@ object WeContactPrefsScreenApi : ApiHookItem() {
         val position: Int = -1
     )
 
-    private const val TAG = "WeContactPrefsScreenApi"
+    private val TAG = nameof(WeContactPrefsScreenApi)
 
     private val providers = CopyOnWriteArrayList<IContactInfoProvider>()
 
@@ -40,10 +41,6 @@ object WeContactPrefsScreenApi : ApiHookItem() {
 
     fun removeProvider(provider: IContactInfoProvider) {
         val removed = providers.remove(provider)
-        WeLogger.i(
-            TAG,
-            "provider remove ${if (removed) "succeeded" else "failed"}, current provider count: ${providers.size}"
-        )
     }
 
     private lateinit var prefConstructor: Constructor<*>

@@ -12,9 +12,6 @@ import androidx.annotation.RequiresApi
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -27,6 +24,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.composables.icons.materialsymbols.MaterialSymbols
+import com.composables.icons.materialsymbols.outlinedfilled.Visibility
+import com.composables.icons.materialsymbols.outlinedfilled.Visibility_off
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
@@ -149,7 +149,7 @@ object FingerprintPay : ClickableHookItem() {
                         trailingIcon = {
                             IconButton(onClick = { visible = !visible }) {
                                 Icon(
-                                    imageVector = if (visible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                    imageVector = if (visible) MaterialSymbols.OutlinedFilled.Visibility else MaterialSymbols.OutlinedFilled.Visibility_off,
                                     contentDescription = if (visible) "Hide password" else "Show password"
                                 )
                             }

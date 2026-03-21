@@ -9,11 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Contacts
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.NavigationBar
@@ -36,6 +31,11 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.composables.icons.materialsymbols.MaterialSymbols
+import com.composables.icons.materialsymbols.outlinedfilled.Contacts
+import com.composables.icons.materialsymbols.outlinedfilled.Explore
+import com.composables.icons.materialsymbols.outlinedfilled.Home
+import com.composables.icons.materialsymbols.outlinedfilled.Person
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import dev.ujhhgtg.wekit.hooks.api.ui.WeMainActivityBeautifyApi
@@ -58,10 +58,10 @@ import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 object ReplaceNavigationBar : ClickableHookItem() {
 
     private val ICONS = listOf(
-        Icons.Default.Home to "主页",
-        Icons.Default.Contacts to "联系人",
-        Icons.Default.Explore to "发现",
-        Icons.Default.Person to "我"
+        MaterialSymbols.OutlinedFilled.Home     to "主页",
+        MaterialSymbols.OutlinedFilled.Contacts to "联系人",
+        MaterialSymbols.OutlinedFilled.Explore  to "发现",
+        MaterialSymbols.OutlinedFilled.Person   to "我"
     )
 
     private const val KEY_USE_BACKDROP = "tab_bar_use_backdrop"

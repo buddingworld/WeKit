@@ -338,7 +338,6 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.biometric)
@@ -348,6 +347,9 @@ dependencies {
     implementation(libs.aboutlibraries.compose.m3)
     implementation(libs.kyant0.backdrop)
     implementation(libs.kyant0.shapes)
+
+    implementation(libs.composablehorizons.material.symbols.filled)
+    implementation(libs.composablehorizons.material.symbols.outlined)
 
     implementation(libs.google.guava)
     implementation(libs.google.protobuf.java)
@@ -368,9 +370,6 @@ dependencies {
     implementation(libs.dexmaker)
     implementation(project(":libs:common:annotation-scanner"))
     ksp(project(":libs:common:annotation-scanner"))
-
-    implementation(libs.material.dialogs.core)
-    implementation(libs.material.dialogs.input)
 
     implementation(libs.dalvik.dx)
     implementation(libs.okhttp3.okhttp)

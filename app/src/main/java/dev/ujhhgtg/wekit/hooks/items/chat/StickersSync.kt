@@ -34,15 +34,16 @@ import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.KnownPaths
-import dev.ujhhgtg.wekit.utils.ToastUtils
 import dev.ujhhgtg.wekit.utils.ToastUtils.showToastSuspend
 import dev.ujhhgtg.wekit.utils.createDirectoriesNoThrow
 import dev.ujhhgtg.wekit.utils.enumValueOfClass
 import dev.ujhhgtg.wekit.utils.logging.WeLogger
 import dev.ujhhgtg.wekit.utils.polyfills.convToList
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
@@ -161,7 +162,7 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
                                     val groupItemInfo = ctorGroupItemInfo.newInstance(emojiThumb, 2, "", 0)
                                     stickers.add(groupItemInfo)
                                 } catch (e: Exception) {
-                                    WeLogger.e(TAG, "Failed to load sticker: $path", e)
+                                    WeLogger.e(TAG, "failed to load sticker: $path", e)
                                 }
                             }
 
@@ -398,7 +399,6 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
                     }
                 }.getInstance(ClassLoaderProvider.classLoader!!)
             }
-            WeLogger.d(TAG, "actualRetTypeInitArg2Type=${actualRetTypeInitArg2Type!!.name}")
             param.result = retType.createInstance(bytes, "image/png",
                 actualRetTypeInitArg2Type!!.createInstance(bytes))
         }
@@ -507,23 +507,25 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
                             modifier = androidx.compose.ui.Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    stickerPacks.forEach { pack ->
-                                        WeDatabaseApi.dbInstance.asResolver()
-                                            .firstMethod {
-                                                name = "delete"
-                                                parameters(
-                                                    String::class,
-                                                    String::class,
-                                                    Array<String>::class
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        stickerPacks.forEach { pack ->
+                                            WeDatabaseApi.dbInstance.asResolver()
+                                                .firstMethod {
+                                                    name = "delete"
+                                                    parameters(
+                                                        String::class,
+                                                        String::class,
+                                                        Array<String>::class
+                                                    )
+                                                }
+                                                .invoke(
+                                                    "EmojiGroupInfo",
+                                                    "productID = ?",
+                                                    arrayOf(pack.appPackId)
                                                 )
-                                            }
-                                            .invoke(
-                                                "EmojiGroupInfo",
-                                                "productID = ?",
-                                                arrayOf(pack.appPackId)
-                                            )
+                                        }
+                                        showToastSuspend("已清除 ${stickerPacks.size} 个贴纸包缓存!")
                                     }
-                                    ToastUtils.showToast("已清除 ${stickerPacks.size} 个贴纸包缓存!")
                                 }
                                 .padding(vertical = 12.dp, horizontal = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,

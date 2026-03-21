@@ -49,7 +49,7 @@ abstract class BaseHookItem {
     // --- hookBefore ---
 
     inline fun Executable.hookBefore(
-        priority: Int = WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50),
+        priority: Int = hookPriority,
         crossinline action: HookAction
     ) {
         XposedBridge.hookMethod(
@@ -65,7 +65,7 @@ abstract class BaseHookItem {
 
     @JvmName("hookBefore2")
     inline fun MethodResolver<*>.hookBefore(
-        priority: Int = WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50),
+        priority: Int = hookPriority,
         crossinline action: HookAction
     ) {
         return this.self.hookBefore(priority, action)
@@ -73,7 +73,7 @@ abstract class BaseHookItem {
 
     @JvmName("hookBefore3")
     inline fun ConstructorResolver<*>.hookBefore(
-        priority: Int = WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50),
+        priority: Int = hookPriority,
         crossinline action: HookAction
     ) {
         return this.self.hookBefore(priority, action)
@@ -84,7 +84,7 @@ abstract class BaseHookItem {
     // --- hookAfter ---
 
     inline fun Executable.hookAfter(
-        priority: Int = WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50),
+        priority: Int = hookPriority,
         crossinline action: HookAction
     ) {
         XposedBridge.hookMethod(
@@ -100,7 +100,7 @@ abstract class BaseHookItem {
 
     @JvmName("hookAfter2")
     inline fun MethodResolver<*>.hookAfter(
-        priority: Int = WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50),
+        priority: Int = hookPriority,
         crossinline action: HookAction
     ) {
         return this.self.hookAfter(priority, action)
@@ -108,7 +108,7 @@ abstract class BaseHookItem {
 
     @JvmName("hookAfter3")
     inline fun ConstructorResolver<*>.hookAfter(
-        priority: Int = WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50),
+        priority: Int = hookPriority,
         crossinline action: HookAction
     ) {
         return this.self.hookAfter(priority, action)
@@ -119,28 +119,28 @@ abstract class BaseHookItem {
     // --- dex delegate ---
 
     inline fun DexMethodDelegate.hookBefore(
-        priority: Int = WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50),
+        priority: Int = hookPriority,
         crossinline action: HookAction
     ) {
         return this.method.hookBefore(priority, action)
     }
 
     inline fun DexMethodDelegate.hookAfter(
-        priority: Int = WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50),
+        priority: Int = hookPriority,
         crossinline action: HookAction
     ) {
         return this.method.hookAfter(priority, action)
     }
 
     inline fun DexConstructorDelegate.hookBefore(
-        priority: Int = WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50),
+        priority: Int = hookPriority,
         crossinline action: HookAction
     ) {
         return this.constructor.hookBefore(priority, action)
     }
 
     inline fun DexConstructorDelegate.hookAfter(
-        priority: Int = WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50),
+        priority: Int = hookPriority,
         crossinline action: HookAction
     ) {
         return this.constructor.hookAfter(priority, action)
@@ -154,5 +154,9 @@ abstract class BaseHookItem {
         runCatching {
             action(param)
         }.onFailure { e -> WeLogger.e("executeHookAction", "failed to execute hook of $path", e) }
+    }
+
+    companion object {
+        val hookPriority by lazy { WePrefs.getIntOrDef(PreferenceKeys.HOOK_PRIORITY, 50) }
     }
 }

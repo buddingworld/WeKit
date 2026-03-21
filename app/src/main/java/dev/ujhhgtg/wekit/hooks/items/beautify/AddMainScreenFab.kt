@@ -25,16 +25,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.QrCodeScanner
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Update
-import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -54,13 +44,23 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.composables.icons.materialsymbols.MaterialSymbols
+import com.composables.icons.materialsymbols.outlinedfilled.Add
+import com.composables.icons.materialsymbols.outlinedfilled.Camera
+import com.composables.icons.materialsymbols.outlinedfilled.Cancel
+import com.composables.icons.materialsymbols.outlinedfilled.Extension
+import com.composables.icons.materialsymbols.outlinedfilled.Movie
+import com.composables.icons.materialsymbols.outlinedfilled.Qr_code_scanner
+import com.composables.icons.materialsymbols.outlinedfilled.Settings
+import com.composables.icons.materialsymbols.outlinedfilled.Update
+import com.composables.icons.materialsymbols.outlinedfilled.Wallet
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.nameof.nameof
 import dev.ujhhgtg.wekit.constants.PackageNames
-import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.hooks.api.core.WeConversationApi
 import dev.ujhhgtg.wekit.hooks.api.ui.WeMainActivityBeautifyApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
+import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.ui.content.MainSettingsDialog
 import dev.ujhhgtg.wekit.ui.utils.LifecycleOwnerProvider
 import dev.ujhhgtg.wekit.ui.utils.setLifecycleOwner
@@ -86,10 +86,6 @@ object AddMainScreenFab : SwitchHookItem() {
 
     fun removeProvider(provider: IMenuItemsProvider) {
         val removed = providers.remove(provider)
-        WeLogger.i(
-            TAG,
-            "provider remove ${if (removed) "succeeded" else "failed"}, current provider count: ${providers.size}"
-        )
     }
 
     private val TAG = nameof(AddMainScreenFab)
@@ -111,43 +107,43 @@ object AddMainScreenFab : SwitchHookItem() {
                 .get()!! as Activity
 
             val menuItems = mutableMapOf(
-                "扫一扫" to (Icons.Default.QrCodeScanner to {
+                "扫一扫" to (MaterialSymbols.OutlinedFilled.Qr_code_scanner to {
                     startActivityByName(
                         activity,
                         "com.tencent.mm.plugin.scanner.ui.BaseScanUI"
                     )
                 }),
-                "朋友圈" to (Icons.Default.Camera to {
+                "朋友圈" to (MaterialSymbols.OutlinedFilled.Camera to {
                     startActivityByName(
                         activity,
                         "com.tencent.mm.plugin.sns.ui.improve.ImproveSnsTimelineUI"
                     )
                 }),
-                "钱包" to (Icons.Default.Wallet to {
+                "钱包" to (MaterialSymbols.OutlinedFilled.Wallet to {
                     startActivityByName(
                         activity,
                         "com.tencent.mm.plugin.mall.ui.MallIndexUIv2"
                     )
                 }),
-                "视频号" to (Icons.Default.Movie to {
+                "视频号" to (MaterialSymbols.OutlinedFilled.Movie to {
                     startActivityByName(
                         activity,
                         "com.tencent.mm.plugin.finder.ui.FinderHomeAffinityUI"
                     )
                 }),
-                "设置" to (Icons.Default.Settings to {
+                "设置" to (MaterialSymbols.OutlinedFilled.Settings to {
                     startActivityByName(
                         activity,
                         "com.tencent.mm.plugin.setting.ui.setting_new.MainSettingsUI"
                     )
                 }),
-                "模块设置" to (Icons.Default.Extension to {
+                "模块设置" to (MaterialSymbols.OutlinedFilled.Extension to {
                     MainSettingsDialog(activity).show()
                 }),
-                "强制停止" to (Icons.Default.Cancel to {
+                "强制停止" to (MaterialSymbols.OutlinedFilled.Cancel to {
                     Process.killProcess(Process.myPid())
                 }),
-                "全部已读" to (Icons.Default.Update to {
+                "全部已读" to (MaterialSymbols.OutlinedFilled.Update to {
                     WeConversationApi.markAllAsRead()
                     ToastUtils.showToast("已将全部未读消息标为已读")
                 })
@@ -295,7 +291,7 @@ object AddMainScreenFab : SwitchHookItem() {
                                 ) {
                                     val rotation by animateFloatAsState(if (expanded) 45f else 0f)
                                     Icon(
-                                        Icons.Filled.Add,
+                                        MaterialSymbols.OutlinedFilled.Add,
                                         contentDescription = null,
                                         tint = activeColor,
                                         modifier = Modifier.rotate(rotation)

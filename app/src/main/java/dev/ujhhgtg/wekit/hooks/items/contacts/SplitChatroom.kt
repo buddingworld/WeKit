@@ -11,8 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +28,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.composables.icons.materialsymbols.MaterialSymbols
+import com.composables.icons.materialsymbols.outlined.Search
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
 import dev.ujhhgtg.wekit.hooks.api.core.WeDatabaseApi
@@ -108,9 +108,9 @@ object SplitChatroom : ClickableHookItem() {
 //  Internal step state
 // ---------------------------------------------------------------------------
 
-private sealed interface Step {
-    data object Search : Step
-    data class Results(val filtered: List<WeGroup>) : Step
+private sealed interface DialogPhase {
+    data object Search : DialogPhase
+    data class Results(val filtered: List<WeGroup>) : DialogPhase
 }
 
 // ---------------------------------------------------------------------------
@@ -123,10 +123,10 @@ private fun SplitChatroomDialog(
     onDismiss: () -> Unit,
     onSelect: (chatroomId: String) -> Unit,
 ) {
-    var step by remember { mutableStateOf<Step>(Step.Search) }
+    var phase by remember { mutableStateOf<DialogPhase>(DialogPhase.Search) }
 
-    when (val s = step) {
-        is Step.Search -> SearchStep(
+    when (val s = phase) {
+        is DialogPhase.Search -> SearchStep(
             onDismiss = onDismiss,
             onQuery = { keyword ->
                 val filtered = if (keyword.isEmpty()) allGroups else allGroups.filter { g ->
@@ -135,14 +135,14 @@ private fun SplitChatroomDialog(
                             g.nicknamePinyin.contains(keyword, ignoreCase = true) ||
                             g.wxId.contains(keyword, ignoreCase = true)
                 }
-                step = Step.Results(filtered)
+                phase = DialogPhase.Results(filtered)
             },
         )
 
-        is Step.Results -> ResultsStep(
+        is DialogPhase.Results -> ResultsStep(
             filtered = s.filtered,
             onDismiss = onDismiss,
-            onBack = { step = Step.Search },
+            onBack = { phase = DialogPhase.Search },
             onSelect = onSelect,
         )
     }
@@ -173,7 +173,7 @@ private fun SearchStep(
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
                     placeholder = { Text("输入群名 / 拼音 / ID (留空显示全部)") },
-                    leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
+                    leadingIcon = { Icon(MaterialSymbols.Outlined.Search, contentDescription = null) },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { onQuery(keyword.trim()) }),
                 )

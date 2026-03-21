@@ -38,10 +38,6 @@ object WeHomeScreenPopupMenuApi : ApiHookItem(), IResolvesDex {
 
     fun removeProvider(provider: IMenuItemsProvider) {
         val removed = providers.remove(provider)
-        WeLogger.i(
-            TAG,
-            "provider remove ${if (removed) "succeeded" else "failed"}, current provider count: ${providers.size}"
-        )
     }
 
     private val TAG = nameof(WeHomeScreenPopupMenuApi)

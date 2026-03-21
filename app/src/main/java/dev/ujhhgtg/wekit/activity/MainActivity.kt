@@ -19,12 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -55,6 +49,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import com.composables.icons.materialsymbols.MaterialSymbols
+import com.composables.icons.materialsymbols.outlined.Open_in_new
+import com.composables.icons.materialsymbols.outlinedfilled.Check_circle
+import com.composables.icons.materialsymbols.outlinedfilled.Info
+import com.composables.icons.materialsymbols.outlinedfilled.More_vert
+import com.composables.icons.materialsymbols.outlinedfilled.Warning
 import com.topjohnwu.superuser.Shell
 import dev.ujhhgtg.wekit.BuildConfig
 import dev.ujhhgtg.wekit.R
@@ -172,7 +172,7 @@ class MainActivity : ComponentActivity() {
                     ),
                     actions = {
                         IconButton(onClick = { showMenu = !showMenu }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Menu")
+                            Icon(MaterialSymbols.OutlinedFilled.More_vert, contentDescription = "Menu")
                         }
                         DropdownMenu(
                             expanded = showMenu,
@@ -224,7 +224,7 @@ class MainActivity : ComponentActivity() {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = if (activationState.isActivated) Icons.Default.CheckCircle else Icons.Default.Warning,
+                                imageVector = if (activationState.isActivated) MaterialSymbols.OutlinedFilled.Check_circle else MaterialSymbols.OutlinedFilled.Warning,
                                 contentDescription = null,
                                 tint = Color.White,
                                 modifier = Modifier.size(32.dp)
@@ -252,7 +252,7 @@ class MainActivity : ComponentActivity() {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
-                                    Icons.Default.Info,
+                                    MaterialSymbols.OutlinedFilled.Info,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary
                                 )
@@ -299,7 +299,7 @@ class MainActivity : ComponentActivity() {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Default.OpenInNew,
+                                imageVector = MaterialSymbols.Outlined.Open_in_new,
                                 contentDescription = null,
                                 modifier = Modifier.size(24.dp),
                                 tint = MaterialTheme.colorScheme.primary
@@ -341,13 +341,13 @@ class MainActivity : ComponentActivity() {
 
                     // Link Cards
                     LinkCard(
-                        iconRes = R.drawable.ic_github,
+                        iconRes = R.drawable.github_24px,
                         title = "GitHub",
                         subtitle = "修改于 Ujhhgtg/WeKit (原始: cwuom/WeKit)",
                         onClick = { onUrlClick("https://github.com/Ujhhgtg/WeKit") }
                     )
                     LinkCard(
-                        iconRes = R.drawable.ic_telegram,
+                        iconRes = R.drawable.telegram_24px,
                         title = "Telegram",
                         subtitle = "@ujhhgtg_wekit_ci",
                         onClick = { onUrlClick("https://t.me/ujhhgtg_wekit_ci") }

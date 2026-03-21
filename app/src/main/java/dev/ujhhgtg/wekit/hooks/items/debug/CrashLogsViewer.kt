@@ -17,12 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Article
-import androidx.compose.material.icons.automirrored.outlined.TextSnippet
-import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -35,6 +29,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.composables.icons.materialsymbols.MaterialSymbols
+import com.composables.icons.materialsymbols.outlined.Article
+import com.composables.icons.materialsymbols.outlined.Content_copy
+import com.composables.icons.materialsymbols.outlined.Delete
+import com.composables.icons.materialsymbols.outlined.Share
+import com.composables.icons.materialsymbols.outlined.Text_snippet
 import dev.ujhhgtg.nameof.nameof
 import dev.ujhhgtg.wekit.hooks.core.ClickableHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
@@ -122,11 +122,11 @@ object CrashLogsViewer : ClickableHookItem() {
 
     private fun showCrashLogOptions(context: Context, logFile: Path) {
         val options = listOf(
-            LogOption("查看详情", Icons.AutoMirrored.Outlined.Article),
-            LogOption("复制简易信息", Icons.AutoMirrored.Outlined.TextSnippet),
-            LogOption("复制完整日志", Icons.Outlined.ContentCopy),
-            LogOption("分享日志", Icons.Outlined.Share),
-            LogOption("删除日志", Icons.Outlined.Delete, destructive = true)
+            LogOption("查看详情", MaterialSymbols.Outlined.Article),
+            LogOption("复制简易信息", MaterialSymbols.Outlined.Text_snippet),
+            LogOption("复制完整日志", MaterialSymbols.Outlined.Content_copy),
+            LogOption("分享日志", MaterialSymbols.Outlined.Share),
+            LogOption("删除日志", MaterialSymbols.Outlined.Delete, destructive = true)
         )
 
         showComposeDialog(context) {

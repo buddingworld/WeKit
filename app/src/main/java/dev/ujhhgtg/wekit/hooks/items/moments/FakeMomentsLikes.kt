@@ -1,18 +1,36 @@
 package dev.ujhhgtg.wekit.hooks.items.moments
 
-import android.annotation.SuppressLint
 import android.content.ContentValues
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.list.listItemsMultiChoice
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.nameof.nameof
-import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.hooks.api.core.WeDatabaseApi
 import dev.ujhhgtg.wekit.hooks.api.core.WeDatabaseListenerApi
 import dev.ujhhgtg.wekit.hooks.api.ui.WeMomentsContextMenuApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
-import dev.ujhhgtg.wekit.ui.utils.CommonContextWrapper
+import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
+import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
+import dev.ujhhgtg.wekit.ui.content.Button
+import dev.ujhhgtg.wekit.ui.content.TextButton
+import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.ModuleRes
+import dev.ujhhgtg.wekit.utils.ToastUtils
 import dev.ujhhgtg.wekit.utils.logging.WeLogger
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -57,8 +75,90 @@ object FakeMomentsLikes : SwitchHookItem(), WeMomentsContextMenuApi.IMenuItemsPr
                 777006,
                 "伪点赞",
                 { ModuleRes.getDrawable("star_24px")!! },
-                { _, _ -> true }) { context ->
-                showFakeLikesDialog(context)
+                { _, _ -> true }) { moments ->
+                    val allFriends = WeDatabaseApi.getContacts()
+
+                    val displayItems = allFriends.map { contact ->
+                        buildString {
+                            if (contact.remarkName.isNotBlank()) {
+                                append(contact.remarkName)
+                                if (contact.nickname.isNotBlank()) append(" (${contact.nickname})")
+                            } else if (contact.nickname.isNotBlank()) {
+                                append(contact.nickname)
+                            } else {
+                                append(contact.wxId)
+                            }
+                        }
+                    }
+
+                    val snsInfo = moments.snsInfo
+                    val snsId = moments.snsInfo!!.javaClass.superclass!!
+                        .getDeclaredField("field_snsId")
+                        .apply { isAccessible = true }
+                        .get(snsInfo) as Long
+
+                    val currentSelected = fakeLikeWxIds[snsId] ?: emptySet()
+                    val initialSelection = allFriends.mapIndexedNotNull { index, contact ->
+                        if (contact.wxId in currentSelected) index else null
+                    }.toSet()
+
+                    showComposeDialog(moments.activity) {
+                        var selectedIndices by remember { mutableStateOf(initialSelection) }
+
+                        AlertDialogContent(
+                            title = { Text("选择伪点赞用户") },
+                            text = {
+                                LazyColumn {
+                                    itemsIndexed(displayItems) { index, label ->
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable {
+                                                    selectedIndices = if (index in selectedIndices)
+                                                        selectedIndices - index
+                                                    else
+                                                        selectedIndices + index
+                                                }
+                                                .padding(vertical = 4.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Checkbox(
+                                                checked = index in selectedIndices,
+                                                onCheckedChange = { checked ->
+                                                    selectedIndices = if (checked)
+                                                        selectedIndices + index
+                                                    else
+                                                        selectedIndices - index
+                                                }
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(text = label)
+                                        }
+                                    }
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { dismiss() }) {
+                                    Text("取消")
+                                }
+                            },
+                            confirmButton = {
+                                Button(onClick = {
+                                    val selectedWxids = selectedIndices.map { allFriends[it].wxId }.toSet()
+                                    if (selectedWxids.isEmpty()) {
+                                        fakeLikeWxIds.remove(snsId)
+                                        ToastUtils.showToast("已清除朋友圈的伪点赞配置")
+                                    } else {
+                                        fakeLikeWxIds[snsId] = selectedWxids
+                                        ToastUtils.showToast("已设置朋友圈的 ${selectedWxids.size} 个伪点赞")
+                                    }
+                                    dismiss()
+                                }) {
+                                    Text("确定")
+                                }
+                            }
+                        )
+                    }
             }
         )
     }
@@ -132,69 +232,4 @@ object FakeMomentsLikes : SwitchHookItem(), WeMomentsContextMenuApi.IMenuItemsPr
         values.put("attrBuf", toByteArrayMethod?.invoke(snsObj) as? ByteArray ?: return@runCatching)
         WeLogger.i(TAG, "成功为朋友圈 $snsId 注入 ${fakeList.size} 个伪点赞")
     }.onFailure { WeLogger.e(TAG, "注入伪点赞失败", it) }
-
-    /**
-     * 显示伪点赞用户选择对话框
-     */
-    @SuppressLint("CheckResult")
-    private fun showFakeLikesDialog(context: WeMomentsContextMenuApi.MomentsContext) {
-        try {
-            // 获取所有好友列表
-            val allFriends = WeDatabaseApi.getContacts()
-
-            val displayItems = allFriends.map { contact ->
-                buildString {
-                    // 如果有备注，显示"备注(昵称)"
-                    if (contact.remarkName.isNotBlank()) {
-                        append(contact.remarkName)
-                        if (contact.nickname.isNotBlank()) {
-                            append(" (${contact.nickname})")
-                        }
-                    }
-                    // 否则直接显示昵称
-                    else if (contact.nickname.isNotBlank()) {
-                        append(contact.nickname)
-                    }
-                    // 最后备选用wxid
-                    else {
-                        append(contact.wxId)
-                    }
-                }
-            }
-
-            val snsInfo = context.snsInfo
-            val snsId = context.snsInfo!!.javaClass.superclass!!.getDeclaredField("field_snsId")
-                .apply { isAccessible = true }.get(snsInfo) as Long
-            val currentSelected = fakeLikeWxIds[snsId] ?: emptySet()
-
-            val currentIndices = allFriends.mapIndexedNotNull { index, contact ->
-                if (currentSelected.contains(contact.wxId)) index else null
-            }.toIntArray()
-
-            val wrappedContext = CommonContextWrapper.create(context.activity)
-
-            // 显示多选对话框
-            MaterialDialog(wrappedContext).show {
-                title(text = "选择伪点赞用户")
-                listItemsMultiChoice(
-                    items = displayItems,
-                    initialSelection = currentIndices
-                ) { _, indices, _ ->
-                    val selectedWxids = indices.map { allFriends[it].wxId }.toSet()
-
-                    if (selectedWxids.isEmpty()) {
-                        fakeLikeWxIds.remove(snsId)
-                        WeLogger.d(TAG, "已清除朋友圈 $snsId 的伪点赞配置")
-                    } else {
-                        fakeLikeWxIds[snsId] = selectedWxids
-                        WeLogger.d(TAG, "已设置朋友圈 $snsId 的伪点赞: $selectedWxids")
-                    }
-                }
-                positiveButton(text = "确定")
-                negativeButton(text = "取消")
-            }
-        } catch (e: Exception) {
-            WeLogger.e(TAG, "显示选择对话框失败", e)
-        }
-    }
 }
