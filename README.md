@@ -46,9 +46,11 @@
 
 ## 下载
 
-本项目不会发布稳定版本，请从 [GitHub Actions](https://github.com/Ujhhgtg/WeKit/actions/workflows/ci.yml) 下载最新 CI 构建产物
+本项目不会发布稳定版本，请从 [GitHub Actions](https://github.com/Ujhhgtg/WeKit/actions/workflows/ci.yml) 或 [Telegram CI 频道](https://t.me/ujhhgtg_wekit_ci) 下载最新 CI 构建产物
 
 Releases 中会发布“稳定的 CI”，但不保证真的稳定，且可能无法享受最新功能与修复，所以我还是建议你使用每夜版
+
+如果你是免 Root 用户, 也可以从 [GitHub Actions](https://github.com/Ujhhgtg/WeKit/actions/workflows/ci.yml) 中下载已嵌入模块的微信安装包 (包名为 `com.tencent.mm2`)
 
 ## 开发
 
