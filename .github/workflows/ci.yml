@@ -84,6 +84,16 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: ${{ success() && github.ref == 'refs/heads/master' }}
+    services:
+      telegram-bot-api:
+        image: aiogram/telegram-bot-api:latest
+        env:
+          TELEGRAM_API_ID: "21724"
+          TELEGRAM_API_HASH: "3e0cb5efcd52300aec5994fdfc5bdc16"
+          TELEGRAM_STATISTICS: 1
+        ports:
+          - 8081:8081
+
     steps:
       - name: Download APK artifact
         uses: actions/download-artifact@v8
@@ -91,11 +101,12 @@ jobs:
           name: wekit-apk
           path: artifacts
 
-      - name: Find APK files
-        id: find_apk
+      - name: Wait for Telegram API
         run: |
-          apks=$(ls artifacts/*.apk | tr '\n' ',')
-          echo "apk_paths=$apks" >> $GITHUB_OUTPUT
+          until curl -s http://localhost:8081 > /dev/null; do
+          echo "Waiting for Telegram API server..."
+          sleep 1
+          done
 
       - name: Send APKs via Telegram API
         env:
@@ -117,7 +128,7 @@ jobs:
           
           if [ ${#apks[@]} -eq 1 ]; then
             # Single APK — use sendDocument (supports caption)
-            curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendDocument" \
+            curl -s -X POST "http://localhost:8081/bot${BOT_TOKEN}/sendDocument" \
               -F chat_id="${CHAT_ID}" \
               -F document=@"${apks[0]}" \
               -F caption="${caption}" \
@@ -140,7 +151,7 @@ jobs:
             done
             media_json+="]"
           
-            curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup" \
+            curl -s -X POST "http://localhost:8081/bot${BOT_TOKEN}/sendMediaGroup" \
               -F chat_id="${CHAT_ID}" \
               -F media="${media_json}" \
               "${form_args[@]}"
