@@ -15,7 +15,11 @@ object DisplayHiddenContactSettings : SwitchHookItem() {
             .firstMethod {
                 name = "initView"
             }.hookAfter { param ->
-                val prefScreen = param.thisObject.cast<ProfileSettingUI>().preferenceScreen
+                val prefScreen = param.thisObject.asResolver()
+                    .firstMethod {
+                        name = "getPreferenceScreen"
+                        superclass()
+                    }.invoke()!!
                 val hiddenSet = prefScreen.asResolver()
                     .firstField {
                         type = HashSet::class

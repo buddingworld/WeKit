@@ -82,7 +82,7 @@ fun DexResolverDialogContent(
     dismiss: () -> Unit
 ) {
     var phase by remember { mutableStateOf<DialogPhase>(DialogPhase.Idle) }
-    var currentTask by remember { mutableStateOf("") }
+    var currentTask by remember { mutableStateOf("正在适配...") }
     var completed by remember { mutableIntStateOf(0) }
     val scanResults = remember { mutableStateMapOf<String, ScanResult>() }
 
@@ -109,7 +109,7 @@ fun DexResolverDialogContent(
         dexKit: DexKitBridge,
         progressChannel: Channel<ScanProgress>
     ): ScanResult {
-        val path = if (item is BaseHookItem) item.path else item::class.java.simpleName
+        val path = if (item is BaseHookItem) item.path else error("unreachable")
         return try {
             progressChannel.send(ScanProgress.Start(path))
             item.resolveDex(dexKit)
