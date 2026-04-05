@@ -272,7 +272,7 @@ fun DexResolverDialogContent(
                     Button(onClick = {
                         dismiss()
                         exitProcess(0)
-                    }) { Text("重启应用") }
+                    }) { Text("重启微信") }
                 }
             }
         }

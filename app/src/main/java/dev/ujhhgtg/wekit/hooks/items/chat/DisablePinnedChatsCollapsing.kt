@@ -1,4 +1,4 @@
-package dev.ujhhgtg.wekit.hooks.items.contacts
+package dev.ujhhgtg.wekit.hooks.items.chat
 
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
@@ -8,8 +8,8 @@ import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import org.luckypray.dexkit.DexKitBridge
 
 @HookItem(
-    path = "联系人与群组/禁用置顶聊天折叠",
-    description = "隐藏「折叠置顶聊天」选项\n启用本功能后, 需重启应用 2 次以使更改完全生效"
+    path = "聊天/禁用置顶聊天折叠",
+    description = "隐藏「折叠置顶聊天」选项\n启用本功能后, 需重启微信 2 次以使更改完全生效"
 )
 object DisablePinnedChatsCollapsing : SwitchHookItem(), IResolvesDex {
 

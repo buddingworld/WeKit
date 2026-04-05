@@ -1,4 +1,4 @@
-package dev.ujhhgtg.wekit.hooks.items.contacts
+package dev.ujhhgtg.wekit.hooks.items.chat
 
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -21,7 +21,7 @@ import org.luckypray.dexkit.DexKitBridge
 import kotlin.math.roundToInt
 
 @HookItem(
-    path = "联系人与群组/显示群成员身份",
+    path = "聊天/显示群成员身份",
     description = "在群聊中显示群成员的身份: 群主, 管理员, 成员"
 )
 object DisplayGroupMemberRoles : SwitchHookItem(), IResolvesDex,
@@ -50,6 +50,7 @@ object DisplayGroupMemberRoles : SwitchHookItem(), IResolvesDex,
     ) {
         val msgInfo = WeChatMessageViewApi.getMsgInfoFromParam(param)
         if (!msgInfo.isInGroupChat) return
+        if (msgInfo.isSend != 0) return
         val sender = runCatching { msgInfo.sender }.getOrNull() ?: return
         val groupId = msgInfo.talker
 
@@ -126,7 +127,6 @@ object DisplayGroupMemberRoles : SwitchHookItem(), IResolvesDex,
         }
     }
 }
-
 
 private class RoundedBackgroundSpan(
     private val backgroundColor: Int,

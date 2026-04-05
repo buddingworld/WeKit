@@ -523,7 +523,7 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
-                                "清除应用数据库贴纸包缓存",
+                                "清除微信数据库贴纸包缓存",
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }

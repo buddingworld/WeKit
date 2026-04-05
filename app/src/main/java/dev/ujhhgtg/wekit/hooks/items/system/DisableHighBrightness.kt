@@ -6,7 +6,7 @@ import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 
-@HookItem(path = "系统与隐私/禁止屏幕高亮度", description = "禁止应用将屏幕亮度设置得过高")
+@HookItem(path = "系统与隐私/禁止屏幕高亮度", description = "禁止微信将屏幕亮度设置得过高")
 object DisableHighBrightness : SwitchHookItem() {
 
     override fun onEnable() {
