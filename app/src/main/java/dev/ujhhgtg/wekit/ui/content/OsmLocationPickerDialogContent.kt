@@ -1,5 +1,12 @@
 package dev.ujhhgtg.wekit.ui.content
 
+import android.content.res.Resources
+import android.graphics.Canvas
+import android.graphics.Point
+import android.graphics.Rect
+import android.graphics.drawable.Drawable
+import android.util.TypedValue
+import android.view.MotionEvent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,17 +39,26 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.composables.icons.materialsymbols.MaterialSymbols
 import com.composables.icons.materialsymbols.outlined.Check
 import com.composables.icons.materialsymbols.outlined.Close
+import dev.ujhhgtg.wekit.constants.PackageNames
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.tileprovider.BitmapPool
 import org.osmdroid.tileprovider.tilesource.ITileSource
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.util.RectL
 import org.osmdroid.views.MapView
+import org.osmdroid.views.MapViewRepository
+import org.osmdroid.views.Projection
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Overlay
+import kotlin.math.roundToInt
+
 
 /**
- * A full-screen dialog wrapping an osmdroid [MapView] (OpenStreetMap, FOSS).
+ * A dialog wrapping an osmdroid [MapView] (OpenStreetMap, FOSS).
  * The user taps anywhere on the map to drop a pin; tapping Confirm fires
  * [onLocationSelected] with the chosen [GeoPoint].
  *
@@ -55,22 +71,20 @@ import org.osmdroid.views.overlay.Marker
 @Composable
 fun OsmLocationPickerDialogContent(
     initialLocation: GeoPoint = GeoPoint(31.224361, 121.469170), // Shanghai
-    initialZoom: Double = 12.0,
+    initialZoom: Double = 5.0,
     tileSource: ITileSource = TileSourceFactory.MAPNIK,
     onLocationSelected: (GeoPoint) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val context = LocalContext.current
-
     // osmdroid requires a user-agent to be set before first MapView creation
     SideEffect {
-        Configuration.getInstance().userAgentValue = context.packageName
+        Configuration.getInstance().userAgentValue = PackageNames.THIS
     }
 
     var pickedPoint by remember { mutableStateOf<GeoPoint?>(null) }
 
     // Hold a stable reference so overlays can be mutated without recomposing
-    val markerRef = remember { mutableStateOf<Marker?>(null) }
+    val markerRef = remember { mutableStateOf<CustomOsmMarker?>(null) }
 
     Surface(
         modifier = Modifier
@@ -102,18 +116,20 @@ fun OsmLocationPickerDialogContent(
                             minZoomLevel = 3.0
                             maxZoomLevel = 19.0
 
+                            // Tap-to-pin overlay
                             val eventsOverlay = MapEventsOverlay(
                                 object : MapEventsReceiver {
                                     override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
                                         pickedPoint = p
+
+                                        // Move existing marker or create a new one
                                         val existing = markerRef.value
                                         if (existing != null) {
                                             existing.position = p
                                         } else {
-                                            val m = Marker(this@apply).apply {
+                                            val m = CustomOsmMarker(this@apply).apply {
                                                 position = p
                                                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                                                title = "选择位置"
                                             }
                                             overlays.add(m)
                                             markerRef.value = m
@@ -125,17 +141,20 @@ fun OsmLocationPickerDialogContent(
                                     override fun longPressHelper(p: GeoPoint) = false
                                 }
                             )
+                            // Add events overlay FIRST so it's hit-tested last
+                            // (osmdroid overlays are drawn/consumed in reverse order)
                             overlays.add(0, eventsOverlay)
                         }
                     },
                     update = { mapView ->
+                        // Re-apply tile source if it changes (e.g. on recomposition)
                         if (mapView.tileProvider.tileSource != tileSource) {
                             mapView.setTileSource(tileSource)
                         }
                     },
                 )
 
-                // Hint chip – hidden once a point is chosen
+                // Hint overlay – hidden once a point is chosen
                 if (pickedPoint == null) {
                     Surface(
                         modifier = Modifier
@@ -151,19 +170,12 @@ fun OsmLocationPickerDialogContent(
                         )
                     }
                 }
+            }
 
-                // Coordinate chips – float over map once a point is picked
-                pickedPoint?.let { pt ->
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        OsmCoordinateChip(label = "纬度", value = "%.6f".format(pt.latitude))
-                        OsmCoordinateChip(label = "经度", value = "%.6f".format(pt.longitude))
-                    }
-                }
+            // ── Coordinate readout ────────────────────────────────────
+            pickedPoint?.let { pt ->
+                HorizontalDivider()
+                OsmCoordinateReadout(point = pt)
             }
         }
     }
@@ -208,6 +220,19 @@ private fun OsmPickerHeader(
 }
 
 @Composable
+private fun OsmCoordinateReadout(point: GeoPoint) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+    ) {
+        OsmCoordinateChip(label = "纬度", value = "%.6f".format(point.latitude))
+        OsmCoordinateChip(label = "经度", value = "%.6f".format(point.longitude))
+    }
+}
+
+@Composable
 private fun OsmCoordinateChip(label: String, value: String) {
     Surface(
         shape = MaterialTheme.shapes.small,
@@ -230,5 +255,206 @@ private fun OsmCoordinateChip(label: String, value: String) {
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
             )
         }
+    }
+}
+
+private class CustomOsmMarker(mapView: MapView) : Overlay() {
+    private var mIcon: Drawable? = null
+    private var mPosition: GeoPoint?
+    private var mBearing: Float = 0.0f
+    private var mAnchorU: Float
+    private var mAnchorV: Float
+    private var mIWAnchorU: Float
+    private var mIWAnchorV: Float
+    var alpha: Float = 1.0f
+    private var mDraggable: Boolean
+    private var mIsDragged: Boolean
+    var isFlat: Boolean
+    private var mOnMarkerClickListener: OnMarkerClickListener?
+    private var mOnMarkerDragListener: OnMarkerDragListener?
+
+    var image: Drawable? = null
+    private var mPanToView: Boolean
+    private var mDragOffsetY: Float
+
+    private var mPositionPixels: Point
+    private var mResources: Resources?
+
+    private var mMapViewRepository: MapViewRepository?
+
+    var isDisplayed: Boolean = false
+        private set
+    private val mRect = Rect()
+    private val mOrientedMarkerRect = Rect()
+
+    init {
+        mMapViewRepository = mapView.repository
+        mResources = mapView.context.resources
+        mPosition = GeoPoint(0.0, 0.0)
+        mAnchorU = ANCHOR_CENTER
+        mAnchorV = ANCHOR_CENTER
+        mIWAnchorU = ANCHOR_CENTER
+        mIWAnchorV = ANCHOR_TOP
+        mDraggable = false
+        mIsDragged = false
+        mPositionPixels = Point()
+        mPanToView = true
+        mDragOffsetY = 0.0f
+        this.isFlat = false
+        mOnMarkerClickListener = null
+        mOnMarkerDragListener = null
+        setDefaultIcon()
+    }
+
+    fun setDefaultIcon() {
+        mIcon = mMapViewRepository!!.getDefaultMarkerIcon()
+        setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM)
+    }
+    var position: GeoPoint?
+        get() = mPosition
+        set(position) {
+            mPosition = position!!.clone()
+            mBounds = BoundingBox(
+                position.latitude,
+                position.longitude,
+                position.latitude,
+                position.longitude
+            )
+        }
+
+    fun setAnchor(anchorU: Float, anchorV: Float) {
+        mAnchorU = anchorU
+        mAnchorV = anchorV
+    }
+
+    override fun draw(canvas: Canvas, pj: Projection) {
+        if (mIcon == null) return
+        if (!isEnabled) return
+
+        pj.toPixels(mPosition, mPositionPixels)
+
+        val rotationOnScreen = (if (this.isFlat) -mBearing else -pj.orientation - mBearing)
+        drawAt(canvas, mPositionPixels.x, mPositionPixels.y, rotationOnScreen)
+    }
+
+    override fun onDetach(mapView: MapView?) {
+        BitmapPool.getInstance().asyncRecycle(mIcon)
+        mIcon = null
+        BitmapPool.getInstance().asyncRecycle(this.image)
+        this.mOnMarkerClickListener = null
+        this.mOnMarkerDragListener = null
+        this.mResources = null
+
+        mMapViewRepository = null
+        super.onDetach(mapView)
+    }
+
+    fun hitTest(event: MotionEvent): Boolean {
+        return mIcon != null && this.isDisplayed && mOrientedMarkerRect.contains(
+            event.x.toInt(), event.y.toInt()
+        )
+    }
+
+    override fun onSingleTapConfirmed(event: MotionEvent, mapView: MapView): Boolean {
+        val touched = hitTest(event)
+        return if (touched) {
+            if (mOnMarkerClickListener == null) {
+                onMarkerClickDefault(this, mapView)
+            } else {
+                mOnMarkerClickListener!!.onMarkerClick(this, mapView)
+            }
+        } else false
+    }
+
+    fun moveToEventPosition(event: MotionEvent, mapView: MapView) {
+        val offsetY = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_MM,
+            mDragOffsetY,
+            mapView.context.resources.displayMetrics
+        )
+        val pj = mapView.getProjection()
+        this.position =
+            pj.fromPixels(event.x.toInt(), (event.y - offsetY).toInt()) as GeoPoint?
+        mapView.invalidate()
+    }
+
+    override fun onLongPress(event: MotionEvent, mapView: MapView): Boolean {
+        val touched = hitTest(event)
+        if (touched) {
+            if (mDraggable) {
+                //starts dragging mode:
+                mIsDragged = true
+                if (mOnMarkerDragListener != null) mOnMarkerDragListener!!.onMarkerDragStart(this)
+                moveToEventPosition(event, mapView)
+            }
+        }
+        return touched
+    }
+
+    override fun onTouchEvent(event: MotionEvent, mapView: MapView): Boolean {
+        if (mDraggable && mIsDragged) {
+            when (event.action) {
+                MotionEvent.ACTION_UP -> {
+                    mIsDragged = false
+                    if (mOnMarkerDragListener != null) mOnMarkerDragListener!!.onMarkerDragEnd(this)
+                    return true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    moveToEventPosition(event, mapView)
+                    if (mOnMarkerDragListener != null) mOnMarkerDragListener!!.onMarkerDrag(this)
+                    return true
+                }
+                else -> return false
+            }
+        } else return false
+    }
+
+    interface OnMarkerClickListener {
+        fun onMarkerClick(marker: CustomOsmMarker?, mapView: MapView?): Boolean
+    }
+
+    interface OnMarkerDragListener {
+        fun onMarkerDrag(marker: CustomOsmMarker?)
+
+        fun onMarkerDragEnd(marker: CustomOsmMarker?)
+
+        fun onMarkerDragStart(marker: CustomOsmMarker?)
+    }
+
+    private fun onMarkerClickDefault(marker: CustomOsmMarker, mapView: MapView): Boolean {
+        if (marker.mPanToView) mapView.controller.animateTo(marker.position)
+        return true
+    }
+
+    private fun drawAt(pCanvas: Canvas, pX: Int, pY: Int, pOrientation: Float) {
+        val markerWidth = mIcon!!.intrinsicWidth
+        val markerHeight = mIcon!!.intrinsicHeight
+        val offsetX = pX - (markerWidth * mAnchorU).roundToInt()
+        val offsetY = pY - (markerHeight * mAnchorV).roundToInt()
+        mRect.set(offsetX, offsetY, offsetX + markerWidth, offsetY + markerHeight)
+        RectL.getBounds(mRect, pX, pY, pOrientation.toDouble(), mOrientedMarkerRect)
+        this.isDisplayed = Rect.intersects(mOrientedMarkerRect, pCanvas.getClipBounds())
+        if (!this.isDisplayed) {
+            return
+        }
+        if (this.alpha == 0f) {
+            return
+        }
+        if (pOrientation != 0f) {
+            pCanvas.save()
+            pCanvas.rotate(pOrientation, pX.toFloat(), pY.toFloat())
+        }
+        mIcon!!.alpha = (this.alpha * 255).toInt()
+        mIcon!!.bounds = mRect
+        mIcon!!.draw(pCanvas)
+        if (pOrientation != 0f) {
+            pCanvas.restore()
+        }
+    }
+
+    companion object {
+        const val ANCHOR_CENTER: Float = 0.5f
+        const val ANCHOR_TOP: Float = 0.0f
+        const val ANCHOR_BOTTOM: Float = 1.0f
     }
 }

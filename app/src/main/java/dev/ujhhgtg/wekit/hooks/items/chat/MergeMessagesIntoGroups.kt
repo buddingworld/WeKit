@@ -26,21 +26,21 @@ object MergeMessagesIntoGroups : SwitchHookItem(), WeChatMessageViewApi.ICreateV
 
     // ── field cache ──────────────────────────────────────────────────────────
 
-    private var avatarField: Field? = null
-    private var displayNameField: Field? = null
-    private var timeTVField: Field? = null
+    private lateinit var avatarField: Field
+    private lateinit var displayNameField: Field
+    private lateinit var timeField: Field
 
     private fun ensureFields(tag: Any) {
-        if (avatarField == null) {
+        if (!::avatarField.isInitialized) {
             avatarField = tag.asResolver()
                 .firstField { name = "avatarIV"; superclass() }.self
         }
-        if (displayNameField == null) {
+        if (!::displayNameField.isInitialized) {
             displayNameField = tag.asResolver()
                 .firstField { name = "userTV"; superclass() }.self
         }
-        if (timeTVField == null) {
-            timeTVField = tag.asResolver()
+        if (!::timeField.isInitialized) {
+            timeField = tag.asResolver()
                 .firstField { name = "timeTV"; superclass() }.self
         }
     }
@@ -79,7 +79,7 @@ object MergeMessagesIntoGroups : SwitchHookItem(), WeChatMessageViewApi.ICreateV
         // Record whether THIS message's timestamp is visible so that the
         // message at position-1 can use it when it is (re-)bound.
         val currentHasVisibleTime =
-            (timeTVField?.get(tag) as? View)?.visibility == View.VISIBLE
+            (timeField.get(tag) as? View)?.visibility == View.VISIBLE
         timeVisibilityCache.put(position, currentHasVisibleTime)
 
         val prevSender = senderAt(adapter, position - 1)
@@ -95,14 +95,14 @@ object MergeMessagesIntoGroups : SwitchHookItem(), WeChatMessageViewApi.ICreateV
         val isLastInGroup = nextSender != currentSender || nextHasVisibleTime
 
         // Avatar: INVISIBLE (not GONE) so the text column stays aligned.
-        (avatarField?.get(tag) as? View)?.let { avatar ->
+        (avatarField.get(tag) as? View)?.let { avatar ->
             val avatarContainer = avatar.parent as? View ?: avatar
             avatarContainer.visibility =
                 if (isLastInGroup) View.VISIBLE else View.INVISIBLE
         }
 
-        // Nickname: GONE collapses the row height for mid-group bubbles.
-        (displayNameField?.get(tag) as? View)?.visibility =
+        // Display Name: GONE collapses the row height for mid-group bubbles.
+        (displayNameField.get(tag) as? View)?.visibility =
             if (isFirstInGroup) View.VISIBLE else View.GONE
     }
 

@@ -162,9 +162,9 @@ object CrashLogsManager {
     fun setPendingJavaCrashFlag(logFileName: String) {
         try {
             (crashLogsDir / PENDING_JAVA_CRASH_FLAG).writeText(logFileName)
-            WeLogger.d(TAG, "Pending Java crash flag set: $logFileName")
+            WeLogger.d(TAG, "pending Java crash flag set: $logFileName")
         } catch (e: IOException) {
-            WeLogger.e("Failed to set pending Java crash flag", e)
+            WeLogger.e("failed to set pending Java crash flag", e)
         }
     }
 
@@ -181,7 +181,7 @@ object CrashLogsManager {
         }
 
     fun clearPendingJavaCrashFlag() {
-        deleteFlagFile(PENDING_JAVA_CRASH_FLAG, "Pending Java crash flag cleared")
+        deleteFlagFile(PENDING_JAVA_CRASH_FLAG, "pending Java crash flag cleared")
     }
 
     fun hasPendingJavaCrash(): Boolean = pendingJavaCrashLogFile != null
