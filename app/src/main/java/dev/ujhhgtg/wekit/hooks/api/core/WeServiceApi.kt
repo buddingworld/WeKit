@@ -1,5 +1,6 @@
 package dev.ujhhgtg.wekit.hooks.api.core
 
+import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
@@ -28,6 +29,15 @@ object WeServiceApi : ApiHookItem(), IResolvesDex {
 
     val storageFeatureService by lazy {
         getServiceByClass(classStorageFeatureService.clazz)
+    }
+
+    val messageInfoStorage by lazy {
+        storageFeatureService.asResolver()
+            .firstMethod {
+                parameterCount = 0
+                returnType = WeMessageApi.classMsgInfoStorage.clazz
+            }
+            .invoke()
     }
 
     val chatroomService by lazy {

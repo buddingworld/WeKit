@@ -2,7 +2,6 @@ package dev.ujhhgtg.wekit.hooks.items.chat
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
@@ -69,43 +68,40 @@ object AntiMessageRecall3 : SwitchHookItem(), IResolvesDex {
                     arrayOf(msgSvrId)
                 ) as Cursor
 
-                if (cursor.moveToFirst()) {
-                    val originalCreateTime =
-                        cursor.getLong(cursor.getColumnIndexOrThrow("createTime"))
+                cursor.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        val originalCreateTime =
+                            cursor.getLong(cursor.getColumnIndexOrThrow("createTime"))
 
-                    val match = nameRegex.find(replaceMsg)
+                        val match = nameRegex.find(replaceMsg)
 
-                    val senderName = match?.groupValues?.get(2) ?: "未知"
+                        val senderName = match?.groupValues?.get(2) ?: "未知"
 
-                    val interceptNotice = "'$senderName' 尝试撤回上一条消息 (已阻止)"
+                        val interceptNotice = "「$senderName」 尝试撤回上一条消息 (已阻止)"
 
-                    val contentValues = ContentValues().apply {
-                        put("msgid", 0)
-                        put(
-                            "msgSvrId",
-                            originalCreateTime + Random.nextInt()
-                        )
-                        put("type", 10000)
-                        put("status", 3)
-                        put("createTime", originalCreateTime + 1)
-                        put("talker", session)
-                        put("content", interceptNotice)
-                    }
-
-                    val msgInfo =
-                        WeMessageApi.createMsgInfoFromContentValues(contentValues, true)
-                    val msgInfoStorage = WeServiceApi.storageFeatureService.asResolver()
-                        .firstMethod {
-                            parameterCount = 0
-                            returnType = WeMessageApi.classMsgInfoStorage.clazz
+                        val contentValues = ContentValues().apply {
+                            put("msgid", 0)
+                            put(
+                                "msgSvrId",
+                                originalCreateTime + Random.nextInt()
+                            )
+                            put("type", 10000)
+                            put("status", 3)
+                            put("createTime", originalCreateTime + 1)
+                            put("talker", session)
+                            put("content", interceptNotice)
                         }
-                        .invoke()
-                    WeMessageApi.methodMsgInfoStorageInsertMessage.method.invoke(
-                        msgInfoStorage,
-                        msgInfo
-                    )
-                    WeLogger.d(TAG, "blocked message revoke")
+
+                        val msgInfo =
+                            WeMessageApi.createMsgInfoFromContentValues(contentValues, true)
+                        WeMessageApi.methodMsgInfoStorageInsertMessage.method.invoke(
+                            WeServiceApi.messageInfoStorage,
+                            msgInfo
+                        )
+                        WeLogger.d(TAG, "blocked message revoke")
+                    }
                 }
+
             }
         }
     }

@@ -3,17 +3,15 @@ package dev.ujhhgtg.wekit.hooks.items.chat
 import android.app.Activity
 import android.view.ContextThemeWrapper
 import android.view.View
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
-import dev.ujhhgtg.comptime.nameOf
+import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.HookItem
@@ -50,7 +48,7 @@ object EmojiGameControl : SwitchHookItem(), IResolvesDex {
 
     private const val MD5_MORRA = "9bd1281af3a31710a45b84d736363691"
     private const val MD5_DICE = "08f223fa83f1ca34e143d1e580252c7c"
-    private val TAG = nameOf(EmojiGameControl)
+    private val TAG = This.Class.simpleName
 
     private val methodRandom by dexMethod()
     private val methodPanelClick by dexMethod()
@@ -63,8 +61,8 @@ object EmojiGameControl : SwitchHookItem(), IResolvesDex {
     }
 
     enum class DiceFace(val index: Int, val chineseName: String) {
-        ONE(0, "一"), TWO(1, "二"), THREE(2, "三"),
-        FOUR(3, "四"), FIVE(4, "五"), SIX(5, "六")
+        ONE(0, "1"), TWO(1, "2"), THREE(2, "3"),
+        FOUR(3, "4"), FIVE(4, "5"), SIX(5, "6")
     }
 
     override fun resolveDex(dexKit: DexKitBridge) {
@@ -234,31 +232,33 @@ object EmojiGameControl : SwitchHookItem(), IResolvesDex {
 
                     HorizontalDivider()
 
-                    // FIXME: animation is weird, so we remove it for now
                     if (isSingleMode) {
-                        // --- Single Mode: Radio Buttons ---
+                        // --- Single Mode: Direct-send buttons ---
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(2.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             options.forEachIndexed { index, label ->
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.clickable { selectedIndex = index }
+                                FilledTonalButton(
+                                    onClick = {
+                                        if (isDice) valDice = index else valMorra = index
+                                        onSend(true, "")
+                                        onDismiss()
+                                    },
+                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                    modifier = Modifier.weight(1f)
                                 ) {
-                                    RadioButton(
-                                        selected = selectedIndex == index,
-                                        onClick = { selectedIndex = index }
+                                    Text(
+                                        label,
+                                        maxLines = 1,
+                                        style = MaterialTheme.typography.bodyMedium
                                     )
-                                    Text(label)
                                 }
                             }
                         }
                     } else {
-                        // --- Multiple Mode: TextField ---
+                        // --- Multiple Mode: Text field ---
                         OutlinedTextField(
                             value = inputText,
                             onValueChange = { inputText = it.filter { c -> c.isDigit() } },
@@ -277,13 +277,13 @@ object EmojiGameControl : SwitchHookItem(), IResolvesDex {
                 }) { Text("随机") }
             },
             confirmButton = {
-                Button(onClick = {
-                    onSend(
-                        isSingleMode,
-                        inputText
-                    )
-                    onDismiss()
-                }) { Text("发送") }
+                // In single mode the option buttons send directly; only show confirm in multi mode
+                if (!isSingleMode) {
+                    Button(onClick = {
+                        onSend(false, inputText)
+                        onDismiss()
+                    }) { Text("发送") }
+                }
             })
     }
 

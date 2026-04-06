@@ -74,7 +74,6 @@ object AddMainScreenFab : SwitchHookItem() {
         fun getMenuItems(activity: Activity): List<MenuItem>
     }
 
-    // TODO: do not force other features to use ImageVector
     data class MenuItem(val text: String, val icon: ImageVector, val onClick: () -> Unit)
 
     private val providers = CopyOnWriteArrayList<IMenuItemsProvider>()
