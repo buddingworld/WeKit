@@ -12,7 +12,7 @@ object WeLogger {
     private const val CHUNK_SIZE = 4000
     private const val MAX_CHUNKS = 200
 
-    // ========== String ==========
+    // ========== Tag + String ==========
 
     fun e(tag: String?, msg: String) {
         Log.e(TAG, "$tag: $msg")
@@ -35,6 +35,7 @@ object WeLogger {
     }
 
     // ========== Tag + String + Throwable ==========
+
     fun e(tag: String?, msg: String, e: Throwable) {
         Log.e(TAG, "$tag: $msg", e)
     }
@@ -53,12 +54,6 @@ object WeLogger {
 
     fun v(tag: String?, msg: String, e: Throwable) {
         Log.v(TAG, "$tag: $msg", e)
-    }
-
-    // ========== String + Throwable ==========
-
-    fun e(msg: String, e: Throwable) {
-        Log.e(TAG, msg, e)
     }
 
     fun getStackTraceString(): String {
@@ -99,6 +94,7 @@ object WeLogger {
     }
 
     // ========== 分段打印 ==========
+
     fun logChunked(priority: Int, tag: String, msg: String) {
         if (msg.length <= CHUNK_SIZE) {
             Log.println(priority, BuildConfig.TAG, "$tag: $msg")

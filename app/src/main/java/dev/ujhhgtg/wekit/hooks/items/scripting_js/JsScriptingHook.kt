@@ -99,7 +99,7 @@ object JsScriptingHook : SwitchHookItem(),
             data.applyViewJson(modifiedJson, true)
             return data.toPacketBytes()
         } catch (e: Exception) {
-            WeLogger.e(TAG, e)
+            WeLogger.e(TAG, "onRequest failed", e)
         }
 
         return null
@@ -120,7 +120,7 @@ object JsScriptingHook : SwitchHookItem(),
             data.applyViewJson(modifiedJson, true)
             return data.toPacketBytes()
         } catch (e: Exception) {
-            WeLogger.e(TAG, e)
+            WeLogger.e(TAG, "onResponse failed", e)
         }
         return null
     }

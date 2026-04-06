@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Debug
 import android.os.Process
+import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.utils.WeLogger
 import dev.ujhhgtg.wekit.utils.polyfills.getThreadId
 import java.io.BufferedReader
@@ -267,7 +268,7 @@ object CrashInfoCollector {
                 }
             }
         } catch (e: Exception) {
-            WeLogger.e("error while getting process name", e)
+            WeLogger.e(This.Class.simpleName, "error while getting process name", e)
         }
         return "Unknown"
     }

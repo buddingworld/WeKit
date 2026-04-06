@@ -5,6 +5,7 @@ import com.highcapable.kavaref.resolver.ConstructorResolver
 import com.highcapable.kavaref.resolver.MethodResolver
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
+import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.dexkit.dsl.DexConstructorDelegate
 import dev.ujhhgtg.wekit.dexkit.dsl.DexDelegateBase
 import dev.ujhhgtg.wekit.dexkit.dsl.DexMethodDelegate
@@ -31,7 +32,7 @@ abstract class BaseHookItem {
         runCatching {
             hasEnabled = true
             onEnable()
-        }.onFailure { e -> WeLogger.e("failed to enable item", e) }
+        }.onFailure { e -> WeLogger.e(TAG, "failed to enable item", e) }
     }
 
     fun disable() {
@@ -39,7 +40,7 @@ abstract class BaseHookItem {
         runCatching {
             hasEnabled = false
             onDisable()
-        }.onFailure { e -> WeLogger.e("failed to disable item", e) }
+        }.onFailure { e -> WeLogger.e(TAG, "failed to disable item", e) }
     }
 
     open fun onEnable() {}
@@ -176,5 +177,9 @@ abstract class BaseHookItem {
         runCatching {
             action(param)
         }.onFailure { e -> WeLogger.e("executeHookAction", "failed to execute hook of $path", e) }
+    }
+
+    companion object {
+        private val TAG = nameOf(BaseHookItem::class)
     }
 }

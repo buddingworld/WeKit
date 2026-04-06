@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.core.content.pm.PackageInfoCompat
+import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.constants.PackageNames
 
 enum class HostSpecies { WeChat, WeKit, Unknown }
@@ -43,7 +44,7 @@ object HostInfo {
         val packageInfo = try {
             pm.getPackageInfo(packageName, PackageManager.GET_META_DATA)
         } catch (e: PackageManager.NameNotFoundException) {
-            WeLogger.e("failed to get package info", e)
+            WeLogger.e(This.Class.simpleName, "failed to get package info", e)
             throw e
         }
 

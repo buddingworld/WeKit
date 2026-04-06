@@ -23,7 +23,7 @@ object NativeCrashHandler {
      */
     fun install(): Boolean {
         if (isInstalled) {
-            WeLogger.i(TAG, "Native crash handler already installed")
+            WeLogger.i(TAG, "native crash handler already installed")
             return true
         }
 
@@ -56,9 +56,9 @@ object NativeCrashHandler {
         try {
             uninstallNative()
             isInstalled = false
-            WeLogger.i(TAG, "Native crash handler uninstalled")
+            WeLogger.i(TAG, "native crash handler uninstalled")
         } catch (e: Throwable) {
-            WeLogger.e("[NativeCrashHandler] Failed to uninstall native crash handler", e)
+            WeLogger.e(TAG, "failed to uninstall native crash handler", e)
         }
     }
 
@@ -73,11 +73,11 @@ object NativeCrashHandler {
      * 4 = SIGBUS (总线错误)
      */
     fun triggerCrash(crashType: Int) {
-        WeLogger.w(TAG, "Triggering test crash: type=$crashType")
+        WeLogger.w(TAG, "triggering test crash: type=$crashType")
         try {
             triggerTestCrashNative(crashType)
         } catch (e: Throwable) {
-            WeLogger.e("[NativeCrashHandler] Failed to trigger test crash", e)
+            WeLogger.e(TAG, "failed to trigger test crash", e)
         }
     }
 }

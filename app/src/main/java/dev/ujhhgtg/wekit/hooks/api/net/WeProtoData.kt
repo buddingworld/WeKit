@@ -35,6 +35,8 @@ class WeProtoData private constructor() {
     }
 
     companion object {
+        private val TAG = nameOf(WeProtoData::class)
+
         fun fromBytes(b: ByteArray): WeProtoData {
             val data = WeProtoData()
             if (hasPacketPrefix(b)) {
@@ -241,7 +243,7 @@ class WeProtoData private constructor() {
             out.flush()
             bos.toByteArray()
         }.getOrElse {
-            WeLogger.e("WeProtoData - toBytes", it)
+            WeLogger.e(TAG, "toBytes failed", it)
             ByteArray(0)
         }
     }

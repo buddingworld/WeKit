@@ -49,7 +49,7 @@ object ModifyTransferWalletBalanceDisplay : ClickableHookItem(), IWePacketInterc
             WeLogger.i(TAG, "篡改完成，返回新数据包")
             return data.toPacketBytes()
         } catch (e: Exception) {
-            WeLogger.e(TAG, e)
+            WeLogger.e(TAG, "onResponse failed", e)
         }
 
         return null

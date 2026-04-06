@@ -79,7 +79,7 @@ object RemoveArticleAds : SwitchHookItem(), IWePacketInterceptor {
             }
 
         } catch (e: Exception) {
-            WeLogger.e(TAG, e)
+            WeLogger.e(TAG, "onResponse failed", e)
         }
 
         return null

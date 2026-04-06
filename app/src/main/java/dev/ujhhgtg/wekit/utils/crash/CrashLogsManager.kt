@@ -50,7 +50,7 @@ object CrashLogsManager {
             val logFile = crashLogsDir / fileName
 
             logFile.writeText(crashInfo)
-            WeLogger.i(TAG, "Crash log saved: ${logFile.absolutePathString()}")
+            WeLogger.i(TAG, "crash log saved: ${logFile.absolutePathString()}")
 
             if (isJavaCrash) setPendingJavaCrashFlag(logFile.name)
             else setPendingCrashFlag(logFile.name)
@@ -58,7 +58,7 @@ object CrashLogsManager {
             cleanOldLogs()
             logFile.absolutePathString()
         } catch (e: IOException) {
-            WeLogger.e("Failed to save crash log", e)
+            WeLogger.e(TAG, "failed to save crash log", e)
             null
         }
     }
@@ -92,7 +92,7 @@ object CrashLogsManager {
                 logFile.readText()
             }
         } catch (e: IOException) {
-            WeLogger.e("Failed to read crash log", e)
+            WeLogger.e(TAG, "failed to read crash log", e)
             null
         }
     }
@@ -103,7 +103,7 @@ object CrashLogsManager {
             WeLogger.d(TAG, "Reading full crash log, size: ${logFile.fileSize()} bytes")
             logFile.readText()
         } catch (e: IOException) {
-            WeLogger.e("Failed to read full crash log", e)
+            WeLogger.e(TAG, "failed to read full crash log", e)
             null
         }
     }
@@ -133,9 +133,9 @@ object CrashLogsManager {
     private fun setPendingCrashFlag(logFileName: String) {
         try {
             (crashLogsDir / PENDING_CRASH_FLAG).writeText(logFileName)
-            WeLogger.d(TAG, "Pending crash flag set: $logFileName")
+            WeLogger.d(TAG, "pending crash flag set: $logFileName")
         } catch (e: IOException) {
-            WeLogger.e("Failed to set pending crash flag", e)
+            WeLogger.e(TAG, "failed to set pending crash flag", e)
         }
     }
 
@@ -164,7 +164,7 @@ object CrashLogsManager {
             (crashLogsDir / PENDING_JAVA_CRASH_FLAG).writeText(logFileName)
             WeLogger.d(TAG, "pending Java crash flag set: $logFileName")
         } catch (e: IOException) {
-            WeLogger.e("failed to set pending Java crash flag", e)
+            WeLogger.e(TAG, "failed to set pending Java crash flag", e)
         }
     }
 
@@ -197,10 +197,10 @@ object CrashLogsManager {
             val flagFile = crashLogsDir / flagFileName
             if (!flagFile.exists()) return null
             val fileName = flagFile.readText().trim()
-            WeLogger.d(TAG, "Pending $logLabel log: $fileName")
+            WeLogger.d(TAG, "pending $logLabel log: $fileName")
             fileName
         } catch (e: IOException) {
-            WeLogger.e("Failed to get $logLabel flag", e)
+            WeLogger.e(TAG, "failed to get $logLabel flag", e)
             null
         }
     }

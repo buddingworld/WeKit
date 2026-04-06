@@ -33,8 +33,8 @@ import dev.ujhhgtg.wekit.ui.content.Button
 import dev.ujhhgtg.wekit.ui.content.DefaultColumn
 import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
-import dev.ujhhgtg.wekit.utils.showToast
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.showToast
 import org.json.JSONObject
 import org.luckypray.dexkit.DexKitBridge
 import java.util.concurrent.ConcurrentHashMap
@@ -266,7 +266,7 @@ object AutoOpenRedPackets : ClickableHookItem(), WeDatabaseListenerApi.IInsertLi
                         )
                         TextField(
                             value = delayInput,
-                            onValueChange = { delayInput = it.take(5) },
+                            onValueChange = { delayInput = it.filter { c -> c.isDigit() }.take(5) },
                             label = { Text("基础延迟 (毫秒)") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             singleLine = true,
@@ -294,32 +294,29 @@ object AutoOpenRedPackets : ClickableHookItem(), WeDatabaseListenerApi.IInsertLi
     }
 
     override fun resolveDex(dexKit: DexKitBridge) {
-        // 查找接收红包类
-        classReceiveLuckyMoney.find(dexKit, allowMultiple = true) {
+        classReceiveLuckyMoney.find(dexKit) {
             matcher {
                 methods {
                     add {
                         name = "<init>"
-                        usingStrings("MicroMsg.NetSceneReceiveLuckyMoney")
+                        usingEqStrings("MicroMsg.NetSceneReceiveLuckyMoney")
                     }
                 }
             }
         }
 
-        // 查找开红包类
-        classOpenLuckyMoney.find(dexKit, allowMultiple = true) {
+        classOpenLuckyMoney.find(dexKit) {
             matcher {
                 methods {
                     add {
                         name = "<init>"
-                        usingStrings("MicroMsg.NetSceneOpenLuckyMoney")
+                        usingEqStrings("MicroMsg.NetSceneOpenLuckyMoney")
                     }
                 }
             }
         }
 
-        // 查找 onGYNetEnd 回调方法
-        methodOnGYNetEnd.find(dexKit, true) {
+        methodOnGYNetEnd.find(dexKit) {
             matcher {
                 declaredClass = classReceiveLuckyMoney.getDescriptorString()!!
                 name = "onGYNetEnd"
@@ -327,7 +324,7 @@ object AutoOpenRedPackets : ClickableHookItem(), WeDatabaseListenerApi.IInsertLi
             }
         }
 
-        methodOnOpenGYNetEnd.find(dexKit, true) {
+        methodOnOpenGYNetEnd.find(dexKit) {
             matcher {
                 declaredClass = classReceiveLuckyMoney.getDescriptorString()!!
                 name = "onGYNetEnd"
