@@ -4,11 +4,7 @@ import android.content.SharedPreferences
 
 object RuntimeConfig {
 
-    private lateinit var mmPrefs: SharedPreferences
-
-    fun setMmPrefs(sharedPreferences: SharedPreferences) {
-        mmPrefs = sharedPreferences
-    }
+    lateinit var mmPrefs: SharedPreferences
 
     val loggedInWxId: String
         get() = mmPrefs.getString("login_weixin_username", "") ?: ""

@@ -54,7 +54,7 @@ object WeLauncher {
                 val activity = thisObject as Activity
                 val sharedPreferences =
                     activity.getSharedPreferences("${PackageNames.WECHAT}_preferences", 0)
-                RuntimeConfig.setMmPrefs(sharedPreferences)
+                RuntimeConfig.mmPrefs = sharedPreferences
             }
         }
     }

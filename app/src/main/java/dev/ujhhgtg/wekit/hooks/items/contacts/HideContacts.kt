@@ -51,13 +51,18 @@ object HideContacts : ClickableHookItem(), IResolvesDex {
 
     var hiddenContacts
         get() = WePrefs.getStringSetOrDef(KEY_CONTACTS, emptySet())
-        set(value) { WePrefs.putStringSet(KEY_CONTACTS, value) }
+        set(value) {
+            for (convId in value) {
+                WeConversationApi.setIfNotifyNewMessages(convId, false)
+            }
+            WePrefs.putStringSet(KEY_CONTACTS, value)
+        }
 
     private object ScreenOffReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
             if (intent?.action != Intent.ACTION_SCREEN_OFF) return
 
-            val activity = (WeCurrentActivityApi.activity ?: return).get()!!
+            val activity = WeCurrentActivityApi.activity ?: return
             if (activity !is ChattingUI) return
 
             val wxId = activity.intent.getStringExtra("Chat_User")
@@ -109,7 +114,7 @@ object HideContacts : ClickableHookItem(), IResolvesDex {
                 if (lastShakeTime + 1000 > now) return // 1-second debounce
                 lastShakeTime = now
 
-                exitToMainActivity(WeCurrentActivityApi.activity!!.get()!!)
+                exitToMainActivity(WeCurrentActivityApi.activity ?: return)
             }
         }
 

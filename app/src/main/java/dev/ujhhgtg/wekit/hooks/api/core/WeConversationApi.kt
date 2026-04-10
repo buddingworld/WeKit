@@ -2,6 +2,7 @@ package dev.ujhhgtg.wekit.hooks.api.core
 
 import android.database.Cursor
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
+import com.highcapable.kavaref.extension.createInstance
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
@@ -15,12 +16,14 @@ import org.luckypray.dexkit.DexKitBridge
 object WeConversationApi : ApiHookItem(), IResolvesDex {
 
     private val TAG = nameOf(WeConversationApi)
-    val classConversationStorage by dexClass()
-    val methodUpdateUnreadByTalker by dexMethod()
-    val methodHiddenConvParent by dexMethod()
-    val methodGetConvByName by dexMethod()
+    private val classConversationStorage by dexClass()
+    private val methodUpdateUnreadByTalker by dexMethod()
+    private val methodHiddenConvParent by dexMethod()
+    private val methodGetConvByName by dexMethod()
     private val methodChatroomStorageGetMemberCount by dexMethod()
     private val classChatroomMember by dexClass()
+    private val methodSetDnd by dexMethod()
+    private val methodSetNoDnd by dexMethod()
 
     val conversationStorage by lazy {
         WeServiceApi.storageFeatureService.asResolver()
@@ -161,6 +164,23 @@ object WeConversationApi : ApiHookItem(), IResolvesDex {
         setConversationsVisibility(visible, talkers.toTypedArray())
     }
 
+    private lateinit var contactType: Class<*>
+
+    // TODO: this only updates local DB without syncing to server
+    fun setIfNotifyNewMessages(convId: String, shouldNotify: Boolean) {
+        if (!::contactType.isInitialized) {
+            contactType = methodSetDnd.method.parameterTypes[0]
+        }
+
+        val contact = contactType.createInstance(convId)
+        if (!shouldNotify) {
+            methodSetDnd.method.invoke(null, contact, true)
+        }
+        else {
+            methodSetNoDnd.method.invoke(null, contact, true)
+        }
+    }
+
     override fun resolveDex(dexKit: DexKitBridge) {
         classConversationStorage.find(dexKit) {
             searchPackages("com.tencent.mm.storage")
@@ -201,6 +221,18 @@ object WeConversationApi : ApiHookItem(), IResolvesDex {
             searchPackages("com.tencent.mm.storage")
             matcher {
                 usingEqStrings("MicroMsg.ChatRoomMember", "service is null")
+            }
+        }
+
+        methodSetDnd.find(dexKit) {
+            matcher {
+                usingEqStrings("MicroMsg.OpenImOpLogLogic", "OpenImOpLogLogic OpenIMModContactMuteOplog username:%s switch add")
+            }
+        }
+
+        methodSetNoDnd.find(dexKit) {
+            matcher {
+                usingEqStrings("MicroMsg.OpenImOpLogLogic", "OpenImOpLogLogic OpenIMModContactMuteOplog username:%s switch cancel")
             }
         }
     }
