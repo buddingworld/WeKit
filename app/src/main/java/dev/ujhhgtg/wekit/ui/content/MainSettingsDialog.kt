@@ -38,6 +38,7 @@ import com.composables.icons.materialsymbols.outlined.Chat
 import com.composables.icons.materialsymbols.outlined.Contacts
 import com.composables.icons.materialsymbols.outlined.Delete_forever
 import com.composables.icons.materialsymbols.outlined.Download
+import com.composables.icons.materialsymbols.outlined.Edit_document
 import com.composables.icons.materialsymbols.outlined.Frame_bug
 import com.composables.icons.materialsymbols.outlined.Imagesearch_roller
 import com.composables.icons.materialsymbols.outlined.License
@@ -145,6 +146,17 @@ class MainSettingsDialog(context: Context) : BasePrefsDialog(context, BuildConfi
             title = "显示加载完成 Toast",
             summary = "全部功能加载完成后显示 Toast 提示",
             icon = MaterialSymbols.Outlined.Notifications
+        )
+        addPreference(
+            title = "刷新日志文件缓冲区",
+            summary = "立即将缓冲区中的所有日志写入日志文件",
+            icon = MaterialSymbols.Outlined.Edit_document,
+            onClick = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    WeLogger.flush()
+                    showToastSuspend("已刷新")
+                }
+            }
         )
 
         addCategory("兼容")

@@ -3,9 +3,9 @@ package dev.ujhhgtg.wekit.utils.crash
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.WeLogger.exitProcess
 import dev.ujhhgtg.wekit.utils.crash.CrashInfoCollector.collectCrashInfo
 import dev.ujhhgtg.wekit.utils.polyfills.getThreadId
-import kotlin.system.exitProcess
 
 object JavaCrashHandler : Thread.UncaughtExceptionHandler {
 

@@ -3,7 +3,6 @@ package dev.ujhhgtg.wekit.ui.content
 import android.app.Dialog
 import android.content.Context
 import android.content.pm.ApplicationInfo
-import android.os.Process
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,6 +34,7 @@ import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.cache.DexCacheManager
 import dev.ujhhgtg.wekit.hooks.core.BaseHookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.WeLogger.exitProcess
 import dev.ujhhgtg.wekit.utils.copyToClipboard
 import dev.ujhhgtg.wekit.utils.showToast
 import kotlinx.coroutines.CoroutineScope
@@ -50,7 +50,6 @@ import kotlinx.coroutines.withContext
 import org.luckypray.dexkit.DexKitBridge
 import java.io.PrintWriter
 import java.io.StringWriter
-import kotlin.system.exitProcess
 
 private sealed class ScanProgress {
     data class Start(val path: String) : ScanProgress()

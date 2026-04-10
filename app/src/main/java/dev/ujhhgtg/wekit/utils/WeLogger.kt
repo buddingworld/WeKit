@@ -209,4 +209,10 @@ object WeLogger {
         Log.ASSERT  -> "A"
         else        -> "?"
     }
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun exitProcess(status: Int) {
+        flush()
+        kotlin.system.exitProcess(status)
+    }
 }

@@ -214,7 +214,7 @@ object CrashLogsManager {
 
     private val TAG = nameOf(CrashLogsManager::class)
 
-    private const val CRASH_LOGS_DIR = "crash_logs"
+    private const val CRASH_LOGS_DIR = "crashes"
     private const val CRASH_LOGS_PREFIX = "crash_"
     private const val CRASH_LOG_SUFFIX = ".log"
     private const val PENDING_CRASH_FLAG = "pending_crash.flag"

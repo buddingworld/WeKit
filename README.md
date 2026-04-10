@@ -114,7 +114,7 @@ chmod +x ./gradlew
 7. - Q: 模块出现问题 (例如找不到入口, 功能失效) 怎么办?
    - A: 前往 Issues 提交 LSPosed 详细日志; 如果模块可以正常加载, 请同时上传模块的日志
      LSPosed 日志: LSPosed -> 设置 -> 禁用详细日志 (关) -> 日志 -> 右上角保存 -> 上传至 Issue
-     模块日志: /sdcard/Android/data/<宿主包名>/WeKit/logs/*
+     模块日志: 模块设置 -> 刷新日志文件缓冲区; /sdcard/Android/data/<宿主包名>/WeKit/logs/*
 8. - Q: XXX
    - A: [![问 DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Ujhhgtg/WeKit)
 
