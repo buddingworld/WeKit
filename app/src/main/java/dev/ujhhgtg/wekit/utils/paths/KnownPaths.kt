@@ -1,7 +1,8 @@
-package dev.ujhhgtg.wekit.utils
+package dev.ujhhgtg.wekit.utils.paths
 
 import android.os.Environment
 import dev.ujhhgtg.wekit.BuildConfig
+import dev.ujhhgtg.wekit.utils.HostInfo
 import java.nio.file.Path
 import kotlin.io.path.div
 

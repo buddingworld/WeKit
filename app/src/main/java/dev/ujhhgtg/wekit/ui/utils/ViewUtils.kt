@@ -4,8 +4,6 @@ import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListAdapter
-import dev.ujhhgtg.comptime.nameOf
-import dev.ujhhgtg.wekit.utils.WeLogger
 
 fun <T : View> View.findViewByClassName(className: String): T? {
     if (this.javaClass.name == className || this.javaClass.simpleName == className) {
@@ -84,26 +82,6 @@ fun <T : View> View.findViewByChildIndexes(vararg indexes: Int): T? {
     }
     @Suppress("UNCHECKED_CAST")
     return current as? T
-}
-
-fun debugViewTree(view: View, connector: String = "", indent: String = "") {
-    val idStr = if (view.id != View.NO_ID) {
-        runCatching { view.resources.getResourceEntryName(view.id) }.getOrDefault("UNKNOWN_ID")
-    } else "NO_ID"
-    WeLogger.d(
-        nameOf(::debugViewTree),
-        "$indent$connector${view.javaClass.name} [ID: $idStr / ${view.id}] [TAG: ${view.tag?.javaClass?.name ?: "null"}]"
-    )
-    if (view is ViewGroup) {
-        val children = (0 until view.childCount).mapNotNull { view.getChildAt(it) }
-        children.forEachIndexed { i, child ->
-            val isLast = i == children.lastIndex
-            val childConnector = if (isLast) "└─ " else "├─ "
-            val childIndent =
-                indent + if (connector.isEmpty()) "" else if (connector.startsWith("└")) "   " else "│  "
-            debugViewTree(child, childConnector, childIndent)
-        }
-    }
 }
 
 fun ListAdapter.iterator(parent: ViewGroup): Iterator<View> =

@@ -118,7 +118,7 @@ class DexMethodDescriptor : Serializable {
                 Float::class.javaPrimitiveType -> "F"
                 Long::class.javaPrimitiveType -> "J"
                 Double::class.javaPrimitiveType -> "D"
-                else -> throw IllegalStateException("Type: ${type.name} is not a primitive type")
+                else -> error("Type: ${type.name} is not a primitive type")
             }
             if (type.isArray) return "[${getTypeSig(type.componentType!!)}"
             return "L${type.name.replace('.', '/')};"

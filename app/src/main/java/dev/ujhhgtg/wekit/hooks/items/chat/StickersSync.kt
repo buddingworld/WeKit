@@ -32,11 +32,11 @@ import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.HostInfo
-import dev.ujhhgtg.wekit.utils.KnownPaths
+import dev.ujhhgtg.wekit.utils.paths.KnownPaths
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.createDirectoriesNoThrow
+import dev.ujhhgtg.wekit.utils.paths.createDirectoriesNoThrow
 import dev.ujhhgtg.wekit.utils.enumValueOfClass
-import dev.ujhhgtg.wekit.utils.polyfills.convToList
+import dev.ujhhgtg.wekit.utils.polyfills.intoList
 import dev.ujhhgtg.wekit.utils.showToastSuspend
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -115,7 +115,7 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
             showToastSuspend("正在加载贴纸包...")
 
             withContext(Dispatchers.IO) {
-                val packDirs = Files.list(stickersDir).filter { Files.isDirectory(it) }.convToList()
+                val packDirs = Files.list(stickersDir).filter { Files.isDirectory(it) }.intoList()
                 if (packDirs.isEmpty()) {
                     showToastSuspend("未找到任何贴纸包")
                     return@withContext emptyList<StickerPack>()

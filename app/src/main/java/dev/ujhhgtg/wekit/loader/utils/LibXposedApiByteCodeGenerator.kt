@@ -1,5 +1,6 @@
 package dev.ujhhgtg.wekit.loader.utils
 
+import androidx.annotation.Keep
 import dev.ujhhgtg.wekit.constants.PackageNames
 import dev.ujhhgtg.wekit.dexkit.DexMethodDescriptor
 import dev.ujhhgtg.wekit.loader.startup.StartupInfo
@@ -23,6 +24,7 @@ import org.jf.dexlib2.writer.io.MemoryDataStore
 import org.jf.dexlib2.writer.pool.DexPool
 import java.lang.reflect.Modifier
 
+@Keep
 object LibXposedApiByteCodeGenerator {
 
     const val CMD_SET_WRAPPER = "SetLibXposedApiByteCodeGeneratorWrapper"
@@ -71,11 +73,11 @@ object LibXposedApiByteCodeGenerator {
             null, null
         )
 
-        val methods = ArrayList<ImmutableMethod>()
+        val methods = mutableListOf<ImmutableMethod>()
 
         // Constructor
         run {
-            val insCtor = ArrayList<Instruction>()
+            val insCtor = mutableListOf<Instruction>()
             insCtor.add(
                 ImmutableInstruction35c(
                     Opcode.INVOKE_DIRECT, 1, 0, 0, 0, 0, 0,
@@ -99,7 +101,7 @@ object LibXposedApiByteCodeGenerator {
 
         // before()
         run {
-            val insBefore = ArrayList<Instruction>()
+            val insBefore = mutableListOf<Instruction>()
             insBefore.add(ImmutableInstruction31i(Opcode.CONST, 0, tagValue))
             insBefore.add(
                 ImmutableInstruction35c(
@@ -130,7 +132,7 @@ object LibXposedApiByteCodeGenerator {
 
         // after()
         run {
-            val insAfter = ArrayList<Instruction>()
+            val insAfter = mutableListOf<Instruction>()
             insAfter.add(ImmutableInstruction31i(Opcode.CONST, 0, tagValue))
             insAfter.add(
                 ImmutableInstruction35c(

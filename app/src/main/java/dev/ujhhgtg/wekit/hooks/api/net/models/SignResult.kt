@@ -1,4 +1,4 @@
-package dev.ujhhgtg.wekit.hooks.api.net.model
+package dev.ujhhgtg.wekit.hooks.api.net.models
 
 import org.json.JSONObject
 

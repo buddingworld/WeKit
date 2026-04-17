@@ -156,7 +156,7 @@ object Lsp100HookWrapper {
 
         private fun checkLifecycle() {
             if ((isAfter && after == null) || (!isAfter && before == null)) {
-                throw IllegalStateException("attempt to access hook param after destroyed")
+                error("attempt to access hook param after destroyed")
             }
         }
     }

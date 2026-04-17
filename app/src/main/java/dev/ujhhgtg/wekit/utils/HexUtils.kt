@@ -2,7 +2,7 @@ package dev.ujhhgtg.wekit.utils
 
 /**
  * 将十六进制字符串转换为字节数组
- * 移植自 Hutool HexUtil，去除了冗余依赖
+ * 移植自 Hutool HexUtil, 去除了冗余依赖
  */
 fun hexToBytes(src: String?): ByteArray? {
     if (src.isNullOrEmpty()) return null

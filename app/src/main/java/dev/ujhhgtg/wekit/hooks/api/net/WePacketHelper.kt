@@ -474,7 +474,7 @@ object WePacketHelper : ApiHookItem(), IResolvesDex {
                     }
 
                     val builder = classConfigBuilder.clazz.getDeclaredConstructor().newInstance()
-                        ?: throw IllegalStateException("ConfigBuilder 实例化失败")
+                        ?: error("ConfigBuilder 实例化失败")
 
                     XposedHelpers.setObjectField(builder, "a", finalReqObject)
                     XposedHelpers.setObjectField(

@@ -14,7 +14,6 @@ data class HostInfoImpl(
     val packageName: String,
     val hostName: String,
     val versionCode: Long,
-    val versionCode32: Int,
     val versionName: String,
     val hostSpecies: HostSpecies
 )
@@ -27,8 +26,7 @@ object HostInfo {
     val application: Application get() = _info.application
     val appInfo: ApplicationInfo get() = application.applicationInfo
     val packageName: String get() = _info.packageName
-    val versionCode32: Int get() = _info.versionCode32
-    val versionCode: Int get() = versionCode32
+    val versionCode: Long get() = _info.versionCode
     val isModule: Boolean get() = _info.hostSpecies == HostSpecies.WeKit
     val isHost: Boolean get() = !isModule
 
@@ -53,7 +51,6 @@ object HostInfo {
             packageName = packageName,
             hostName = application.applicationInfo.loadLabel(pm).toString(),
             versionCode = PackageInfoCompat.getLongVersionCode(packageInfo),
-            versionCode32 = PackageInfoCompat.getLongVersionCode(packageInfo).toInt(),
             versionName = packageInfo.versionName.orEmpty(),
             hostSpecies = run {
                 if (PackageNames.isWeChat(packageName)) return@run HostSpecies.WeChat

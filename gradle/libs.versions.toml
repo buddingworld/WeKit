@@ -1,8 +1,8 @@
 [versions]
-agp = "9.1.0"
+agp = "9.1.1"
 coil = "3.4.0"
 compose-bom = "2026.03.01"
-dexkit = "2.1.0"
+dexkit = "2.2.0"
 appcompat = "1.7.1"
 composablehorizons-symbols = "2.2.1"
 lifecycle-runtime = "2.10.0"
@@ -33,7 +33,7 @@ kyant0-backdrop = "2.0.0-alpha03"
 kyant0-shapes = "1.2.0"
 markwon = "4.6.2"
 annotation = "1.10.0"
-mcp-server = "0.11.0"
+mcp-server = "0.11.1"
 ktor = "3.4.2"
 dexmaker = "2.28.6"
 
@@ -41,8 +41,12 @@ dexmaker = "2.28.6"
 namespace = "dev.ujhhgtg.wekit"
 # noinspection UnusedVersionCatalogEntry
 minSdk = "29"
-# noinspection OldTargetApi,UnusedVersionCatalogEntry
-targetSdk = "36"
+# noinspection UnusedVersionCatalogEntry
+targetSdk = "37"
+# noinspection UnusedVersionCatalogEntry
+compileSdk = "37"
+# noinspection UnusedVersionCatalogEntry
+compileSdkMinor = "0"
 # noinspection UnusedVersionCatalogEntry
 jdk = "21"
 # noinspection UnusedVersionCatalogEntry
@@ -80,7 +84,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 mmkv = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 google-protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
-google-guava = { module = "com.google.guava:guava", version = "33.5.0-android" }
+google-guava = { module = "com.google.guava:guava", version = "33.6.0-android" }
 okhttp3-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 
 legacyxposed-api = { module = "de.robv.android.xposed:api", version = "82" }

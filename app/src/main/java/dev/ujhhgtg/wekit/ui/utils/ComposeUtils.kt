@@ -17,7 +17,6 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import dev.ujhhgtg.wekit.utils.HostInfo
 
 // useful for showing a compose dialog in non-compose context,
 // or when you don't want to manage the state for a dialog inside a composable
@@ -25,18 +24,14 @@ import dev.ujhhgtg.wekit.utils.HostInfo
 // note that you should use AlertDialogContent instead of AlertDialog inside 'content' to avoid
 // creating multiple windows
 fun showComposeDialog(
-    context: Context? = null,
+    context: Context,
     directlyDismissable: Boolean = true,
     content: @Composable ShowComposeDialogScope.() -> Unit
 ) {
-    val ctx =
-        if (context == null)
-            HostInfo.application
-        else
-            CommonContextWrapper.create(context)
+    val context = CommonContextWrapper.create(context)
 
     val dialog = Dialog(
-        ctx,
+        context,
         android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth
     )
     val lifecycleOwner = XposedLifecycleOwner.create()
@@ -47,18 +42,16 @@ fun showComposeDialog(
             requestFeature(Window.FEATURE_NO_TITLE)
         }
 
-        // FIXME: this doesn't work:
-        // setCanceledOnTouchOutside(dismissable)
         setCancelable(directlyDismissable)
 
-        val scope = ShowComposeDialogScope(ctx, this, window!!, ::dismiss)
+        val scope = ShowComposeDialogScope(context, this, window!!, ::dismiss)
 
         setContentView(
-            ComposeView(ctx).apply {
+            ComposeView(context).apply {
                 setLifecycleOwner(lifecycleOwner)
 
                 setContent {
-                    CompositionLocalProvider(LocalContext provides ctx) {
+                    CompositionLocalProvider(LocalContext provides context) {
                         AppTheme {
                             Box(
                                 modifier = Modifier.wrapContentSize(),

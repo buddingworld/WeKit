@@ -26,8 +26,8 @@ fun getGitHash(): String {
 android {
     namespace = libs.versions.namespace.get()
     compileSdk {
-        version = release(libs.versions.targetSdk.get().toInt()) {
-            minorApiLevel = 1
+        version = release(libs.versions.compileSdk.get().toInt()) {
+            minorApiLevel = libs.versions.compileSdkMinor.get().toInt()
         }
     }
     ndkVersion = libs.versions.ndk.get()

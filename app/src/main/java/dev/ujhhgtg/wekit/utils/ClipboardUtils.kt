@@ -11,9 +11,5 @@ fun copyToClipboard(context: Context, content: String) {
     clipboard.setPrimaryClip(clip)
 }
 
-fun copyToClipboard(content: String) {
-    val clipboard =
-        HostInfo.application.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    val clip = ClipData.newPlainText("text", content)
-    clipboard.setPrimaryClip(clip)
-}
+@Suppress("NOTHING_TO_INLINE")
+inline fun copyToClipboard(content: String) = copyToClipboard(HostInfo.application, content)

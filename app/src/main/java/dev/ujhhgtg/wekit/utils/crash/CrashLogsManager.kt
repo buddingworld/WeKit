@@ -1,7 +1,7 @@
 package dev.ujhhgtg.wekit.utils.crash
 
 import dev.ujhhgtg.comptime.nameOf
-import dev.ujhhgtg.wekit.utils.KnownPaths
+import dev.ujhhgtg.wekit.utils.paths.KnownPaths
 import dev.ujhhgtg.wekit.utils.WeLogger
 import java.io.IOException
 import java.nio.charset.StandardCharsets

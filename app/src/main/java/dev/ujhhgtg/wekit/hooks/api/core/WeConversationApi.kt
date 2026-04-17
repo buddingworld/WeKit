@@ -112,39 +112,6 @@ object WeConversationApi : ApiHookItem(), IResolvesDex {
         setConversationsVisibility(visible, talkers.toTypedArray())
     }
 
-//    private fun debugCursor(cursor: Cursor?) {
-//        if (cursor == null) {
-//            WeLogger.d("CursorDebug", "Cursor is null")
-//            return
-//        }
-//
-//        WeLogger.d("CursorDebug", "Rows: ${cursor.count} | Columns: ${cursor.columnCount}")
-//
-//        // Save current position to restore it later
-//        val initialPosition = cursor.position
-//
-//        if (cursor.moveToFirst()) {
-//            do {
-//                val rowString = StringBuilder()
-//                for (i in 0 until cursor.columnCount) {
-//                    val columnName = cursor.getColumnName(i)
-//                    val value = try {
-//                        cursor.getString(i) ?: "NULL"
-//                    } catch (_: Exception) {
-//                        "BLOB/Internal Error"
-//                    }
-//                    rowString.append("[$columnName: $value] ")
-//                }
-//                WeLogger.d("CursorDebug", "Row ${cursor.position}: $rowString")
-//            } while (cursor.moveToNext())
-//        } else {
-//            WeLogger.d("CursorDebug", "Cursor is empty")
-//        }
-//
-//        // Restore the cursor to its original position
-//        cursor.moveToPosition(initialPosition)
-//    }
-
     fun onlyShowFilteredConversations(queryFilter: String, selectedColumns: String = "username") {
         setAllConversationVisibility(false)
         setFilteredConversationsVisibility(true, queryFilter, selectedColumns)

@@ -48,6 +48,9 @@ import org.luckypray.dexkit.DexKitBridge
 object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
 
     private val TAG = This.Class.simpleName
+
+//    private val THEME_PATH = (KnownPaths.moduleData / "theme").createDirectoriesNoThrow()
+
     private const val KEY_BACKGROUND_URI = "background_uri"
     private const val VIEW_TAG = 1426719277
 
@@ -65,20 +68,38 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
         }
     }
 
+//    private fun applyToViewBackground(view: View, path: Path) {
+//        val context = view.context
+//        val imageLoader = ImageLoader(context)
+//
+//        imageLoader.enqueue(
+//            ImageRequest.Builder(context)
+//                .data(path.toFile())
+//                .target { image ->
+//                    val bitmap = image.toBitmap()
+//                    view.background = bitmap.toDrawable(context.resources)
+//                }
+//                .build()
+//        )
+//    }
+
     override fun onEnable() {
         hookF()
-        hookB()
-        hookC()
+        hookB() // ok
+        hookC() // ok
         hookD()
         hookE()
         hookG()
         hookH()
     }
 
+    @Suppress("ClassName")
+    private data object VIEW_TAG_CONTENT
+
     private fun hookB() {
         View::class.asResolver().firstMethod { name = "setBackgroundDrawable" }.hookBefore {
             val view = thisObject as? View? ?: return@hookBefore
-            if (view.getTag(VIEW_TAG) != Any::class) return@hookBefore
+            if (view.getTag(VIEW_TAG) != VIEW_TAG_CONTENT) return@hookBefore
             args[0] = null
         }
     }
@@ -100,14 +121,22 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
     }
 
     private fun hookD() {
-        // action bar
 //        "com.tencent.mm.ui.chatting.ChattingUIFragment".toClass().asResolver()
 //            .firstMethod { name = "dealContentView" }.hookAfter {
 //                val viewGroup = thisObject as ViewGroup
 //                val activity = viewGroup.context as Activity
 //                when (activity.javaClass.name) {
 //                    "com.tencent.mm.ui.LauncherUI" -> {
-//
+//                        val bgView = View(activity)
+//                        applyToViewBackground(bgView, THEME_PATH / "bg_chat_actionbar.png")
+//                        val chattingUiLayout = viewGroup.findViewWhich<ChattingUILayout> { view ->
+//                            view is ChattingUILayout
+//                        }!!
+//                        setNullBg(chattingUiLayout)
+//                        val childAt0 = chattingUiLayout[0] as ViewGroup
+//                        setNullBgRecursively(childAt0)
+//                        val parent = chattingUiLayout.parent as ViewGroup
+//                        parent.addView(bgView, 0, ViewGroup.LayoutParams(-1, ))
 //                    }
 //
 //                    "com.tencent.mm.ui.conversation.ConvBoxServiceConversationUI" -> {
@@ -337,7 +366,7 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
 
     private fun setNullBg(view: View) {
         view.background = null
-        view.setTag(VIEW_TAG, Any::class)
+        view.setTag(VIEW_TAG, VIEW_TAG_CONTENT)
     }
 
     private val methodChattingBackgroundComponentInitBg by dexMethod()

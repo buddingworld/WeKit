@@ -9,7 +9,7 @@ import dev.ujhhgtg.wekit.hooks.api.core.model.MessageType
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageViewApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.LruCache
+import dev.ujhhgtg.wekit.utils.collections.LruCache
 import java.lang.reflect.InvocationTargetException
 
 @HookItem(path = "聊天/自动语音转文字", description = "自动将语音消息转为文字")

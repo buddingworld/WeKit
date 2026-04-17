@@ -63,5 +63,5 @@ fun Uri.openInSystem(
     }
 }
 
-val Uri.fileExtension: String
+inline val Uri.fileExtension: String
     get() = pathSegments.last().substringAfterLast('.', "")

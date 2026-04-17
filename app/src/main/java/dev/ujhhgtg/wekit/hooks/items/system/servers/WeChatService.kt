@@ -4,7 +4,7 @@ import dev.ujhhgtg.wekit.hooks.api.core.WeApi
 import dev.ujhhgtg.wekit.hooks.api.core.WeDatabaseApi
 import dev.ujhhgtg.wekit.hooks.api.core.WeMessageApi
 import dev.ujhhgtg.wekit.hooks.api.core.model.MessageType
-import dev.ujhhgtg.wekit.utils.LruCache
+import dev.ujhhgtg.wekit.utils.collections.LruCache
 import kotlinx.serialization.Serializable
 
 object WeChatService {

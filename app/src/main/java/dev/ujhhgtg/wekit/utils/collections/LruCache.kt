@@ -1,4 +1,4 @@
-package dev.ujhhgtg.wekit.utils
+package dev.ujhhgtg.wekit.utils.collections
 
 // prefer this over android's own LruCache since kotlin.collections provide several useful methods
 class LruCache<K, V>(

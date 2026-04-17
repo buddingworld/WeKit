@@ -571,7 +571,7 @@ object WeMessageApi : ApiHookItem(), IResolvesDex {
             currentClass = currentClass.superclass
         }
 
-        throw IllegalStateException("无法解析 AccPath 方法 (扫描了 $scanCount 个候选项, StorageClass=${storageObj.javaClass.name})")
+        error("无法解析 AccPath 方法 (扫描了 $scanCount 个候选项, StorageClass=${storageObj.javaClass.name})")
     }
 
     /** 发送图片消息 */

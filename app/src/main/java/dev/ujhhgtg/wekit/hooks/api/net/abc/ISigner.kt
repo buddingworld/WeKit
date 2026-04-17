@@ -1,6 +1,6 @@
 package dev.ujhhgtg.wekit.hooks.api.net.abc
 
-import dev.ujhhgtg.wekit.hooks.api.net.model.SignResult
+import dev.ujhhgtg.wekit.hooks.api.net.models.SignResult
 import org.json.JSONObject
 
 interface ISigner {

@@ -36,7 +36,6 @@ import dev.ujhhgtg.wekit.ui.content.DefaultColumn
 import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.cast
 import dev.ujhhgtg.wekit.utils.invokeOriginal
 import dev.ujhhgtg.wekit.utils.showToast
 import org.luckypray.dexkit.DexKitBridge
@@ -129,7 +128,7 @@ object EmojiGameControl : SwitchHookItem(), IResolvesDex {
                         )
                         val emojiMd5 = getMd5Method.invoke(emojiInfo) as? String
 
-                        val activity = args[0].cast<View>().context.cast<ContextThemeWrapper>().baseContext as Activity
+                        val activity = ((args[0] as View).context as ContextThemeWrapper).baseContext as Activity
 
                         when (emojiMd5) {
                             MD5_MORRA -> showSelectDialog(this, false, activity)

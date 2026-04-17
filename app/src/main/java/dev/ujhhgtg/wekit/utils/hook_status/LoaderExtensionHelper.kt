@@ -1,4 +1,4 @@
-package dev.ujhhgtg.wekit.utils.hookstatus
+package dev.ujhhgtg.wekit.utils.hook_status
 
 import dev.ujhhgtg.wekit.loader.startup.StartupInfo
 

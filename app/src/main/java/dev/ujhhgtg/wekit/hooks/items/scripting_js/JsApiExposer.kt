@@ -6,9 +6,10 @@ import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.hooks.api.core.WeApi
 import dev.ujhhgtg.wekit.hooks.api.core.WeMessageApi
 import dev.ujhhgtg.wekit.utils.DefaultJson
-import dev.ujhhgtg.wekit.utils.KnownPaths
-import dev.ujhhgtg.wekit.utils.createDirectoriesNoThrow
+import dev.ujhhgtg.wekit.utils.paths.KnownPaths
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.paths.createDirectoriesNoThrow
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.FormBody
@@ -516,8 +517,8 @@ object JsApiExposer {
             val map = DefaultJson.decodeFromString<Map<String, kotlinx.serialization.json.JsonElement>>(storageFile.readText())
             map.forEach { (k, v) ->
                 storage[k] = when (v) {
-                    is kotlinx.serialization.json.JsonPrimitive if v.isString -> v.content
-                    is kotlinx.serialization.json.JsonPrimitive -> v.jsonPrimitive.contentOrNull
+                    is JsonPrimitive if v.isString -> v.content
+                    is JsonPrimitive -> v.jsonPrimitive.contentOrNull
                     else -> v.toString()
                 }
             }

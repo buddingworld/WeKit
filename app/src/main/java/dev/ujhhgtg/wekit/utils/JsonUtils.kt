@@ -21,10 +21,10 @@ fun JsonElement.getByPath(path: String): JsonElement? {
     }
 }
 
-val JsonElement.asInt: Int get() = jsonPrimitive.int
-val JsonElement.asLong: Long get() = jsonPrimitive.long
-val JsonElement.asString: String get() = jsonPrimitive.content
+inline val JsonElement.asInt: Int get() = jsonPrimitive.int
+inline val JsonElement.asLong: Long get() = jsonPrimitive.long
+inline val JsonElement.asString: String get() = jsonPrimitive.content
 
-val JsonElement.asIntOrNull: Int? get() = jsonPrimitive.intOrNull
-val JsonElement.asLongOrNull: Long? get() = jsonPrimitive.longOrNull
-val JsonElement.asStringOrNull: String? get() = jsonPrimitive.contentOrNull
+inline val JsonElement.asIntOrNull: Int? get() = jsonPrimitive.intOrNull
+inline val JsonElement.asLongOrNull: Long? get() = jsonPrimitive.longOrNull
+inline val JsonElement.asStringOrNull: String? get() = jsonPrimitive.contentOrNull

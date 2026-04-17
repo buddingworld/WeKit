@@ -16,7 +16,7 @@ import dev.ujhhgtg.wekit.hooks.api.core.WeConversationApi
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageViewApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.LruCache
+import dev.ujhhgtg.wekit.utils.collections.LruCache
 import org.luckypray.dexkit.DexKitBridge
 import kotlin.math.roundToInt
 

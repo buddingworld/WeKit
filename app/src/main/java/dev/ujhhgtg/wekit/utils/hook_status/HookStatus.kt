@@ -1,4 +1,4 @@
-package dev.ujhhgtg.wekit.utils.hookstatus
+package dev.ujhhgtg.wekit.utils.hook_status
 
 import android.content.Context
 import dev.ujhhgtg.wekit.constants.PackageNames

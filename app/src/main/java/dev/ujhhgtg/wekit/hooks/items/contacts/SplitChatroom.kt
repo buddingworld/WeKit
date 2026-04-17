@@ -42,7 +42,6 @@ import dev.ujhhgtg.wekit.ui.content.Button
 import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.showToast
 
 @HookItem(path = "联系人与群组/分裂群组", description = "让群聊一分为二")
 object SplitChatroom : ClickableHookItem() {
@@ -50,18 +49,7 @@ object SplitChatroom : ClickableHookItem() {
     private val TAG = nameOf(SplitChatroom)
 
     override fun onClick(context: Context) {
-        val groups = try {
-            WeDatabaseApi.getGroups()
-        } catch (e: Exception) {
-            WeLogger.e(TAG, "获取群聊列表失败", e)
-            showToast(context, "获取数据失败: ${e.message}")
-            return
-        }
-
-        if (groups.isEmpty()) {
-            showToast(context, "未获取到群聊列表, 请确认是否已登录或数据是否同步")
-            return
-        }
+        val groups = WeDatabaseApi.getGroups()
 
         showComposeDialog(context) {
             SplitChatroomDialog(

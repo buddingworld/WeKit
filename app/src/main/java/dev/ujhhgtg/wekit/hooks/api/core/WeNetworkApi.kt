@@ -82,7 +82,7 @@ object WeNetworkApi : ApiHookItem(), IResolvesDex {
         queueClass: Class<*>,
         netSceneClass: Class<*>
     ): Method? {
-        val candidates = ArrayList<Method>()
+        val candidates = mutableListOf<Method>()
 
         for (method in queueClass.declaredMethods) {
             if (!Modifier.isPublic(method.modifiers)) continue
@@ -95,14 +95,10 @@ object WeNetworkApi : ApiHookItem(), IResolvesDex {
                 // 所以 paramType.isAssignableFrom(netSceneClass) 会为 true
                 if (paramType.isAssignableFrom(netSceneClass) &&
                     !paramType.isPrimitive &&
-                    paramType != String::class.java
+                    paramType != String::class.java &&
+                    (method.returnType == Boolean::class.javaPrimitiveType || method.returnType == Boolean::class.java)
                 ) {
-
-                    if (method.returnType == Boolean::class.javaPrimitiveType ||
-                        method.returnType == Boolean::class.java
-                    ) {
-                        candidates.add(method)
-                    }
+                    candidates.add(method)
                 }
             }
         }

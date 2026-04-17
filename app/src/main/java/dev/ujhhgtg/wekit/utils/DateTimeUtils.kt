@@ -2,4 +2,5 @@ package dev.ujhhgtg.wekit.utils
 
 import kotlin.time.Clock
 
-fun now() = Clock.System.now()
+@Suppress("NOTHING_TO_INLINE")
+inline fun now() = Clock.System.now()
