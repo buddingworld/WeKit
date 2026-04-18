@@ -55,7 +55,7 @@ object WeChatMessageContextMenuApi : ApiHookItem(), IResolvesDex {
             currentView = args[1] as View
             val tag = currentView.tag
 
-            val msgInfo = WeMessageApi.getMsgInfoInstanceFromTag(tag)
+            val msgInfo = WeMessageApi.getMsgInfoFromTag(tag)
 
             try {
                 for (item in menuItems.values.flatten()) {
@@ -94,7 +94,7 @@ object WeChatMessageContextMenuApi : ApiHookItem(), IResolvesDex {
                 .get()!!
 
             val tag = currentView.tag
-            val msgInfo = WeMessageApi.getMsgInfoInstanceFromTag(tag)
+            val msgInfo = WeMessageApi.getMsgInfoFromTag(tag)
 
             val menuItem = args[0] as android.view.MenuItem
             val msgInfoWrapper = MessageInfo(msgInfo)

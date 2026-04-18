@@ -177,7 +177,7 @@ object ChatToolbar : SwitchHookItem(), IResolvesDex {
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 contentPadding = PaddingValues(horizontal = 8.dp),
                             ) {
-                                // workaroung for weird WeChat bug where 'Album' doesn't display, so I have to render it manually
+                                // workaround for weird WeChat bug where 'Album' doesn't display, so I have to render it manually
 
                                 item {
                                     FeatureChip("相册", MaterialSymbols.Outlined.Photo_library) {

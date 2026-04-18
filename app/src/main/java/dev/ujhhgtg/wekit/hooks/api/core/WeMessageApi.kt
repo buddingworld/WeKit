@@ -749,7 +749,7 @@ object WeMessageApi : ApiHookItem(), IResolvesDex {
         }
     }
 
-    fun getMsgInfoInstanceFromTag(tag: Any): Any {
+    fun getMsgInfoFromTag(tag: Any): Any {
         val mGetMsgInfo = tag.asResolver()
             .optional()
             .firstMethodOrNull {

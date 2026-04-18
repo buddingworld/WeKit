@@ -110,7 +110,7 @@ public class Xp51HookImpl implements IHookBridge, ILoaderService {
     @NonNull
     @Override
     public String getEntryPointName() {
-        return this.getClass().getName();
+        return "dev.ujhhgtg.wekit.loader.entry.xp51.Xp51HookImpl";
     }
 
     @NonNull

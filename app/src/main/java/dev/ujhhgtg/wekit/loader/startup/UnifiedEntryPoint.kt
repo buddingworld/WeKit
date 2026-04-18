@@ -3,7 +3,7 @@ package dev.ujhhgtg.wekit.loader.startup
 import android.app.Instrumentation
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.ClassLoaderProvider
-import dev.ujhhgtg.comptime.nameOf
+import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.loader.abc.IHookBridge
 import dev.ujhhgtg.wekit.loader.abc.ILoaderService
 import dev.ujhhgtg.wekit.loader.utils.HybridClassLoader
@@ -12,7 +12,7 @@ import dev.ujhhgtg.wekit.utils.hookAfterDirectly
 
 object UnifiedEntryPoint {
 
-    private val TAG = nameOf(UnifiedEntryPoint)
+    private val TAG = This.Class.simpleName
 
     fun entry(
         loaderService: ILoaderService,
@@ -28,7 +28,6 @@ object UnifiedEntryPoint {
         self.asResolver()
             .firstField { name = "parent"; superclass() }
             .set(HybridClassLoader)
-        WeLogger.d(TAG, "injected hybrid class loader")
 
         com.tencent.mm.app.Application::class.asResolver()
             .firstMethod { name = "attachBaseContext" }
