@@ -1,10 +1,8 @@
 package dev.ujhhgtg.wekit.activity
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.UserManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
@@ -63,11 +61,17 @@ import dev.ujhhgtg.wekit.ui.utils.AppTheme
 import dev.ujhhgtg.wekit.ui.utils.GitHubIcon
 import dev.ujhhgtg.wekit.ui.utils.TelegramIcon
 import dev.ujhhgtg.wekit.utils.HostInfo
+import dev.ujhhgtg.wekit.utils.androidUserId
 import dev.ujhhgtg.wekit.utils.formatEpoch
 import dev.ujhhgtg.wekit.utils.getEnabled
 import dev.ujhhgtg.wekit.utils.hook_status.HookStatus
 import dev.ujhhgtg.wekit.utils.openInSystem
 import dev.ujhhgtg.wekit.utils.setEnabled
+import dev.ujhhgtg.wekit.utils.showToast
+import java.nio.file.Path
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.div
 
 
 class MainActivity : ComponentActivity() {
@@ -77,6 +81,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         runCatching { HookStatus.init(this) }
+        Shell.getShell()
 
         setContent {
             AppTheme {
@@ -87,8 +92,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
 }
 
 private data class ActivationState(
@@ -105,6 +108,8 @@ private fun AppContent(onUrlClick: (String) -> Unit) {
 
     var showMenu by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
+    var showConfirmDeletionDialog by remember { mutableStateOf(false) }
+    var showNoRootDialog by remember { mutableStateOf(false) }
 
     var isLauncherIconEnabled by remember {
         mutableStateOf(
@@ -183,6 +188,13 @@ private fun AppContent(onUrlClick: (String) -> Unit) {
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                     ) {
+                        DropdownMenuItem(
+                            text = { Text("屏蔽微信热更新") },
+                            onClick = {
+                                showMenu = false
+                                showConfirmDeletionDialog = true
+                            }
+                        )
                         DropdownMenuItem(
                             text = { Text(if (isLauncherIconEnabled) "隐藏桌面图标" else "显示桌面图标") },
                             onClick = {
@@ -270,23 +282,17 @@ private fun AppContent(onUrlClick: (String) -> Unit) {
                 }
             }
 
-            var showErrorDialog by remember { mutableStateOf(false) }
-
             ElevatedCard(
                 onClick = {
-                    val userId = run {
-                        val userManager =
-                            context.getSystemService(Context.USER_SERVICE) as UserManager
-                        val userHandle = android.os.Process.myUserHandle()
-                        userManager.getSerialNumberForUser(userHandle)
+                    if (!(Shell.isAppGrantedRoot() ?: false)) {
+                        showNoRootDialog = true
                     }
-                    Shell.cmd(
-                        "am force-stop --user $userId ${PackageNames.WECHAT}",
-                        "am start --user $userId -n ${PackageNames.WECHAT}/${PackageNames.WECHAT}.ui.LauncherUI"
-                    ).submit { result ->
-                        if (!result.isSuccess) {
-                            showErrorDialog = true
-                        } else {
+                    else {
+                        val userId = context.androidUserId
+                        Shell.cmd(
+                            "am force-stop --user $userId ${PackageNames.WECHAT}",
+                            "am start --user $userId -n ${PackageNames.WECHAT}/${PackageNames.WECHAT}.ui.LauncherUI"
+                        ).submit {
                             context.finishAndRemoveTask()
                         }
                     }
@@ -356,14 +362,53 @@ private fun AppContent(onUrlClick: (String) -> Unit) {
                 }
             }
 
-            if (showErrorDialog) {
+            if (showConfirmDeletionDialog) {
+                val paths = remember {
+                    val paths = mutableListOf<Path>()
+                    @Suppress("SdCardPath")
+                    val dataDir = Path("/data/user/${context.androidUserId}/${PackageNames.WECHAT}/")
+                    paths.apply {
+                        add(dataDir / "tinker")
+                        add(dataDir / "tinker_server")
+                        add(dataDir / "tinker_temp")
+                    }
+                }
+
                 AlertDialog(
-                    onDismissRequest = { showErrorDialog = false },
-                    title = { Text("未授予 Root 权限") },
-                    text = { Text("请授予 Root 权限以一键强制停止并启动微信") },
+                    onDismissRequest = { showConfirmDeletionDialog = false },
+                    title = { Text("确定执行?") },
+                    text = { Text("本操作将尝试尝试修复微信热更新导致的模块不加载\n将删除以下路径的文件, 请确认无误后再删除!\n${
+                        paths.joinToString("\n") { "- " + it.absolutePathString() }}") },
+                    dismissButton = {
+                        TextButton(onClick = { showConfirmDeletionDialog = false }) { Text("取消") }
+                    },
                     confirmButton = {
                         Button(onClick = {
-                            showErrorDialog = false
+                            showConfirmDeletionDialog = false
+                            if (!(Shell.isAppGrantedRoot() ?: false)) {
+                                showNoRootDialog = true
+                            }
+                            else {
+                                // if using Shell.cmd or su -c without -mm, the view of /data/user/0 is restricted
+                                paths.forEach { path ->
+                                    ProcessBuilder("su", "-mm", "-c", "rm -rf ${path.absolutePathString()}")
+                                        .redirectErrorStream(true)
+                                        .start()
+                                }
+                                showToast(context, "删除成功!")
+                            }
+                        }) { Text("确定") }
+                    })
+            }
+
+            if (showNoRootDialog) {
+                AlertDialog(
+                    onDismissRequest = { showNoRootDialog = false },
+                    title = { Text("未授予 Root 权限") },
+                    text = { Text("请授予 Root 权限以执行此操作") },
+                    confirmButton = {
+                        Button(onClick = {
+                            showNoRootDialog = false
                         }) { Text("确定") }
                     })
             }

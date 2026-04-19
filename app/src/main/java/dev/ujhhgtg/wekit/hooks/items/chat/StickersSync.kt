@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.condition.type.Modifiers
-import com.highcapable.kavaref.extension.ClassLoaderProvider
 import com.highcapable.kavaref.extension.createInstance
 import com.highcapable.kavaref.extension.isSubclassOf
 import com.tencent.mm.storage.emotion.EmojiGroupInfo
@@ -24,6 +23,7 @@ import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
 import dev.ujhhgtg.wekit.dexkit.dsl.dexConstructor
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
+import dev.ujhhgtg.wekit.dexkit.toClass
 import dev.ujhhgtg.wekit.hooks.api.core.WeDatabaseApi
 import dev.ujhhgtg.wekit.hooks.api.core.WeServiceApi
 import dev.ujhhgtg.wekit.hooks.core.ClickableHookItem
@@ -32,10 +32,10 @@ import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.HostInfo
-import dev.ujhhgtg.wekit.utils.paths.KnownPaths
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.paths.createDirectoriesNoThrow
 import dev.ujhhgtg.wekit.utils.enumValueOfClass
+import dev.ujhhgtg.wekit.utils.paths.KnownPaths
+import dev.ujhhgtg.wekit.utils.paths.createDirectoriesNoThrow
 import dev.ujhhgtg.wekit.utils.polyfills.intoList
 import dev.ujhhgtg.wekit.utils.showToastSuspend
 import kotlinx.coroutines.CoroutineScope
@@ -282,27 +282,23 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
     override fun onEnable() {
         @Suppress("UNCHECKED_CAST")
         methodGetEmojiGroupInfo.hookAfter {
-            if (result !is List<*>) {
-                WeLogger.d(TAG, "param result is not list, skipped")
-                return@hookAfter
-            }
-
             // Inject each sticker pack
             stickerPacks.forEachIndexed { index, pack ->
-                val stickersPackData = ContentValues()
-                stickersPackData.put(
-                    "packGrayIconUrl",
-                    "$PLACEHOLDER_PACK_URL$SEPERATOR${pack.packName}"
-                )
-                stickersPackData.put(
-                    "packIconUrl",
-                    "$PLACEHOLDER_PACK_URL$SEPERATOR${pack.packName}"
-                )
-                stickersPackData.put("packName", pack.packName)
-                stickersPackData.put("packStatus", 1)
-                stickersPackData.put("productID", pack.appPackId)
-                stickersPackData.put("status", 7)
-                stickersPackData.put("sync", 2)
+                val stickersPackData = ContentValues().apply {
+                    put(
+                        "packGrayIconUrl",
+                        "$PLACEHOLDER_PACK_URL$SEPERATOR${pack.packName}"
+                    )
+                    put(
+                        "packIconUrl",
+                        "$PLACEHOLDER_PACK_URL$SEPERATOR${pack.packName}"
+                    )
+                    put("packName", pack.packName)
+                    put("packStatus", 1)
+                    put("productID", pack.appPackId)
+                    put("status", 7)
+                    put("sync", 2)
+                }
 
                 val emojiGroupInfo = EmojiGroupInfo()
                 emojiGroupInfo.convertFrom(stickersPackData, true)
@@ -314,11 +310,7 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
 
         @Suppress("UNCHECKED_CAST")
         methodAddAllGroupItems.hookBefore {
-            val manager = args[0]
-            if (manager == null) {
-                WeLogger.w(TAG, "args[0] is null, skipped")
-                return@hookBefore
-            }
+            val manager = args[0] ?: return@hookBefore
 
             val packConfig = manager.asResolver()
                 .firstMethod {
@@ -392,7 +384,7 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
                             }[0]
                         }
                     }
-                }.getInstance(ClassLoaderProvider.classLoader!!)
+                }.toClass()
             }
             result = retType.createInstance(
                 bytes, "image/png",
@@ -501,20 +493,11 @@ object StickersSync : ClickableHookItem(), IResolvesDex {
                                 .clickable {
                                     CoroutineScope(Dispatchers.IO).launch {
                                         stickerPacks.forEach { pack ->
-                                            WeDatabaseApi.dbInstance.asResolver()
-                                                .firstMethod {
-                                                    name = "delete"
-                                                    parameters(
-                                                        String::class,
-                                                        String::class,
-                                                        Array<String>::class
-                                                    )
-                                                }
-                                                .invoke(
-                                                    "EmojiGroupInfo",
-                                                    "productID = ?",
-                                                    arrayOf(pack.appPackId)
-                                                )
+                                            WeDatabaseApi.delete(
+                                                "EmojiGroupInfo",
+                                                "productID = ?",
+                                                arrayOf(pack.appPackId)
+                                            )
                                         }
                                         showToastSuspend("已清除 ${stickerPacks.size} 个贴纸包缓存!")
                                     }

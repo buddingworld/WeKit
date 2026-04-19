@@ -1,6 +1,5 @@
 package dev.ujhhgtg.wekit.hooks.api.core
 
-import android.database.Cursor
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.createInstance
 import dev.ujhhgtg.comptime.nameOf
@@ -53,11 +52,7 @@ object WeConversationApi : ApiHookItem(), IResolvesDex {
     }
 
     fun markAllAsRead() {
-        val cursor = WeDatabaseApi.rawQueryMethod.invoke(
-            WeDatabaseApi.dbInstance,
-            "SELECT username FROM rconversation WHERE unReadCount>0 OR unReadMuteCount>0",
-            arrayOf<String>()
-        ) as Cursor
+        val cursor = WeDatabaseApi.rawQuery("SELECT username FROM rconversation WHERE unReadCount>0 OR unReadMuteCount>0")
         while (cursor.moveToNext()) {
             val talker = cursor.getString(0)
             try {
@@ -99,11 +94,7 @@ object WeConversationApi : ApiHookItem(), IResolvesDex {
     }
 
     fun setAllConversationVisibility(visible: Boolean) {
-        val cursor = WeDatabaseApi.rawQueryMethod.invoke(
-            WeDatabaseApi.dbInstance,
-            "SELECT username FROM rconversation",
-            arrayOf<String>()
-        ) as Cursor
+        val cursor = WeDatabaseApi.rawQuery("SELECT username FROM rconversation")
         val talkers = mutableListOf<String>()
         while (cursor.moveToNext()) {
             talkers += cursor.getString(0)
@@ -118,11 +109,7 @@ object WeConversationApi : ApiHookItem(), IResolvesDex {
     }
 
     fun setFilteredConversationsVisibility(visible: Boolean, queryFilter: String, selectedColumns: String = "username") {
-        val cursor = WeDatabaseApi.rawQueryMethod.invoke(
-            WeDatabaseApi.dbInstance,
-            "SELECT $selectedColumns FROM rconversation $queryFilter",
-            arrayOf<String>()
-        ) as Cursor
+        val cursor = WeDatabaseApi.rawQuery("SELECT $selectedColumns FROM rconversation $queryFilter")
         val talkers = mutableListOf<String>()
         while (cursor.moveToNext()) {
             talkers += cursor.getString(0)

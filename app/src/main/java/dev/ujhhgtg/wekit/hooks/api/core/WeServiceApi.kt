@@ -21,6 +21,7 @@ object WeServiceApi : ApiHookItem(), IResolvesDex {
     private val methodApiManagerGetApi by dexMethod()
     private val methodMmKernelGetServiceImpl by dexMethod()
     private val classMsgInfoStorage by dexClass()
+
     val classApiManager: Class<*> by lazy { methodApiManagerGetApi.method.declaringClass }
 
     val emojiFeatureService by lazy {
@@ -57,6 +58,19 @@ object WeServiceApi : ApiHookItem(), IResolvesDex {
     }
 
     override fun resolveDex(dexKit: DexKitBridge) {
+        val classMmKernel = dexKit.findClass {
+            matcher {
+                usingEqStrings("MicroMsg.MMKernel", "Kernel not null, has initialized.")
+            }
+        }.single()
+
+        methodMmKernelGetServiceImpl.find(dexKit) {
+            matcher {
+                declaredClass = classMmKernel.name
+                paramTypes(Class::class.java)
+            }
+        }
+
         methodServiceManagerGetService.find(dexKit) {
             matcher {
                 modifiers(Modifier.STATIC)
@@ -124,13 +138,5 @@ object WeServiceApi : ApiHookItem(), IResolvesDex {
                 usingEqStrings("[get] ", " is not a interface!")
             }
         }
-
-        methodMmKernelGetServiceImpl.find(dexKit) {
-            matcher {
-                declaredClass(WeDatabaseApi.classMmKernel.clazz)
-                paramTypes(Class::class.java)
-            }
-        }
     }
-
 }

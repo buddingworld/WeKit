@@ -50,7 +50,7 @@ compileSdkMinor = "0"
 # noinspection UnusedVersionCatalogEntry
 jdk = "21"
 # noinspection UnusedVersionCatalogEntry
-ndk = "29.0.14206865"
+ndk = "30.0.14904198"
 
 [libraries]
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }

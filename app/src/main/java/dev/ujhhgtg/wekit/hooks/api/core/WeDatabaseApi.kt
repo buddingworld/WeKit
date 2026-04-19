@@ -3,6 +3,7 @@ package dev.ujhhgtg.wekit.hooks.api.core
 import android.annotation.SuppressLint
 import android.database.Cursor
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
+import com.tencent.wcdb.database.SQLiteDatabase
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
@@ -16,7 +17,6 @@ import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
 import org.luckypray.dexkit.DexKitBridge
-import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 
 /**
@@ -26,15 +26,13 @@ import java.lang.reflect.Modifier
 @HookItem(path = "API/数据库服务", description = "提供数据库直接查询能力")
 object WeDatabaseApi : ApiHookItem(), IResolvesDex {
 
-    val classMmKernel by dexClass()
+    private val classMmKernel by dexClass()
     private val methodGetStorage by dexMethod()
     private val classCoreStorage by dexClass()
     private val classConfigStorage by dexClass()
     private val classSqliteDbWrapper by dexClass()
 
-    lateinit var dbInstance: Any
-    lateinit var rawQueryMethod: Method
-    lateinit var execStatementMethod: Method
+    lateinit var db: SQLiteDatabase
 
     private val TAG = nameOf(WeDatabaseApi)
 
@@ -188,7 +186,7 @@ object WeDatabaseApi : ApiHookItem(), IResolvesDex {
             }
         }
 
-        methodGetStorage.find(dexKit, true) {
+        methodGetStorage.find(dexKit) {
             matcher {
                 declaredClass(classMmKernel.clazz)
                 modifiers = Modifier.PUBLIC or Modifier.STATIC
@@ -213,7 +211,7 @@ object WeDatabaseApi : ApiHookItem(), IResolvesDex {
 
     override fun onEnable() {
         methodGetStorage.method.hookAfter {
-            if (::dbInstance.isInitialized) return@hookAfter
+            if (::db.isInitialized) return@hookAfter
 
             val storageObj = result ?: return@hookAfter
             initializeDatabase(storageObj)
@@ -221,41 +219,31 @@ object WeDatabaseApi : ApiHookItem(), IResolvesDex {
     }
 
     @Synchronized
-    private fun initializeDatabase(storageObj: Any): Boolean {
-        // 在 Storage 中寻找 Wrapper
+    private fun initializeDatabase(storageObj: Any) {
         val wrapperObj = storageObj.asResolver()
             .firstField {
                 type = classSqliteDbWrapper.clazz
-            }.get() ?: return false
+            }.get() ?: return
 
-        // 获取 DB 实例
-        this.dbInstance = wrapperObj.asResolver()
+        db = wrapperObj.asResolver()
             .firstMethod {
                 parameterCount = 0
                 returnType = "com.tencent.wcdb.database.SQLiteDatabase"
-            }.invoke()!!
-
-        rawQueryMethod = dbInstance.asResolver()
-            .firstMethod {
-                name = "rawQuery"
-                parameterCount = 2
-            }.self
-
-        execStatementMethod = dbInstance.asResolver()
-            .firstMethod {
-                name = "execSQL"
-                parameters(String::class)
-            }.self
-
-        return true
+            }.invoke()!! as SQLiteDatabase
     }
 
-    fun executeQuery(sql: String, args: Array<Any>? = null): List<Map<String, Any?>> {
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun rawQuery(sql: String, args: Array<Any>? = null): Cursor = db.rawQuery(sql, args)
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun delete(table: String, conditions: String, args: Array<String>? = null): Int = db.delete(table, conditions, args)
+
+    fun executeQuery(statement: String, args: Array<Any>? = null): List<Map<String, Any?>> {
         val result = mutableListOf<Map<String, Any?>>()
 
         var cursor: Cursor? = null
         try {
-            cursor = rawQueryMethod.invoke(dbInstance, sql, args) as? Cursor
+            cursor = db.rawQuery(statement, args)
             if (cursor != null && cursor.moveToFirst()) {
                 val columnNames = cursor.columnNames
                 do {
@@ -281,15 +269,8 @@ object WeDatabaseApi : ApiHookItem(), IResolvesDex {
         return result
     }
 
-    fun execStatement(sql: String): Boolean {
-        try {
-            execStatementMethod.invoke(dbInstance, sql)
-            return true
-        } catch (e: Exception) {
-            WeLogger.e(TAG, "SQL Update 执行异常", e)
-        }
-        return false
-    }
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun execStatement(statement: String, args: Array<Any>? = null) = db.execSQL(statement, args)
 
     /**
      * 获取【全部联系人】

@@ -67,7 +67,7 @@
 1. **Android Studio**: Ladybug | 2024.2.1 或更高版本
 2. **JDK**: JDK 21
 3. **Android SDK**:
-   - Compile SDK: 36
+   - Compile SDK: 37
    - Build Tools: 最新版本
 4. **NDK**: 最新版本 (用于 Rust 编译)
 5. **Rust**: 最新版本

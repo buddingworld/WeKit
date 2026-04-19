@@ -219,13 +219,7 @@ object WeDatabaseListenerApi : ApiHookItem() {
     private fun hookOldQueryMethod() {
         com.tencent.wcdb.database.SQLiteDatabase::class.asResolver().firstMethod {
             name = "rawQueryWithFactory"
-            parameters(
-                com.tencent.wcdb.database.SQLiteDatabase.CursorFactory::class,
-                String::class,
-                Array<String>::class,
-                String::class,
-                com.tencent.wcdb.support.CancellationSignal::class
-            )
+            parameterCount = 5
         }.hookBefore {
             try {
                 if (queryListeners.isEmpty()) return@hookBefore

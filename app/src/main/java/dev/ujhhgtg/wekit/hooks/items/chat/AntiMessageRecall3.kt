@@ -1,7 +1,6 @@
 package dev.ujhhgtg.wekit.hooks.items.chat
 
 import android.content.ContentValues
-import android.database.Cursor
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
@@ -61,12 +60,10 @@ object AntiMessageRecall3 : SwitchHookItem(), IResolvesDex {
 
                 resultMap[typeKey] = null
 
-                val db = WeDatabaseApi.dbInstance
-                val cursor = WeDatabaseApi.rawQueryMethod.invoke(
-                    db,
+                val cursor = WeDatabaseApi.rawQuery(
                     "SELECT createTime FROM message WHERE msgSvrId = ?",
                     arrayOf(msgSvrId)
-                ) as Cursor
+                )
 
                 cursor.use { cursor ->
                     if (cursor.moveToFirst()) {
