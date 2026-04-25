@@ -34,7 +34,7 @@ import com.tencent.mm.ui.LauncherUI
 import com.tencent.mm.ui.chatting.ChattingUI
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.hooks.api.core.WeDatabaseApi
-import dev.ujhhgtg.wekit.hooks.api.core.model.WeGroup
+import dev.ujhhgtg.wekit.hooks.api.core.models.WeGroup
 import dev.ujhhgtg.wekit.hooks.core.ClickableHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.ui.content.AlertDialogContent

@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.composables.icons.materialsymbols.MaterialSymbols
 import com.composables.icons.materialsymbols.outlined.Search
-import dev.ujhhgtg.wekit.hooks.api.core.model.IWeContact
+import dev.ujhhgtg.wekit.hooks.api.core.models.IWeContact
 
 @Composable
 fun ContactSelectionDialog(

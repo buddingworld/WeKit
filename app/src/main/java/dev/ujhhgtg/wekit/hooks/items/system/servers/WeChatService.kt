@@ -3,7 +3,7 @@ package dev.ujhhgtg.wekit.hooks.items.system.servers
 import dev.ujhhgtg.wekit.hooks.api.core.WeApi
 import dev.ujhhgtg.wekit.hooks.api.core.WeDatabaseApi
 import dev.ujhhgtg.wekit.hooks.api.core.WeMessageApi
-import dev.ujhhgtg.wekit.hooks.api.core.model.MessageType
+import dev.ujhhgtg.wekit.hooks.api.core.models.MessageType
 import dev.ujhhgtg.wekit.utils.collections.LruCache
 import kotlinx.serialization.Serializable
 

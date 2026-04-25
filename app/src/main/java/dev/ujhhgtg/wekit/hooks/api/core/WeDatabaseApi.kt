@@ -8,11 +8,11 @@ import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
-import dev.ujhhgtg.wekit.hooks.api.core.model.SelfProfileField
-import dev.ujhhgtg.wekit.hooks.api.core.model.WeContact
-import dev.ujhhgtg.wekit.hooks.api.core.model.WeGroup
-import dev.ujhhgtg.wekit.hooks.api.core.model.WeMessage
-import dev.ujhhgtg.wekit.hooks.api.core.model.WeOfficial
+import dev.ujhhgtg.wekit.hooks.api.core.models.SelfProfileField
+import dev.ujhhgtg.wekit.hooks.api.core.models.WeContact
+import dev.ujhhgtg.wekit.hooks.api.core.models.WeGroup
+import dev.ujhhgtg.wekit.hooks.api.core.models.WeMessage
+import dev.ujhhgtg.wekit.hooks.api.core.models.WeOfficial
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.WeLogger

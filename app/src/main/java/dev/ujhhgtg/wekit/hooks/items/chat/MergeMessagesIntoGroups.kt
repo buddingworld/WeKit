@@ -5,8 +5,8 @@ import android.view.View
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import de.robv.android.xposed.XC_MethodHook
 import dev.ujhhgtg.wekit.hooks.api.core.WeMessageApi
-import dev.ujhhgtg.wekit.hooks.api.core.model.MessageInfo
-import dev.ujhhgtg.wekit.hooks.api.core.model.MessageType
+import dev.ujhhgtg.wekit.hooks.api.core.models.MessageInfo
+import dev.ujhhgtg.wekit.hooks.api.core.models.MessageType
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageViewApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem

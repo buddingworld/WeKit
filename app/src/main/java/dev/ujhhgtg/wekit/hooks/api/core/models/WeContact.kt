@@ -1,4 +1,4 @@
-package dev.ujhhgtg.wekit.hooks.api.core.model
+package dev.ujhhgtg.wekit.hooks.api.core.models
 
 interface IWeContact {
     val wxId: String

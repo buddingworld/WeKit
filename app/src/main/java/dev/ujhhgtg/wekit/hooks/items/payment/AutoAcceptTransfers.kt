@@ -6,8 +6,8 @@ import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexConstructor
 import dev.ujhhgtg.wekit.hooks.api.core.WeApi
 import dev.ujhhgtg.wekit.hooks.api.core.WeDatabaseListenerApi
-import dev.ujhhgtg.wekit.hooks.api.core.model.MessageInfo
-import dev.ujhhgtg.wekit.hooks.api.core.model.MessageType
+import dev.ujhhgtg.wekit.hooks.api.core.models.MessageInfo
+import dev.ujhhgtg.wekit.hooks.api.core.models.MessageType
 import dev.ujhhgtg.wekit.hooks.api.net.WeNetSceneApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
