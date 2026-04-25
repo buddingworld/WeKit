@@ -2,7 +2,7 @@
 //
 //import android.app.Activity
 //import android.widget.BaseAdapter
-//import com.highcapable.kavaref.KavaRef.Companion.asResolver
+//import dev.ujhhgtg.wekit.utils.asResolver
 //import com.highcapable.kavaref.condition.type.Modifiers
 //import com.highcapable.kavaref.condition.type.VagueType
 //import com.highcapable.kavaref.extension.createInstance

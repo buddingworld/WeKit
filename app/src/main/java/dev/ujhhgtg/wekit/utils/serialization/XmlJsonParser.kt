@@ -71,11 +71,15 @@ object XmlJsonParser {
                         if (x.next() == '[') {
                             val text = x.nextCDATA()
                             if (text.isNotEmpty()) {
-                                context.accumulate(config.cDataTagName,
-                                    stringToJsonElement(text,
-                                    config.keepBooleanAsString,
-                                    config.keepNumberAsString,
-                                    config.keepStrings))
+                                context.accumulate(
+                                    config.cDataTagName,
+                                    stringToJsonElement(
+                                        text,
+                                        config.keepBooleanAsString,
+                                        config.keepNumberAsString,
+                                        config.keepStrings
+                                    )
+                                )
                             }
                             return false
                         }
@@ -93,6 +97,7 @@ object XmlJsonParser {
                         LT_CHAR -> {
                             depth += 1
                         }
+
                         GT_CHAR -> {
                             depth -= 1
                         }
@@ -485,6 +490,7 @@ private class XmlTokener(
                     if (c == q) return true
                 }
             }
+
             else -> {
                 while (true) {
                     c = next()
@@ -532,6 +538,7 @@ private class XmlTokener(
                     }
                 }
             }
+
             else -> {
                 val sb = StringBuilder()
                 var ch = c
@@ -547,6 +554,7 @@ private class XmlTokener(
                             back()
                             return sb.toString()
                         }
+
                         ch == LT_CHAR || ch == '"' || ch == '\'' -> {
                             throw syntaxError("Bad character in a name")
                         }
@@ -660,6 +668,7 @@ private class XmlTokener(
                     characterPreviousLine = character
                     character = 0
                 }
+
                 '\n' -> {
                     if (previous != '\r') {
                         line++
@@ -667,6 +676,7 @@ private class XmlTokener(
                     }
                     character = 0
                 }
+
                 else -> character++
             }
         }

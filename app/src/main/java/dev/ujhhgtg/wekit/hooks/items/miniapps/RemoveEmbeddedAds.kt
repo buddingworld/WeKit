@@ -1,11 +1,11 @@
 package dev.ujhhgtg.wekit.hooks.items.miniapps
 
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
+import dev.ujhhgtg.wekit.utils.asResolver
 import org.json.JSONObject
 import org.luckypray.dexkit.DexKitBridge
 import java.lang.reflect.Field
@@ -31,9 +31,11 @@ object RemoveEmbeddedAds : SwitchHookItem(), IResolvesDex {
             val transferResultInfo = args[0]
             if (!::protoField.isInitialized) {
                 protoField = transferResultInfo.asResolver()
-                    .firstField { type {
-                        !it.isPrimitive && !it.name.startsWith("java.") && !it.name.startsWith("android.")
-                    } }.self
+                    .firstField {
+                        type {
+                            !it.isPrimitive && !it.name.startsWith("java.") && !it.name.startsWith("android.")
+                        }
+                    }.self
             }
 
             val proto = protoField.get(transferResultInfo)

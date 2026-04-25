@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.PathInterpolator
 import android.widget.FrameLayout
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.resolve
 
 
 @HookItem(
@@ -28,7 +28,7 @@ object BeautifyActivityTransitionAnimation : SwitchHookItem() {
 
     override fun onEnable() {
         // sender
-        View::class.asResolver()
+        View::class.resolve()
             .firstMethod {
                 name = "performClick"
             }
@@ -45,7 +45,7 @@ object BeautifyActivityTransitionAnimation : SwitchHookItem() {
             }
 
         // receiver
-        Activity::class.asResolver()
+        Activity::class.resolve()
             .firstMethod {
                 name = "onPostCreate"
             }
@@ -88,7 +88,7 @@ object BeautifyActivityTransitionAnimation : SwitchHookItem() {
                 }
             }
 
-        Activity::class.asResolver()
+        Activity::class.resolve()
             .firstMethod {
                 name = "overridePendingTransition"
                 parameterCount = 3

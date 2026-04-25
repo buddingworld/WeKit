@@ -7,7 +7,6 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import com.android.dx.stock.ProxyBuilder
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.ClassLoaderProvider
 import com.highcapable.kavaref.extension.createInstance
 import com.highcapable.kavaref.extension.toClass
@@ -30,9 +29,11 @@ import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.ui.content.MainSettingsDialog
-import dev.ujhhgtg.wekit.utils.paths.KnownPaths
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.paths.KnownPaths
 import dev.ujhhgtg.wekit.utils.paths.createDirectoriesNoThrow
+import dev.ujhhgtg.wekit.utils.resolve
 import org.luckypray.dexkit.DexKitBridge
 import org.luckypray.dexkit.query.enums.StringMatchType
 import java.lang.reflect.InvocationHandler
@@ -184,22 +185,16 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
     }
 
     override fun onEnable() {
-        // 尝试 Hook 旧版 UI
         injectLegacy()
 
-        // 尝试 Hook 新版 UI (8.0.67+)
-        // tryHookNewSettingsMethod1()
+        // injectModernMethod1()
         injectModernMethod2()
         // injectModernMethod3()
 
         hookLauncherUi()
     }
 
-    /**
-     * 适配旧版 SettingsUI (基于 PreferenceScreen)
-     */
     private fun injectLegacy() {
-        // 检查类是否存在
         val clsSettingsUi = "${PackageNames.WECHAT}.plugin.setting.ui.setting.SettingsUI"
             .toClassOrNull() ?: run {
             WeLogger.w(TAG, "legacy settings class not found, skipping")
@@ -211,7 +206,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
         val getKeyMethod = methodGetKey.method
         val addPrefMethod = methodAddPref.method
 
-        clsSettingsUi.asResolver().firstMethod {
+        clsSettingsUi.resolve().firstMethod {
             name = "initView"
             parameterCount = 0
         }.hookAfter {
@@ -233,7 +228,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
             }
         }
 
-        clsSettingsUi.asResolver().firstMethod { name = "onPreferenceTreeClick" }
+        clsSettingsUi.resolve().firstMethod { name = "onPreferenceTreeClick" }
             .hookBefore {
                 if (args.size < 2) return@hookBefore
                 val preference = args[1] ?: return@hookBefore
@@ -250,7 +245,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
             }
     }
 
-//    private fun tryHookNewSettingsMethod1() {
+//    private fun injectModernMethod1() {
 //        val newSettingsCls =
 //            "com.tencent.mm.plugin.setting.ui.setting_new.base.BaseSettingPrefUI"
 //                .toClassOrNull() ?: return
@@ -314,6 +309,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
                         GROUP_SETTING_ITEM_CLASS,
                         PARENT_SETTING_ITEM_CLASS
                     )
+
                     mGetNameResId -> WEKIT_SETTING_ITEM_NAME_RES_ID
                     else -> ProxyBuilder.callSuper(
                         proxy,
@@ -347,7 +343,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
             }
 
         // a simple way to inject string resource
-        Context::class.asResolver()
+        Context::class.resolve()
             .firstMethod {
                 name = "getString"
                 parameters(Int::class)
@@ -359,7 +355,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
             }
 
         // create dependency chain
-        CHILD_SETTING_ITEM_CLASS.asResolver()
+        CHILD_SETTING_ITEM_CLASS.resolve()
             .firstMethod {
                 returnType = classSettingLocation.clazz
             }
@@ -379,7 +375,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
             }
 
         // inject into page
-        BaseSettingPrefUI::class.asResolver()
+        BaseSettingPrefUI::class.resolve()
             .firstMethod { name = "superImportUIComponents" }
             .hookAfter {
                 if (thisObject.javaClass.name
@@ -405,7 +401,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
 //    }
 
     private fun hookLauncherUi() {
-        LauncherUI::class.asResolver().apply {
+        LauncherUI::class.resolve().apply {
             firstMethod { name = "onCreate" }
                 .hookBefore {
                     val activity = thisObject as Activity
@@ -429,9 +425,8 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
         }
     }
 
-    private fun openSettingsDialog(context: Context) {
-        MainSettingsDialog(context).show()
-    }
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun openSettingsDialog(context: Context) = MainSettingsDialog(context).show()
 
 //    private class SettingsMenuItemClickListener(val context: Context) :
 //        MenuItem.OnMenuItemClickListener {

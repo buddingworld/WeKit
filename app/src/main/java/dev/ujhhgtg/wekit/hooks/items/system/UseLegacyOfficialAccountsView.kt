@@ -25,7 +25,8 @@ object UseLegacyOfficialAccountsView : SwitchHookItem(), WeStartActivityApi.ISta
     override fun onStartActivity(param: XC_MethodHook.MethodHookParam, intent: Intent) {
         val className = intent.component?.className
         if (className == "${PackageNames.WECHAT}.plugin.brandservice.ui.flutter.BizFlutterTLFlutterViewActivity" ||
-            className == "${PackageNames.WECHAT}.plugin.brandservice.ui.timeline.BizTimeLineUI") {
+            className == "${PackageNames.WECHAT}.plugin.brandservice.ui.timeline.BizTimeLineUI"
+        ) {
             WeLogger.d(This.Class.simpleName, "redirected $className")
             intent.component = ComponentName(
                 HostInfo.packageName,

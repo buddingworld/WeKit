@@ -19,9 +19,8 @@ object ShowWxIdInContactDetails : SwitchHookItem(), IContactInfoProvider {
     private const val SEPARATOR = ";"
 
     override fun getContactInfoItem(activity: Activity): ContactInfoItem {
-        val wxId = activity.intent.getStringExtra("Contact_User") ?:
-            activity.intent.getStringExtra("RoomInfo_Id") ?:
-            activity.intent.getStringExtra("Chat_User")
+        val wxId =
+            activity.intent.getStringExtra("Contact_User") ?: activity.intent.getStringExtra("RoomInfo_Id") ?: activity.intent.getStringExtra("Chat_User")
 
         return ContactInfoItem(
             key = "$PREF_KEY$SEPARATOR$wxId",

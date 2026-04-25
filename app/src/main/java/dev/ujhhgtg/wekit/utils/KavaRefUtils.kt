@@ -1,0 +1,19 @@
+// i don't want to bother forking KavaRef
+@file:Suppress("NOTHING_TO_INLINE", "INVISIBLE_MEMBER", "INVISIBLE_REFERENCE", "NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
+
+package dev.ujhhgtg.wekit.utils
+
+import com.highcapable.kavaref.KavaRef
+import com.highcapable.kavaref.condition.base.MemberCondition.Configuration.Companion.createConfiguration
+import kotlin.reflect.KClass
+
+inline fun <T : Any> KClass<T>.resolve() = KavaRef.MemberScope(java.createConfiguration())
+
+inline fun <T : Any> Class<T>.resolve() = KavaRef.MemberScope(createConfiguration())
+
+@Suppress("UNCHECKED_CAST")
+inline fun <T : Any> T.asResolver() = when (this) {
+    is KClass<*> -> (this as KClass<T>).resolve()
+    is Class<*> -> (this as Class<T>).resolve()
+    else -> KavaRef.MemberScope(javaClass.createConfiguration(memberInstance = this))
+}

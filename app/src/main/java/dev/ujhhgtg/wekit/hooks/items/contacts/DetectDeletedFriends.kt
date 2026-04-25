@@ -147,24 +147,30 @@ object DetectDeletedFriends : ClickableHookItem() {
                     }
                 },
                 dismissButton = when (phase) {
-                    is DialogPhase.Idle -> { {
-                        TextButton(onDismiss) { Text("取消") }
-                    } }
+                    is DialogPhase.Idle -> {
+                        {
+                            TextButton(onDismiss) { Text("取消") }
+                        }
+                    }
 
                     is DialogPhase.Scanning -> null
                     is DialogPhase.Done -> null
                 },
                 confirmButton = when (phase) {
-                    is DialogPhase.Idle -> { {
-                        Button(onClick = {
-                            phase = DialogPhase.Scanning(mutableIntStateOf(0), friends.size)
-                        })
-                        { Text("确定") }
-                    } }
+                    is DialogPhase.Idle -> {
+                        {
+                            Button(onClick = {
+                                phase = DialogPhase.Scanning(mutableIntStateOf(0), friends.size)
+                            })
+                            { Text("确定") }
+                        }
+                    }
 
-                    is DialogPhase.Done -> { {
-                        Button(onDismiss) { Text("关闭") }
-                    } }
+                    is DialogPhase.Done -> {
+                        {
+                            Button(onDismiss) { Text("关闭") }
+                        }
+                    }
 
                     else -> null
                 }

@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.wekit.R
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageContextMenuApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
@@ -15,6 +14,7 @@ import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.ModuleRes
+import dev.ujhhgtg.wekit.utils.asResolver
 
 @HookItem(
     path = "聊天/修改文本消息显示",
@@ -37,7 +37,7 @@ object ModifyTextMessageDisplay : SwitchHookItem(),
                 777002,
                 "修改内容",
                 { ModuleRes.getDrawable(R.drawable.edit_24px)!! },
-                { msgInfo -> msgInfo.isText }
+                { msgInfo -> msgInfo.type?.isText ?: false }
             ) { view, _, _ ->
                 showComposeDialog(view.context) {
                     var input by remember { mutableStateOf("") } // TODO: figure out how to find initial value

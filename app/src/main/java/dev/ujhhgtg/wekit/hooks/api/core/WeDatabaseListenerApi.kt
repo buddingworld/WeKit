@@ -2,7 +2,6 @@ package dev.ujhhgtg.wekit.hooks.api.core
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.VariousClass
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.constants.PreferenceKeys
@@ -12,6 +11,7 @@ import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.preferences.WePrefs
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.resolve
 import java.util.concurrent.CopyOnWriteArrayList
 
 @SuppressLint("DiscouragedApi")
@@ -98,7 +98,7 @@ object WeDatabaseListenerApi : ApiHookItem() {
     // ==================== Insert Hook ====================
 
     private fun hookDatabaseInsert() {
-        com.tencent.wcdb.database.SQLiteDatabase::class.asResolver()
+        com.tencent.wcdb.database.SQLiteDatabase::class.resolve()
             .firstMethod {
                 name = "insertWithOnConflict"
                 parameters(String::class, String::class, ContentValues::class, Int::class)
@@ -122,7 +122,7 @@ object WeDatabaseListenerApi : ApiHookItem() {
     private fun hookDatabaseUpdate() {
         val clsDb = VariousClass("com.tencent.wcdb.compat.SQLiteDatabase", "com.tencent.wcdb.database.SQLiteDatabase").load()
 
-        clsDb.asResolver()
+        clsDb.resolve()
             .firstMethod {
                 name = "updateWithOnConflict"
                 parameters(
@@ -174,7 +174,7 @@ object WeDatabaseListenerApi : ApiHookItem() {
     }
 
     private fun hookNewQueryMethod() {
-        com.tencent.wcdb.compat.SQLiteDatabase::class.asResolver()
+        com.tencent.wcdb.compat.SQLiteDatabase::class.resolve()
             .firstMethod {
                 name = "rawQuery"
                 parameters(String::class, Array<Any>::class)
@@ -206,7 +206,7 @@ object WeDatabaseListenerApi : ApiHookItem() {
     }
 
     private fun hookOldQueryMethod() {
-        com.tencent.wcdb.database.SQLiteDatabase::class.asResolver().firstMethod {
+        com.tencent.wcdb.database.SQLiteDatabase::class.resolve().firstMethod {
             name = "rawQueryWithFactory"
             parameterCount = 5
         }.hookBefore {

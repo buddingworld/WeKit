@@ -10,13 +10,14 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.TextView
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.toClass
 import com.tencent.mm.ui.base.NoMeasuredTextView
 import dev.ujhhgtg.wekit.hooks.core.BaseHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.preferences.WePrefs
 import dev.ujhhgtg.wekit.utils.TargetProcesses
+import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.resolve
 import java.lang.reflect.Field
 import java.time.LocalDate
 import java.time.Month
@@ -33,14 +34,14 @@ object AprilFools : BaseHookItem() {
 
         if (!LocalDate.now().isAprilFools) {
             WePrefs.putBool(KEY_SURRENDER, false)
-        }
-        else {
+        } else {
             if (WePrefs.getBoolOrFalse(KEY_SURRENDER)) return
             enable()
         }
     }
 
     private val viewStateMap = WeakHashMap<View, TextViewAnimationState>()
+
     private data class TextViewAnimationState(val matrix: Matrix, var offset: Float)
 
     private lateinit var noMeasuredTvTextProp: Field
@@ -53,22 +54,22 @@ object AprilFools : BaseHookItem() {
     )
 
     override fun onEnable() {
-        ImageView::class.asResolver()
+        ImageView::class.resolve()
             .firstConstructor { parameterCount = 4 }.hookAfter {
-            applyRotation(thisObject as View)
-        }
+                applyRotation(thisObject as View)
+            }
 
-        "com.tencent.mm.ui.widget.QImageView".toClass().asResolver()
+        "com.tencent.mm.ui.widget.QImageView".toClass().resolve()
             .firstConstructor().hookAfter {
                 applyRotation(thisObject as View)
             }
 
-        TextView::class.asResolver().firstMethod { name = "onDraw" }.hookBefore {
+        TextView::class.resolve().firstMethod { name = "onDraw" }.hookBefore {
             val tv = thisObject as TextView
             applyRainbowEffect(tv, tv.text, tv.paint)
         }
 
-        NoMeasuredTextView::class.asResolver()
+        NoMeasuredTextView::class.resolve()
             .firstMethod { name = "onDraw" }.hookBefore {
                 val view = thisObject as View
 
@@ -80,7 +81,8 @@ object AprilFools : BaseHookItem() {
                 applyRainbowEffect(
                     view,
                     noMeasuredTvTextProp.get(view) as CharSequence,
-                    noMeasuredTvPaintProp.get(view) as TextPaint)
+                    noMeasuredTvPaintProp.get(view) as TextPaint
+                )
             }
     }
 

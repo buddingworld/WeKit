@@ -204,12 +204,12 @@ object WeLogger {
 
     private fun Int.toPriorityChar(): String = when (this) {
         Log.VERBOSE -> "V"
-        Log.DEBUG   -> "D"
-        Log.INFO    -> "I"
-        Log.WARN    -> "W"
-        Log.ERROR   -> "E"
-        Log.ASSERT  -> "A"
-        else        -> "?"
+        Log.DEBUG -> "D"
+        Log.INFO -> "I"
+        Log.WARN -> "W"
+        Log.ERROR -> "E"
+        Log.ASSERT -> "A"
+        else -> "?"
     }
 
     @Suppress("NOTHING_TO_INLINE")

@@ -1,12 +1,12 @@
 package dev.ujhhgtg.wekit.hooks.items.system
 
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.condition.type.Modifiers
 import dev.ujhhgtg.wekit.BuildConfig
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
+import dev.ujhhgtg.wekit.utils.asResolver
 import org.luckypray.dexkit.DexKitBridge
 import java.lang.reflect.Field
 

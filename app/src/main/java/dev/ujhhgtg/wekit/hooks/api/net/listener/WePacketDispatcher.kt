@@ -3,7 +3,6 @@ package dev.ujhhgtg.wekit.hooks.api.net.listener
 import android.os.Handler
 import android.os.Looper
 import androidx.core.os.postDelayed
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.ClassLoaderProvider
 import com.tencent.kinda.framework.module.impl.WXPCommReqResp
 import de.robv.android.xposed.XposedHelpers
@@ -15,6 +14,8 @@ import dev.ujhhgtg.wekit.hooks.api.net.WePacketManager
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.resolve
 import org.luckypray.dexkit.DexKitBridge
 import java.lang.reflect.Proxy
 import java.util.concurrent.ConcurrentHashMap
@@ -34,7 +35,7 @@ object WePacketDispatcher : ApiHookItem(), IResolvesDex {
                 val netSceneBaseClass = WePacketHelper.classNetSceneBase.clazz
                 val callbackInterface = classOnGYNetEnd.clazz
 
-                netSceneBaseClass.asResolver().firstMethod { name = "dispatch" }.hookBefore {
+                netSceneBaseClass.resolve().firstMethod { name = "dispatch" }.hookBefore {
                     val v0Var = args[1] ?: return@hookBefore
                     val originalCallback = args[2] ?: return@hookBefore
 

@@ -1,6 +1,5 @@
 package dev.ujhhgtg.wekit.hooks.api.core
 
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.createInstance
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
@@ -9,6 +8,7 @@ import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
 import org.luckypray.dexkit.DexKitBridge
 
 @HookItem(path = "API/对话服务", description = "提供对话管理能力")
@@ -129,8 +129,7 @@ object WeConversationApi : ApiHookItem(), IResolvesDex {
         val contact = contactType.createInstance(convId)
         if (!shouldNotify) {
             methodSetDnd.method.invoke(null, contact, true)
-        }
-        else {
+        } else {
             methodSetNoDnd.method.invoke(null, contact, true)
         }
     }

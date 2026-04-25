@@ -5,12 +5,13 @@ import dev.ujhhgtg.wekit.R
 import dev.ujhhgtg.wekit.hooks.api.ui.WeShortVideosShareMenuApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.paths.KnownPaths
 import dev.ujhhgtg.wekit.utils.ModuleRes
-import dev.ujhhgtg.wekit.utils.showToast
 import dev.ujhhgtg.wekit.utils.WeLogger
 import dev.ujhhgtg.wekit.utils.copyToClipboard
 import dev.ujhhgtg.wekit.utils.formatBytesSize
+import dev.ujhhgtg.wekit.utils.paths.KnownPaths
+import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.showToastSuspend
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -144,21 +145,15 @@ object DownloadMedia : SwitchHookItem(),
         imageUrls.forEachIndexed { index, fullUrl ->
             val fileName = "image_${System.currentTimeMillis()}.png"
 
-            withContext(Dispatchers.Main) {
-                showToast("开始下载第 ${index + 1} 张图片")
-            }
+            showToastSuspend("开始下载第 ${index + 1} 张图片")
 
             runCatching {
                 downloadFile(fullUrl, KnownPaths.downloads / fileName)
             }.onFailure {
                 WeLogger.e(TAG, "failed to download ${index + 1}th image", it)
-                withContext(Dispatchers.Main) {
-                    showToast("第 ${index + 1} 张图片下载成功")
-                }
+                showToastSuspend("第 ${index + 1} 张图片下载成功")
             }.onSuccess {
-                withContext(Dispatchers.Main) {
-                    showToast("已将图片下载到 /sdcard/Download/WeKit/$fileName")
-                }
+                showToastSuspend("已将图片下载到 /sdcard/Download/WeKit/$fileName")
             }
         }
     }
@@ -168,9 +163,7 @@ object DownloadMedia : SwitchHookItem(),
         url: String,
         urlToken: String
     ) = withContext(Dispatchers.IO) {
-        withContext(Dispatchers.Main) {
-            showToast("开始下载并解密视频")
-        }
+        showToastSuspend("开始下载并解密视频")
 
         val baseDir = KnownPaths.downloads
         val fileName = "video_${System.currentTimeMillis()}.mp4"
@@ -182,44 +175,32 @@ object DownloadMedia : SwitchHookItem(),
         runCatching {
             downloadFile(fullUrl, tempFilePath)
 
-            withContext(Dispatchers.Main) {
-                showToast("开始解密视频")
-            }
+            showToastSuspend("开始解密视频")
             val key = BigInteger(decodeKey)
             decryptFile(tempFilePath, finalFilePath, key)
 
             tempFilePath.deleteIfExists()
         }.onFailure {
             WeLogger.e(TAG, "failed to download video", it)
-            withContext(Dispatchers.Main) {
-                showToast("视频下载失败")
-            }
+            showToastSuspend("视频下载失败")
         }.onSuccess {
-            withContext(Dispatchers.Main) {
-                showToast("已将视频下载到 /sdcard/Download/WeKit/$fileName")
-            }
+            showToastSuspend("已将视频下载到 /sdcard/Download/WeKit/$fileName")
         }
     }
 
     private suspend fun downloadPcdnVideo(
         url: String
     ) = withContext(Dispatchers.IO) {
-        withContext(Dispatchers.Main) {
-            showToast("开始下载视频")
-        }
+        showToastSuspend("开始下载视频")
 
         val fileName = "video_${System.currentTimeMillis()}.mp4"
         runCatching {
             downloadFile(url, KnownPaths.downloads / fileName)
         }.onFailure {
             WeLogger.e(TAG, "failed to download video", it)
-            withContext(Dispatchers.Main) {
-                showToast("视频下载失败")
-            }
+            showToastSuspend("视频下载失败")
         }.onSuccess {
-            withContext(Dispatchers.Main) {
-                showToast("已将视频下载到 /sdcard/Download/WeKit/$fileName")
-            }
+            showToastSuspend("已将视频下载到 /sdcard/Download/WeKit/$fileName")
         }
     }
 

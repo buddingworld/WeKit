@@ -22,7 +22,6 @@ import androidx.core.view.size
 import coil3.load
 import coil3.request.crossfade
 import coil3.size.Scale
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.condition.type.Modifiers
 import com.highcapable.kavaref.extension.toClass
 import com.tencent.mm.ui.LauncherUI
@@ -40,7 +39,9 @@ import dev.ujhhgtg.wekit.ui.utils.findViewWhich
 import dev.ujhhgtg.wekit.ui.utils.rootView
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
 import dev.ujhhgtg.wekit.utils.isDarkMode
+import dev.ujhhgtg.wekit.utils.resolve
 import org.luckypray.dexkit.DexKitBridge
 
 
@@ -97,7 +98,7 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
     private data object VIEW_TAG_CONTENT
 
     private fun hookB() {
-        View::class.asResolver().firstMethod { name = "setBackgroundDrawable" }.hookBefore {
+        View::class.resolve().firstMethod { name = "setBackgroundDrawable" }.hookBefore {
             val view = thisObject as? View? ?: return@hookBefore
             if (view.getTag(VIEW_TAG) != VIEW_TAG_CONTENT) return@hookBefore
             args[0] = null
@@ -105,12 +106,14 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
     }
 
     private fun hookC() {
-        val weUiBounceViewV2 = "com.tencent.mm.ui.widget.pulldown.WeUIBounceViewV2".toClass().asResolver()
-        listOf("setStart2EndBgColorByActionBar",
+        val weUiBounceViewV2 = "com.tencent.mm.ui.widget.pulldown.WeUIBounceViewV2".toClass().resolve()
+        listOf(
+            "setStart2EndBgColorByActionBar",
             "setEnd2StartBgColorByNavigationBar",
             "setStart2EndBgColor",
             "setEnd2StartBgColor",
-            "setBgColor").forEach {
+            "setBgColor"
+        ).forEach {
             weUiBounceViewV2.firstMethod { name = it }.hookBefore {
                 val view = thisObject as? View? ?: return@hookBefore
                 if (view.context !is LauncherUI) return@hookBefore
@@ -161,12 +164,12 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
         }
 
         "com.tencent.mm.ui.chatting.ChattingImageBGView".toClass().constructors.forEach {
-                it.hookAfter {
-                    applyToImageView(thisObject as ImageView)
-                }
+            it.hookAfter {
+                applyToImageView(thisObject as ImageView)
             }
+        }
 
-        "com.tencent.mm.ui.chatting.ChatFooterCustom".toClass().asResolver()
+        "com.tencent.mm.ui.chatting.ChatFooterCustom".toClass().resolve()
             .firstConstructor { parameterCount = 3 }.hookAfter {
                 val viewGroup = thisObject as ViewGroup
                 viewGroup.postDelayed(100L) {
@@ -178,7 +181,7 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
     }
 
     private fun hookE() {
-        HeaderViewListAdapter::class.asResolver()
+        HeaderViewListAdapter::class.resolve()
             .firstMethod { name = "getView" }.hookAfter {
                 val view = result as View
                 if (view.context !is LauncherUI || view !is ViewGroup) return@hookAfter
@@ -197,13 +200,13 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
                 }
             }
 
-        ConversationListView::class.asResolver()
+        ConversationListView::class.resolve()
             .firstMethod { name = "getEmptyFooter" }.hookAfter {
                 val viewGroup = result as ViewGroup
                 setNullBgRecursively(viewGroup)
             }
 
-        MainUI::class.asResolver()
+        MainUI::class.resolve()
             .firstMethod { parameters(Bundle::class) }.hookAfter {
                 val thisObject = thisObject
                 val conversationListView = thisObject.asResolver()
@@ -214,7 +217,7 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
                 WeLogger.d(TAG, "MainUI::onCreate")
             }
 
-        ConversationListView::class.asResolver()
+        ConversationListView::class.resolve()
             .firstMethod { name = "attachViewToParent" }.hookAfter {
                 thisObject.asResolver()
                     .field { type = View::class }
@@ -239,7 +242,7 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
             }
         }
 
-        "com.tencent.mm.plugin.multitask.ui.bg.DynamicBgContainer".toClass().asResolver()
+        "com.tencent.mm.plugin.multitask.ui.bg.DynamicBgContainer".toClass().resolve()
             .firstMethod {
                 modifiers { it.contains(Modifiers.SYNCHRONIZED) }
                 parameterCount = 0
@@ -247,12 +250,12 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
                 result = null
             }
 
-        "com.tencent.mm.dynamicbackground.view.GradientColorBackgroundView".toClass().asResolver()
+        "com.tencent.mm.dynamicbackground.view.GradientColorBackgroundView".toClass().resolve()
             .firstMethod { name = "onDraw" }.hookBefore {
                 result = null
             }
 
-        "com.tencent.mm.plugin.appbrand.widget.desktop.AppBrandDesktopContainerView".toClass().asResolver()
+        "com.tencent.mm.plugin.appbrand.widget.desktop.AppBrandDesktopContainerView".toClass().resolve()
             .firstConstructor { parameterCount = 3 }.hookAfter {
                 val containerView = thisObject as ViewGroup
                 val child = containerView[0] as ViewGroup
@@ -260,7 +263,7 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
                 child.addView(imageView, 0, ViewGroup.LayoutParams(-1, -1))
             }
 
-        ConversationListView::class.asResolver()
+        ConversationListView::class.resolve()
             .firstMethod { name = "setFoldBanner" }.hookAfter {
                 val banner = args[0] as ViewGroup
                 setNullBgRecursively(banner)
@@ -269,7 +272,7 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
     }
 
     private fun hookF() {
-        LauncherUI::class.asResolver()
+        LauncherUI::class.resolve()
             .firstMethod { name = "onResume" }.hookAfter {
                 val activity = thisObject as Activity
                 val viewPager = activity.rootView.findViewWhich<ViewGroup> { it is CustomViewPager }!!
@@ -284,7 +287,7 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
     }
 
     private fun hookG() {
-        "com.tencent.mm.ui.MMActivity".toClass().asResolver()
+        "com.tencent.mm.ui.MMActivity".toClass().resolve()
             .firstMethod { name = "initSwipeBack" }.hookBefore {
                 val activity = thisObject as Activity
                 if (activity.javaClass.name !in SPECIFIC_ACTIVITIES) return@hookBefore
@@ -297,7 +300,20 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
     }
 
     private val SPECIFIC_ACTIVITIES = listOf(
-        "com.tencent.mm.plugin.setting.ui.setting.ColorfulChatroomQRCodeUI", "com.tencent.mm.chatroom.ui.ModRemarkRoomNameUI", "com.tencent.mm.ui.chatting.search.multi.FTSChattingConvMultiTabUI", "com.tencent.mm.ui.contact.ContactRemarkInfoModUI", "com.tencent.mm.ui.transmit.SelectConversationUI", "com.tencent.mm.plugin.profile.ui.ProfileSettingUI", "com.tencent.mm.plugin.profile.ui.PermissionSettingUI", "com.tencent.mm.plugin.profile.ui.CommonChatroomInfoUI", "com.tencent.mm.plugin.profile.ui.ContactMoreInfoUI", "com.tencent.mm.plugin.profile.ui.ContactInfoUI", "com.tencent.mm.ui.SingleChatInfoUI", "com.tencent.mm.chatroom.ui.ChatroomInfoUI", "com.tencent.mm.plugin.setting.ui.setting.ColorfulSelfQRCodeUI", "com.tencent.mm.plugin.readerapp.ui.ReaderAppUI"
+        "com.tencent.mm.plugin.setting.ui.setting.ColorfulChatroomQRCodeUI",
+        "com.tencent.mm.chatroom.ui.ModRemarkRoomNameUI",
+        "com.tencent.mm.ui.chatting.search.multi.FTSChattingConvMultiTabUI",
+        "com.tencent.mm.ui.contact.ContactRemarkInfoModUI",
+        "com.tencent.mm.ui.transmit.SelectConversationUI",
+        "com.tencent.mm.plugin.profile.ui.ProfileSettingUI",
+        "com.tencent.mm.plugin.profile.ui.PermissionSettingUI",
+        "com.tencent.mm.plugin.profile.ui.CommonChatroomInfoUI",
+        "com.tencent.mm.plugin.profile.ui.ContactMoreInfoUI",
+        "com.tencent.mm.plugin.profile.ui.ContactInfoUI",
+        "com.tencent.mm.ui.SingleChatInfoUI",
+        "com.tencent.mm.chatroom.ui.ChatroomInfoUI",
+        "com.tencent.mm.plugin.setting.ui.setting.ColorfulSelfQRCodeUI",
+        "com.tencent.mm.plugin.readerapp.ui.ReaderAppUI"
     )
 
     private fun hookH() {
@@ -350,7 +366,9 @@ object ApplyGlobalBackground : ClickableHookItem(), IResolvesDex {
 
             selMediaLauncher.launch(
                 PickVisualMediaRequest(
-                    ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                )
+            )
         }
     }
 

@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.tencent.mm.ui.halfscreen.HalfScreenTransparentActivity
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
@@ -28,6 +27,7 @@ import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.Button
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.resolve
 import org.luckypray.dexkit.DexKitBridge
 import java.lang.reflect.Modifier
 import kotlin.math.roundToInt
@@ -52,7 +52,7 @@ object ApplyDialogBackgroundBlur : ClickableHookItem(), IResolvesDex {
             HalfScreenTransparentActivity::class.java,
             Dialog::class.java
         ).forEach {
-            it.asResolver()
+            it.resolve()
                 .firstMethod {
                     name = "onCreate"
                 }

@@ -2,7 +2,6 @@ package dev.ujhhgtg.wekit.hooks.api.core
 
 import android.annotation.SuppressLint
 import android.database.Cursor
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.tencent.wcdb.database.SQLiteDatabase
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
@@ -16,6 +15,7 @@ import dev.ujhhgtg.wekit.hooks.api.core.models.WeOfficial
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
 import org.luckypray.dexkit.DexKitBridge
 import java.lang.reflect.Modifier
 
@@ -380,7 +380,7 @@ object WeDatabaseApi : ApiHookItem(), IResolvesDex {
                 msgId = row.long("msgId"),
                 talker = row.str("talker"),
                 content = row.str("content"),
-                type = row.int("type"),
+                typeCode = row.int("type"),
                 createTime = row.long("createTime"),
                 isSend = row.int("isSend")
             )

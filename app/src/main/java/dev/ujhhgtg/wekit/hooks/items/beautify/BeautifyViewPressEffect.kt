@@ -4,15 +4,15 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.RippleDrawable
 import android.view.View
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
+import dev.ujhhgtg.wekit.utils.resolve
 
 @HookItem(path = "界面美化/美化组件按下效果", description = "将 View 的背景替换为 RippleDrawable (没写完)")
 object BeautifyViewPressEffect : SwitchHookItem() {
 
     override fun onEnable() {
-        View::class.asResolver()
+        View::class.resolve()
             .firstMethod {
                 name = "setBackgroundDrawable"
                 parameters(Drawable::class)

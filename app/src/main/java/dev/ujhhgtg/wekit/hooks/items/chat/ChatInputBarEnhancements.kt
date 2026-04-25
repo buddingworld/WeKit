@@ -32,7 +32,6 @@ import com.composables.icons.materialsymbols.MaterialSymbols
 import com.composables.icons.materialsymbols.outlined.Alternate_email
 import com.composables.icons.materialsymbols.outlined.Send_time_extension
 import com.composables.icons.materialsymbols.outlined.Voice_chat
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.tencent.mm.pluginsdk.ui.chat.ChatFooter
 import dev.ujhhgtg.wekit.activity.StubFragmentActivity
 import dev.ujhhgtg.wekit.hooks.api.core.WeApi
@@ -49,9 +48,10 @@ import dev.ujhhgtg.wekit.ui.utils.findViewWhich
 import dev.ujhhgtg.wekit.ui.utils.findViewsWhich
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.AudioUtils
-import dev.ujhhgtg.wekit.utils.paths.KnownPaths
 import dev.ujhhgtg.wekit.utils.coerceToInt
 import dev.ujhhgtg.wekit.utils.fileExtension
+import dev.ujhhgtg.wekit.utils.paths.KnownPaths
+import dev.ujhhgtg.wekit.utils.resolve
 import dev.ujhhgtg.wekit.utils.showToast
 import dev.ujhhgtg.wekit.utils.showToastSuspend
 import kotlinx.coroutines.Dispatchers
@@ -75,9 +75,10 @@ object ChatInputBarEnhancements : SwitchHookItem() {
     lateinit var currentConv: String
 
     override fun onEnable() {
-        ChatFooter::class.asResolver().apply {
+        ChatFooter::class.resolve().apply {
             firstConstructor {
-                parameters(Context::class, AttributeSet::class, Int::class) }
+                parameters(Context::class, AttributeSet::class, Int::class)
+            }
                 .hookAfter {
                     val chatFooter = thisObject as ChatFooter
                     val searchedView = chatFooter.findViewByChildIndexes<View>(0)!!
@@ -103,7 +104,8 @@ object ChatInputBarEnhancements : SwitchHookItem() {
                             val context = view.context
 
                             showComposeDialog(context) {
-                                AlertDialogContent(title = { Text("聊天功能") },
+                                AlertDialogContent(
+                                    title = { Text("聊天功能") },
                                     text = {
                                         Column {
                                             ActionItem(
@@ -166,9 +168,11 @@ object ChatInputBarEnhancements : SwitchHookItem() {
                                                             put("3", 1)
                                                             put("4", System.currentTimeMillis() / 1000)
                                                             put("5", -388413336)
-                                                            put("6", """
+                                                            put(
+                                                                "6", """
                                                                         <msgsource><atuserlist><![CDATA[${contacts.joinToString(",") { c -> c.wxId }}]]></atuserlist><pua>1</pua><alnode><cf>5</cf><inlenlist>73</inlenlist></alnode><eggIncluded>1</eggIncluded></msgsource>
-                                                                    """.trimIndent())
+                                                                    """.trimIndent()
+                                                            )
                                                         }
                                                     }
 
@@ -257,7 +261,8 @@ private fun selectAndSendVoice(context: Context, currentConv: String) {
                                         val tempSilkPath = KnownPaths.moduleCache / "voice_conv_tmp"
                                         val convSuccess = AudioUtils.mp3ToSilk(
                                             tempPath.absolutePathString(),
-                                            tempSilkPath.absolutePathString())
+                                            tempSilkPath.absolutePathString()
+                                        )
                                         if (convSuccess) {
                                             showToast("转换成功! 正在发送...")
                                             success = WeMessageApi.sendVoice(
@@ -265,8 +270,7 @@ private fun selectAndSendVoice(context: Context, currentConv: String) {
                                                 tempSilkPath.absolutePathString(),
                                                 durationMs.coerceToInt()
                                             )
-                                        }
-                                        else {
+                                        } else {
                                             showToast("转换失败! 查看日志以了解错误详情")
                                         }
                                         tempSilkPath.deleteIfExists()
@@ -308,7 +312,7 @@ private fun ActionItem(
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color =  MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

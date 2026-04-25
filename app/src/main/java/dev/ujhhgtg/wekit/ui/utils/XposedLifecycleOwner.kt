@@ -11,7 +11,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 
 // used for injected 'ComposeView's
 class XposedLifecycleOwner private constructor() : LifecycleOwner, ViewModelStoreOwner, SavedStateRegistryOwner {
-    
+
     private val lifecycleRegistry = LifecycleRegistry(this)
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
     override val lifecycle: Lifecycle get() = lifecycleRegistry

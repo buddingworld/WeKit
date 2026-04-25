@@ -3,7 +3,6 @@ package dev.ujhhgtg.wekit.hooks.api.ui
 import android.app.Activity
 import android.content.Context
 import android.widget.BaseAdapter
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.condition.type.Modifiers
 import com.highcapable.kavaref.extension.isSubclassOf
 import com.tencent.mm.chatroom.ui.ChatroomInfoUI
@@ -14,6 +13,7 @@ import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.resolve
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -61,7 +61,7 @@ object WeContactPrefsScreenApi : ApiHookItem() {
             ContactInfoUI::class,
             ChatroomInfoUI::class
         ).forEach {
-            it.asResolver().apply {
+            it.resolve().apply {
                 firstMethod { name = "initView" }
                     .hookAfter {
                         val adapterInstance = adapterField.get(thisObject as Activity)
@@ -108,40 +108,36 @@ object WeContactPrefsScreenApi : ApiHookItem() {
     }
 
     private fun initReflection() {
-        val prefClass = Preference::class
-
-        prefConstructor = prefClass.asResolver()
+        prefConstructor = Preference::class.resolve()
             .firstConstructor {
                 parameters(Context::class)
             }.self
 
-        prefKeyField = prefClass.asResolver()
+        prefKeyField = Preference::class.resolve()
             .firstField {
                 type = String::class
                 modifiers { !it.contains(Modifiers.FINAL) }
             }.self.also { it.isAccessible = true }
 
-        adapterField = MMPreference::class.asResolver()
+        adapterField = MMPreference::class.resolve()
             .firstField {
                 modifiers { !it.contains(Modifiers.STATIC) }
                 type { it isSubclassOf BaseAdapter::class }
             }.self.also { it.isAccessible = true }
 
-        val adapterClass = adapterField.type
-
-        addPreferenceMethod = adapterClass.asResolver()
+        addPreferenceMethod = adapterField.type.resolve()
             .firstMethod {
                 modifiers { !it.contains(Modifiers.FINAL) }
-                parameters(prefClass, Int::class)
+                parameters(Preference::class, Int::class)
             }.self
 
-        setKeyMethod = prefClass.asResolver()
+        setKeyMethod = Preference::class.resolve()
             .firstMethod {
                 parameters(String::class)
                 returnType = Void.TYPE
             }.self
 
-        val charSeqMethods = prefClass.asResolver()
+        val charSeqMethods = Preference::class.resolve()
             .method {
                 parameters(CharSequence::class)
             }.map { it.self }

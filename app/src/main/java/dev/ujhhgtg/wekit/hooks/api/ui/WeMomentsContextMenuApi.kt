@@ -3,7 +3,6 @@ package dev.ujhhgtg.wekit.hooks.api.ui
 import android.app.Activity
 import android.graphics.drawable.Drawable
 import android.view.ContextMenu
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import de.robv.android.xposed.XC_MethodHook
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
@@ -11,6 +10,7 @@ import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
 import org.luckypray.dexkit.DexKitBridge
 import java.lang.reflect.Modifier
 

@@ -213,8 +213,10 @@ object EmojiGameControl : SwitchHookItem(), IResolvesDex {
             title = { Text(if (isDice) "选择骰子点数" else "选择猜拳结果") },
             text = {
                 DefaultColumn {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             "发送模式: ",
                             style = MaterialTheme.typography.labelMedium,

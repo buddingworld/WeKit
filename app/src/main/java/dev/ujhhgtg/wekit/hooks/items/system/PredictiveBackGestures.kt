@@ -10,7 +10,6 @@ import android.window.OnBackInvokedCallback
 import android.window.OnBackInvokedDispatcher
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.Text
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.createInstance
 import com.tencent.mm.ui.LauncherUI
 import com.tencent.mm.ui.chatting.ChattingUIFragment
@@ -25,6 +24,8 @@ import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.Button
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.resolve
 import org.luckypray.dexkit.DexKitBridge
 
 // https://github.com/Ujhhgtg/PandorasBox
@@ -45,7 +46,7 @@ object PredictiveBackGestures : ClickableHookItem(), IResolvesDex {
             return
         }
 
-        ApplicationInfo::class.asResolver()
+        ApplicationInfo::class.resolve()
             .firstConstructor {
                 parameters(ApplicationInfo::class.java)
             }.hookAfter {
@@ -57,14 +58,14 @@ object PredictiveBackGestures : ClickableHookItem(), IResolvesDex {
                 field.set(flags)
             }
 
-        ActivityInfo::class.asResolver()
+        ActivityInfo::class.resolve()
             .firstConstructor()
             .hookAfter {
                 val info = thisObject as ActivityInfo
                 applyFlag(info)
             }
 
-        ActivityThread::class.asResolver()
+        ActivityThread::class.resolve()
             .firstMethod { name = "handleLaunchActivity" }
             .hookBefore {
                 val record = args[0]
@@ -90,7 +91,7 @@ object PredictiveBackGestures : ClickableHookItem(), IResolvesDex {
         // FIXME: both of them breaks back gesture for media preview UI
         //        finish() makes back gestures first passthrough to ChattingUIFragment then to LauncherUI
         //        doPause() makes back gestures always passthrough to LauncherUI
-//        ChattingUIFragment::class.asResolver()
+//        ChattingUIFragment::class.resolve()
 //            .firstMethod { name = "finish" }
         methodChattingUIFragmentDoPause
             .hookAfter {

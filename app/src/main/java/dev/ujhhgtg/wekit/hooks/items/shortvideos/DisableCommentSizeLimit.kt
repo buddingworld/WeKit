@@ -1,9 +1,9 @@
 package dev.ujhhgtg.wekit.hooks.items.shortvideos
 
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
+import dev.ujhhgtg.wekit.utils.asResolver
 
 @HookItem(
     path = "视频号/禁用评论长度限制",

@@ -12,7 +12,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.compose.material3.Text
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.hooks.core.ClickableHookItem
@@ -22,7 +21,9 @@ import dev.ujhhgtg.wekit.ui.content.Button
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
 import dev.ujhhgtg.wekit.utils.isDarkMode
+import dev.ujhhgtg.wekit.utils.resolve
 
 @HookItem(path = "界面美化/莫奈引擎", description = "为微信的部分组件启用动态壁纸取色 [需 SDK >= 31]")
 object MonetEngine : ClickableHookItem() {
@@ -35,8 +36,10 @@ object MonetEngine : ClickableHookItem() {
     val ON_PRIMARY by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             HostInfo.application.run {
-                getColor(if (isDarkMode) android.R.color.system_accent1_200
-                else android.R.color.system_accent1_600)
+                getColor(
+                    if (isDarkMode) android.R.color.system_accent1_200
+                    else android.R.color.system_accent1_600
+                )
             }
         } else DEFAULT_COLOR
     }
@@ -44,8 +47,10 @@ object MonetEngine : ClickableHookItem() {
     val SECONDARY by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             HostInfo.application.run {
-                getColor(if (isDarkMode) android.R.color.system_accent2_200
-                else android.R.color.system_accent2_600)
+                getColor(
+                    if (isDarkMode) android.R.color.system_accent2_200
+                    else android.R.color.system_accent2_600
+                )
             }
         } else Color.LTGRAY
     }
@@ -72,7 +77,7 @@ object MonetEngine : ClickableHookItem() {
             }
         }
 
-        Paint::class.asResolver()
+        Paint::class.resolve()
             .firstMethod { name = "setColor" }
             .hookBefore {
                 val color = args[0] as Int
@@ -80,7 +85,7 @@ object MonetEngine : ClickableHookItem() {
                 args[0] = ON_PRIMARY
             }
 
-        TextView::class.asResolver()
+        TextView::class.resolve()
             .firstMethod { name = "onAttachedToWindow" }.hookAfter {
                 val editText = thisObject as? EditText? ?: return@hookAfter
                 editText.apply {
@@ -99,7 +104,7 @@ object MonetEngine : ClickableHookItem() {
                 }
             }
 
-        View::class.asResolver().firstMethod { name = "setBackgroundDrawable" }.hookBefore {
+        View::class.resolve().firstMethod { name = "setBackgroundDrawable" }.hookBefore {
             val drawable = args[0] as? Drawable? ?: return@hookBefore
             if (drawable is ColorDrawable) {
                 val color = drawable.color
@@ -108,7 +113,7 @@ object MonetEngine : ClickableHookItem() {
         }
 
         // FIXME: probably a bit inefficient
-        View::class.asResolver().firstMethod { name = "onFinishInflate" }.hookAfter {
+        View::class.resolve().firstMethod { name = "onFinishInflate" }.hookAfter {
             val view = thisObject as View
             if (view is Button) {
                 view.backgroundTintList = ColorStateList.valueOf(SECONDARY)

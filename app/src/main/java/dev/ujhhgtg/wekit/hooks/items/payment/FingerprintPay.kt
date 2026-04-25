@@ -27,7 +27,6 @@ import androidx.fragment.app.FragmentActivity
 import com.composables.icons.materialsymbols.MaterialSymbols
 import com.composables.icons.materialsymbols.outlinedfilled.Visibility
 import com.composables.icons.materialsymbols.outlinedfilled.Visibility_off
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.toClass
 import com.tencent.mm.plugin.fingerprint.ui.FingerPrintAuthTransparentUI
 import dev.ujhhgtg.comptime.This
@@ -49,6 +48,7 @@ import dev.ujhhgtg.wekit.utils.EncryptedData
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.TargetProcesses
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.resolve
 import dev.ujhhgtg.wekit.utils.showToast
 
 
@@ -78,7 +78,7 @@ object FingerprintPay : ClickableHookItem() {
             "com.tencent.mm.framework.app.UIPageFragmentActivity",
             "com.tencent.mm.plugin.lite.ui.WxaLiteAppTransparentLiteUI"
         ).forEach { className ->
-            className.toClass().asResolver()
+            className.toClass().resolve()
                 .apply {
                     firstMethod { name = "onResume" }
                         .hookBefore {

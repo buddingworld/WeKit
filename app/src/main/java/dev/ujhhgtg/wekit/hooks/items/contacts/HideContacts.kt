@@ -11,7 +11,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.collection.mutableIntSetOf
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.isSubclassOf
 import com.tencent.mm.ui.LauncherUI
 import com.tencent.mm.ui.chatting.ChattingUI
@@ -28,14 +27,17 @@ import dev.ujhhgtg.wekit.preferences.WePrefs
 import dev.ujhhgtg.wekit.ui.content.ContactSelectionDialog
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.resolve
 import dev.ujhhgtg.wekit.utils.showToast
 import org.luckypray.dexkit.DexKitBridge
 import java.lang.reflect.Field
 import kotlin.math.sqrt
 
 
-@HookItem(path = "联系人与群组/隐藏联系人", description =
-"""隐藏指定的联系人
+@HookItem(
+    path = "联系人与群组/隐藏联系人", description =
+        """隐藏指定的联系人
 隐藏位置:
 1. 首页对话列表
 2. 通讯录内联系人&群聊列表
@@ -148,7 +150,7 @@ object HideContacts : ClickableHookItem(), IResolvesDex {
             WeLogger.d(TAG, "registered screen off receiver")
         }
 
-        ChattingUI::class.asResolver().apply {
+        ChattingUI::class.resolve().apply {
             firstMethod { name = "onResume" }.hookAfter {
                 val activity = thisObject as Activity
                 val wxId = activity.intent.getStringExtra("Chat_User")
@@ -211,12 +213,12 @@ object HideContacts : ClickableHookItem(), IResolvesDex {
             }
         }
 
-        methodChatroomContactAdapterInitCursor.method.declaringClass.asResolver()
+        methodChatroomContactAdapterInitCursor.method.declaringClass.resolve()
             .firstMethod { name = "getCount" }.hookAfter {
                 result = (result as Int) - hiddenPositions.size
             }
 
-        methodChatroomContactAdapterInitCursor.method.declaringClass.asResolver()
+        methodChatroomContactAdapterInitCursor.method.declaringClass.resolve()
             .firstMethod { name = "getView" }.hookBefore {
                 val requestedPos = args[0] as Int
                 var actualPos = requestedPos

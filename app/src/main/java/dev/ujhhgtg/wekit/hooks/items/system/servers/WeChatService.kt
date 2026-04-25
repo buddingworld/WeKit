@@ -70,11 +70,11 @@ object WeChatService {
 
         "friends" -> Result.Success(
             WeDatabaseApi.getFriends()
-            .filter { c ->
-                c.type != 2051 && c.type != 2049 && c.wxId.startsWith("wxid_") && c.wxId != WeApi.selfWxId
-            }.map {
-                ContactInfo(it.wxId, it.nickname, it.customWxId, it.remarkName)
-            })
+                .filter { c ->
+                    c.type != 2051 && c.type != 2049 && c.wxId.startsWith("wxid_") && c.wxId != WeApi.selfWxId
+                }.map {
+                    ContactInfo(it.wxId, it.nickname, it.customWxId, it.remarkName)
+                })
 
         "groups" -> Result.Success(WeDatabaseApi.getGroups().map {
             ContactInfo(it.wxId, it.nickname)
@@ -100,8 +100,8 @@ object WeChatService {
         val messages = WeDatabaseApi.getMessages(convId, pageIndex, pageSize).map { msg ->
             val match = GROUP_SENDER_REGEX.find(msg.content).takeIf { isGroup }
             val sender = match?.groupValues?.get(1)?.let { membersMap[it] ?: it } ?: "<myself>"
-            val isText = MessageType.isText(msg.type)
-            val typeStr = MessageType.fromCode(msg.type)?.name?.lowercase() ?: "unknown"
+            val isText = MessageType.fromCode(msg.typeCode)?.isText ?: false
+            val typeStr = MessageType.fromCode(msg.typeCode)?.name?.lowercase() ?: "unknown"
             val content = if (isText) match?.groupValues?.get(2) ?: msg.content else "<type:$typeStr>"
             MessageInfo(sender, content, typeStr)
         }

@@ -49,7 +49,7 @@ data class WeMessage(
     val msgId: Long,
     val talker: String,
     val content: String,
-    val type: Int,
+    val typeCode: Int,
     val createTime: Long,
     val isSend: Int
 )

@@ -3,7 +3,6 @@ package dev.ujhhgtg.wekit.hooks.api.ui
 import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.view.View
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.isSubclassOf
 import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
@@ -14,6 +13,7 @@ import dev.ujhhgtg.wekit.hooks.api.core.models.MessageInfo
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
 import org.luckypray.dexkit.DexKitBridge
 
 @SuppressLint("StaticFieldLeak")
@@ -78,8 +78,7 @@ object WeChatMessageContextMenuApi : ApiHookItem(), IResolvesDex {
         }
 
         methodSelectMenuItem.hookBefore {
-            val thisObj = thisObject
-            val viewOnLongClickListener = thisObj.asResolver()
+            val viewOnLongClickListener = thisObject.asResolver()
                 .firstField {
                     type {
                         it isSubclassOf View.OnLongClickListener::class

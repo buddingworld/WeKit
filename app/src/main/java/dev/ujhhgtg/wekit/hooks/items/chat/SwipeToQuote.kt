@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Interpolator
 import android.widget.FrameLayout
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import de.robv.android.xposed.XC_MethodHook
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
@@ -17,6 +16,8 @@ import dev.ujhhgtg.wekit.hooks.api.core.WeServiceApi
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageViewApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
+import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.resolve
 import org.luckypray.dexkit.DexKitBridge
 import java.util.Collections
 import java.util.WeakHashMap
@@ -48,7 +49,7 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
 
     override fun onEnable() {
         WeChatMessageViewApi.addListener(this)
-        ViewGroup::class.asResolver()
+        ViewGroup::class.resolve()
             .firstMethod { name = "onInterceptTouchEvent" }
             .hookAfter {
                 val v = thisObject as ViewGroup
@@ -62,6 +63,7 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
                         s.isDragging = false
                         s.triggered = false
                     }
+
                     MotionEvent.ACTION_MOVE -> {
                         val dx = event.x - s.startX
                         val dy = event.y - s.startY
@@ -71,13 +73,14 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
                         }
                         if (s.isDragging) result = true
                     }
+
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                         s.isDragging = false
                     }
                 }
             }
 
-        View::class.asResolver()
+        View::class.resolve()
             .firstMethod { name = "onTouchEvent"; superclass() }
             .hookAfter {
                 val v = thisObject as View
@@ -96,6 +99,7 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
                             result = true
                         }
                     }
+
                     MotionEvent.ACTION_UP -> {
                         if (s.isDragging) {
                             v.animate()
@@ -109,6 +113,7 @@ object SwipeToQuote : SwitchHookItem(), IResolvesDex,
                             result = true
                         }
                     }
+
                     MotionEvent.ACTION_CANCEL -> {
                         if (s.isDragging) {
                             v.animate().translationX(0f).setDuration(150).start()

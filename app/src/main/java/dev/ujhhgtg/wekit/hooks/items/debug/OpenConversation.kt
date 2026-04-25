@@ -24,7 +24,8 @@ object OpenConversation : ClickableHookItem() {
     override fun onClick(context: Context) {
         showComposeDialog(context) {
             var wxId by remember { mutableStateOf("") }
-            AlertDialogContent(title = { Text("跳转对话") },
+            AlertDialogContent(
+                title = { Text("跳转对话") },
                 text = {
                     TextField(
                         value = wxId,

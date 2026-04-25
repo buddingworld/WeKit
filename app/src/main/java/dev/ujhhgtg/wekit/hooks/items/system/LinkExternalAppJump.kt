@@ -90,8 +90,7 @@ object LinkExternalAppJump : SwitchHookItem(),
                         containsKey("key_scan_qr_code_get_a8key_req")
             } ?: false) {
             LauncherUI.getInstance()!!
-        }
-        else {
+        } else {
             param.thisObject as Context
         }
 
@@ -112,8 +111,10 @@ object LinkExternalAppJump : SwitchHookItem(),
         val pm = context.packageManager
 
         @SuppressLint("QueryPermissionsNeeded")
-        val resolveInfos = pm.queryIntentActivities(newIntent,
-            PackageManager.MATCH_DEFAULT_ONLY)
+        val resolveInfos = pm.queryIntentActivities(
+            newIntent,
+            PackageManager.MATCH_DEFAULT_ONLY
+        )
 
         showComposeDialog(context) {
             AlertDialogContent(

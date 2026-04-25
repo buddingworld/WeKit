@@ -1,24 +1,22 @@
 package dev.ujhhgtg.wekit.hooks.items.chat
 
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.condition.type.Modifiers
 import com.tencent.mm.plugin.gif.MMWXGFJNI
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.R
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
-import dev.ujhhgtg.wekit.hooks.api.core.models.MessageType
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageContextMenuApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.paths.KnownPaths
 import dev.ujhhgtg.wekit.utils.ModuleRes
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.paths.KnownPaths
+import dev.ujhhgtg.wekit.utils.showToastSuspend
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.luckypray.dexkit.DexKitBridge
 import kotlin.io.path.div
 import kotlin.io.path.outputStream
@@ -61,7 +59,7 @@ object SaveStickersToLocalStorage : SwitchHookItem(), IResolvesDex,
                 777001,
                 "存本地",
                 { ModuleRes.getDrawable(R.drawable.download_24px)!! },
-                { msgInfo -> msgInfo.isType(MessageType.STICKER) }
+                { msgInfo -> msgInfo.type?.isSticker ?: false }
             ) { _, _, msgInfo ->
                 val md5 = msgInfo.imagePath
                 val emojiInfo = StickersSync.getEmojiInfoByMd5(md5)
@@ -86,14 +84,10 @@ object SaveStickersToLocalStorage : SwitchHookItem(), IResolvesDex,
                             out.write(bytes)
                         }
                     }.onSuccess {
-                        withContext(Dispatchers.Main) {
-                            showToast("已将贴纸保存到 /sdcard/Download/WeKit/$fileName")
-                        }
+                        showToastSuspend("已将贴纸保存到 /sdcard/Download/WeKit/$fileName")
                     }.onFailure { e ->
                         WeLogger.e(TAG, "failed to save sticker $fileName", e)
-                        withContext(Dispatchers.Main) {
-                            showToast("贴纸保存失败! 查看日志以了解错误详情")
-                        }
+                        showToastSuspend("贴纸保存失败! 查看日志以了解错误详情")
                     }
                 }
             }

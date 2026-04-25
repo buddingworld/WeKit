@@ -2,7 +2,6 @@ package dev.ujhhgtg.wekit.hooks.items.chat
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.constants.PackageNames
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
@@ -10,6 +9,8 @@ import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.resolve
 import org.luckypray.dexkit.DexKitBridge
 
 @HookItem(path = "聊天/音视频聊天使用画中画", description = "让微信的音视频聊天使用原生的画中画模式而非悬浮窗 (没写完)")
@@ -58,7 +59,7 @@ object PipVoip : SwitchHookItem(), IResolvesDex {
                 WeLogger.d(TAG, "dealContentView: ${args[0].javaClass}")
             }
 
-        ActivityInfo::class.asResolver()
+        ActivityInfo::class.resolve()
             .firstConstructor()
             .hookAfter {
                 val info = thisObject as ActivityInfo
@@ -66,7 +67,7 @@ object PipVoip : SwitchHookItem(), IResolvesDex {
                     applyFlags(info)
             }
 
-        Activity::class.asResolver()
+        Activity::class.resolve()
             .firstMethod {
                 name = "onPictureInPictureModeChanged"
                 parameterCount = 2
@@ -76,8 +77,7 @@ object PipVoip : SwitchHookItem(), IResolvesDex {
                 val isInPip = args[0] as Boolean
                 if (isInPip) {
                     WeLogger.i(TAG, "currently in pip")
-                }
-                else {
+                } else {
                     WeLogger.i(TAG, "currently not in pip")
                 }
             }

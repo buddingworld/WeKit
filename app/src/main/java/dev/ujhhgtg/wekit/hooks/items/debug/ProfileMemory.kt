@@ -29,7 +29,7 @@ object ProfileMemory : ClickableHookItem() {
         // 2. Runtime heap stats
         val rt = Runtime.getRuntime()
         val heapUsedKb = (rt.totalMemory() - rt.freeMemory()) / 1024
-        val heapMaxKb  = rt.maxMemory() / 1024
+        val heapMaxKb = rt.maxMemory() / 1024
 
         // 3. /proc/self/status — native RSS
         val procStatus = readProcStatus()

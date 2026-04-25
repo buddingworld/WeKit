@@ -11,14 +11,13 @@ import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageContextMenuApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.utils.AudioUtils
-import dev.ujhhgtg.wekit.utils.paths.KnownPaths
 import dev.ujhhgtg.wekit.utils.ModuleRes
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.paths.KnownPaths
+import dev.ujhhgtg.wekit.utils.showToastSuspend
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.luckypray.dexkit.DexKitBridge
 import java.lang.reflect.Modifier
 import kotlin.io.path.Path
@@ -70,7 +69,7 @@ object SaveVoicesToLocalStorage : SwitchHookItem(), IResolvesDex,
                 777003,
                 "存本地",
                 { ModuleRes.getDrawable(R.drawable.download_24px)!! },
-                { msgInfo -> msgInfo.isType(MessageType.VOICE) }
+                { msgInfo -> msgInfo.typeCode == MessageType.VOICE.code }
             ) { _, _, msgInfo ->
                 CoroutineScope(Dispatchers.IO).launch {
                     val encPath = msgInfo.imagePath
@@ -93,14 +92,10 @@ object SaveVoicesToLocalStorage : SwitchHookItem(), IResolvesDex,
                         AudioUtils.pcmToMp3(pcmPath.absolutePathString(), mp3Path.absolutePathString())
                         pcmPath.deleteIfExists()
                     }.onSuccess {
-                        withContext(Dispatchers.Main) {
-                            showToast("已将语音保存到 ${mp3Path.absolutePathString()}")
-                        }
+                        showToastSuspend("已将语音保存到 ${mp3Path.absolutePathString()}")
                     }.onFailure { e ->
                         WeLogger.e(TAG, "failed to save voice to ${mp3Path.absolutePathString()}", e)
-                        withContext(Dispatchers.Main) {
-                            showToast("语音保存失败! 查看日志以了解错误详情")
-                        }
+                        showToastSuspend("语音保存失败! 查看日志以了解错误详情")
                     }
                 }
             }

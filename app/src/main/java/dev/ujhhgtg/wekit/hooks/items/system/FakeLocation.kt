@@ -1,7 +1,6 @@
 package dev.ujhhgtg.wekit.hooks.items.system
 
 import android.content.Context
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.ClickableHookItem
@@ -9,6 +8,7 @@ import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.preferences.WePrefs
 import dev.ujhhgtg.wekit.ui.content.OsmLocationPickerDialogContent
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
+import dev.ujhhgtg.wekit.utils.resolve
 import dev.ujhhgtg.wekit.utils.showToast
 import org.luckypray.dexkit.DexKitBridge
 
@@ -26,7 +26,7 @@ object FakeLocation : ClickableHookItem(), IResolvesDex {
         listOf(methodListener, methodListenerWgs84, methodDefaultManager).forEach {
             it.hookBefore {
                 val tencentLocation = args[0]
-                tencentLocation::class.asResolver().apply {
+                tencentLocation::class.resolve().apply {
                     firstMethod {
                         name = "getLatitude"
                     }.hookBefore {

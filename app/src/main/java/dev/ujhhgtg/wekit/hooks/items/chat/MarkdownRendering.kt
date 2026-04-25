@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.core.graphics.withTranslation
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.tencent.mm.ui.widget.MMNeat7extView
 import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
@@ -45,8 +44,10 @@ import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
 import dev.ujhhgtg.wekit.utils.isDarkMode
 import dev.ujhhgtg.wekit.utils.replaceEmojis
+import dev.ujhhgtg.wekit.utils.resolve
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
 import io.noties.markwon.MarkwonSpansFactory
@@ -78,7 +79,7 @@ object MarkdownRendering : ClickableHookItem(), IResolvesDex {
     private const val MAX_WIDTH_BUFFER = 40
 
     override fun onEnable() {
-        MMNeat7extView::class.asResolver()
+        MMNeat7extView::class.resolve()
             .firstMethod { name = "onDraw" }
             .hookBefore {
                 val neatTextView = thisObject as View
@@ -117,14 +118,14 @@ object MarkdownRendering : ClickableHookItem(), IResolvesDex {
                 } else {
                     msgInfo = MessageInfo(
                         tag.asResolver()
-                        .firstField {
-                            type = WeMessageApi.classMsgInfo.clazz
-                            superclass()
-                        }.get()!!
+                            .firstField {
+                                type = WeMessageApi.classMsgInfo.clazz
+                                superclass()
+                            }.get()!!
                     )
                 }
 
-                if (!msgInfo.isText) return@hookBefore
+                if (!(msgInfo.type?.isText ?: false)) return@hookBefore
                 val isSelfSender = msgInfo.isSelfSender()
 
                 val canvas = args[0] as Canvas

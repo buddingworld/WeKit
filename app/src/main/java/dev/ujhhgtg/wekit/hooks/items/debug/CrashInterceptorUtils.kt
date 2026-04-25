@@ -114,7 +114,9 @@ object CrashInterceptorUtils {
                         Text(
                             displayInfo,
                             fontFamily = FontFamily.Monospace,
-                            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
                         )
                     },
                     confirmButton = {
@@ -139,7 +141,9 @@ object CrashInterceptorUtils {
                         Text(
                             extractSummary(crashInfo),
                             fontFamily = FontFamily.Monospace,
-                            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
                         )
                     },
                     confirmButton = {

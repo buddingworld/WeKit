@@ -74,7 +74,7 @@ object AutoOpenRedPackets : ClickableHookItem(), WeDatabaseListenerApi.IInsertLi
         if (table != "message") return
 
         val type = values.getAsInteger("type") ?: 0
-        if (MessageType.isRedPacket(type)) {
+        if (MessageType.fromCode(type)?.isRedPacket ?: false) {
             WeLogger.i(TAG, "detected red packet message; type=$type")
             handleRedPacket(values)
         }

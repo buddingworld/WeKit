@@ -32,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -104,7 +103,9 @@ fun OsmLocationPickerDialogContent(
             HorizontalDivider()
 
             // ── Map ───────────────────────────────────────────────────
-            Box(modifier = Modifier.weight(1f).clipToBounds()) {
+            Box(modifier = Modifier
+                .weight(1f)
+                .clipToBounds()) {
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
                     factory = { ctx ->
@@ -310,6 +311,7 @@ private class CustomOsmMarker(mapView: MapView) : Overlay() {
         mIcon = mMapViewRepository!!.getDefaultMarkerIcon()
         setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM)
     }
+
     var position: GeoPoint?
         get() = mPosition
         set(position) {
@@ -399,11 +401,13 @@ private class CustomOsmMarker(mapView: MapView) : Overlay() {
                     if (mOnMarkerDragListener != null) mOnMarkerDragListener!!.onMarkerDragEnd(this)
                     return true
                 }
+
                 MotionEvent.ACTION_MOVE -> {
                     moveToEventPosition(event, mapView)
                     if (mOnMarkerDragListener != null) mOnMarkerDragListener!!.onMarkerDrag(this)
                     return true
                 }
+
                 else -> return false
             }
         } else return false

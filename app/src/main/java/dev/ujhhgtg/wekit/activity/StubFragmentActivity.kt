@@ -2,7 +2,6 @@ package dev.ujhhgtg.wekit.activity
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Window

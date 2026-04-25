@@ -1,14 +1,14 @@
 package dev.ujhhgtg.wekit.hooks.items.system
 
 import android.content.Context
-import android.widget.Toast
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.hooks.core.ClickableHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.HostInfo
+import dev.ujhhgtg.wekit.utils.WeLogger
 import dev.ujhhgtg.wekit.utils.formatBytesSize
 import dev.ujhhgtg.wekit.utils.formatEpoch
-import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.showToastSuspend
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -16,7 +16,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.deleteRecursively
@@ -110,13 +109,7 @@ object AutoCleanCache : ClickableHookItem() {
                 if (isEnabled) "\n下次自动清理将在 ${formatEpoch(System.currentTimeMillis() + CLEAN_INTERVAL)} 进行"
                 else ""
 
-            withContext(Dispatchers.Main) {
-                Toast.makeText(
-                    context,
-                    "缓存清理完成, 共释放 $sizeText$timeText",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            showToastSuspend(context, "缓存清理完成, 共释放 $sizeText$timeText")
 
             if (isEnabled) startCleaningJob()
         }

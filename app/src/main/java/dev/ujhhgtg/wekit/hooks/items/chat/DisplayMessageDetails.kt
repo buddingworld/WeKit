@@ -39,7 +39,7 @@ object DisplayMessageDetails : SwitchHookItem(),
                 { ModuleRes.getDrawable(R.drawable.chat_info_24px)!! }, { _ -> true })
             { view, _, msgInfo ->
                 val displayItems = mutableListOf<Pair<String, String>>()
-                displayItems += "类型" to msgInfo.type.toString()
+                displayItems += "类型" to msgInfo.typeCode.toString()
                 displayItems += "ID" to msgInfo.id.toString()
                 displayItems += "对方/群聊 ID" to msgInfo.talker
                 displayItems += "真实发送者 ID" to msgInfo.sender

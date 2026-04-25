@@ -83,7 +83,8 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 AppContent(
                     onUrlClick = { url ->
-                        url.toUri().openInSystem(this, true) }
+                        url.toUri().openInSystem(this, true)
+                    }
                 )
             }
         }
@@ -282,8 +283,7 @@ private fun AppContent(onUrlClick: (String) -> Unit) {
                 onClick = {
                     if (!(Shell.isAppGrantedRoot() ?: false)) {
                         showNoRootDialog = true
-                    }
-                    else {
+                    } else {
                         val userId = context.androidUserId
                         Shell.cmd(
                             "am force-stop --user $userId ${PackageNames.WECHAT}",
@@ -372,8 +372,13 @@ private fun AppContent(onUrlClick: (String) -> Unit) {
                 AlertDialog(
                     onDismissRequest = { showConfirmDeletionDialog = false },
                     title = { Text("修复模块加载") },
-                    text = { Text("本操作将尝试修复微信热更新导致的模块不加载\n将删除以下路径的文件, 请确认无误后再删除!\n${
-                        paths.joinToString("\n") { "- $it" }}") },
+                    text = {
+                        Text(
+                            "本操作将尝试修复微信热更新导致的模块不加载\n将删除以下路径的文件, 请确认无误后再删除!\n${
+                            paths.joinToString("\n") { "- $it" }
+                        }"
+                        )
+                    },
                     dismissButton = {
                         TextButton(onClick = { showConfirmDeletionDialog = false }) { Text("取消") }
                     },
@@ -382,8 +387,7 @@ private fun AppContent(onUrlClick: (String) -> Unit) {
                             showConfirmDeletionDialog = false
                             if (!(Shell.isAppGrantedRoot() ?: false)) {
                                 showNoRootDialog = true
-                            }
-                            else {
+                            } else {
                                 // if using Shell.cmd or su -c without -mm, the view of /data/user/0 is restricted
                                 paths.forEach { path ->
                                     ProcessBuilder("su", "-mm", "-c", "rm -rf $path")

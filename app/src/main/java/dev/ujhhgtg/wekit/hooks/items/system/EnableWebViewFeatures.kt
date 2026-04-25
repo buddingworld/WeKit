@@ -2,12 +2,13 @@ package dev.ujhhgtg.wekit.hooks.items.system
 
 import android.app.Activity
 import android.content.Intent
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.tencent.mm.plugin.webview.ui.tools.WebViewUI
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
+import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.resolve
 import org.luckypray.dexkit.DexKitBridge
 
 @HookItem(path = "系统与隐私/强制启用 WebView 菜单", description = "强制显示 WebView 页面右上角菜单按钮")
@@ -19,7 +20,7 @@ object EnableWebViewFeatures : SwitchHookItem(), IResolvesDex {
     private val methodInitWebViewFeatures by dexMethod()
 
     override fun onEnable() {
-        WebViewUI::class.asResolver()
+        WebViewUI::class.resolve()
             .firstMethod {
                 name = "showOptionMenu"
             }.hookBefore {

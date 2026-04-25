@@ -9,14 +9,14 @@ import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 object AllowPrivateChatReceiveOutgoingRedPackets : SwitchHookItem() {
 
     override fun onEnable() {
-         listOf(
-             "com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyPrepareUI",
-             "com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyNewPrepareUI"
-         ).forEach {
-             it.toClass().hookBeforeOnCreate {
-                 val activity = thisObject as Activity
-                 activity.intent.putExtra("key_type", 1)
-             }
-         }
+        listOf(
+            "com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyPrepareUI",
+            "com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyNewPrepareUI"
+        ).forEach {
+            it.toClass().hookBeforeOnCreate {
+                val activity = thisObject as Activity
+                activity.intent.putExtra("key_type", 1)
+            }
+        }
     }
 }

@@ -3,12 +3,12 @@ package dev.ujhhgtg.wekit.hooks.items.system
 import android.app.ApplicationPackageManager
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.constants.PackageNames
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.resolve
 
 @HookItem(path = "系统与隐私/隐藏模块应用", description = "在不影响模块功能的情况下防止微信查询模块安装状态 (实验性)")
 object HideModuleFromAppList : SwitchHookItem() {
@@ -16,7 +16,7 @@ object HideModuleFromAppList : SwitchHookItem() {
     private val TAG = This.Class.simpleName
 
     override fun onEnable() {
-        ApplicationPackageManager::class.asResolver().apply {
+        ApplicationPackageManager::class.resolve().apply {
             firstMethod {
                 name = "queryIntentActivities"
             }.hookAfter {

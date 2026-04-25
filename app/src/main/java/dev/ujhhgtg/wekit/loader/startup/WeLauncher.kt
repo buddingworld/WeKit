@@ -3,7 +3,6 @@ package dev.ujhhgtg.wekit.loader.startup
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.tencent.mm.ui.LauncherUI
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.constants.PackageNames
@@ -17,6 +16,7 @@ import dev.ujhhgtg.wekit.utils.RuntimeConfig
 import dev.ujhhgtg.wekit.utils.TargetProcesses
 import dev.ujhhgtg.wekit.utils.WeLogger
 import dev.ujhhgtg.wekit.utils.hookAfterDirectly
+import dev.ujhhgtg.wekit.utils.resolve
 
 object WeLauncher {
 
@@ -41,7 +41,7 @@ object WeLauncher {
     }
 
     private fun initMainProcessHooks() {
-        LauncherUI::class.asResolver().apply {
+        LauncherUI::class.resolve().apply {
             firstMethod { name = "onResume" }.hookAfterDirectly {
                 val activity = thisObject as Activity
                 ModuleRes.init(activity)

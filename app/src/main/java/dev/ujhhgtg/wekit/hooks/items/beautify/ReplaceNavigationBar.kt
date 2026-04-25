@@ -39,7 +39,6 @@ import com.composables.icons.materialsymbols.outlinedfilled.Contacts
 import com.composables.icons.materialsymbols.outlinedfilled.Explore
 import com.composables.icons.materialsymbols.outlinedfilled.Home
 import com.composables.icons.materialsymbols.outlinedfilled.Person
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
@@ -56,6 +55,7 @@ import dev.ujhhgtg.wekit.ui.utils.AppTheme
 import dev.ujhhgtg.wekit.ui.utils.LifecycleOwnerProvider
 import dev.ujhhgtg.wekit.ui.utils.setLifecycleOwner
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
+import dev.ujhhgtg.wekit.utils.asResolver
 import org.luckypray.dexkit.DexKitBridge
 
 @HookItem(
@@ -212,8 +212,10 @@ object ReplaceNavigationBar : ClickableHookItem(), IResolvesDex {
                                                 badge = {
                                                     if (index == 0 && unreadCount > 0) {
                                                         Badge(containerColor = Color(0xFFFF3B30)) {
-                                                            Text(if (unreadCount <= 99) unreadCount.toString() else "99+",
-                                                                color = Color.White, fontSize = 10.sp)
+                                                            Text(
+                                                                if (unreadCount <= 99) unreadCount.toString() else "99+",
+                                                                color = Color.White, fontSize = 10.sp
+                                                            )
                                                         }
                                                     }
                                                 }

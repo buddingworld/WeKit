@@ -11,7 +11,8 @@ import java.lang.reflect.Modifier
 object RemoveLimitsDuringCalls : SwitchHookItem(), IResolvesDex {
 
     override fun onEnable() {
-        listOf(methodIsDuringCall,
+        listOf(
+            methodIsDuringCall,
             methodIsMultiTalking,
             methodIsMultiTalking,
             methodIsCameraUsing,

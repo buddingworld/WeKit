@@ -1,7 +1,6 @@
 package dev.ujhhgtg.wekit.hooks.items.moments
 
 import android.content.ContentValues
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.createInstance
 import com.tencent.mm.plugin.sns.ui.SnsCommentFooter
 import com.tencent.mm.protocal.protobuf.SnsObject
@@ -16,6 +15,7 @@ import dev.ujhhgtg.wekit.ui.content.ContactSelectionDialog
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.ModuleRes
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.resolve
 import dev.ujhhgtg.wekit.utils.showToast
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -38,8 +38,8 @@ object FakeMomentsLikes : SwitchHookItem(), WeMomentsContextMenuApi.IMenuItemsPr
 
     override fun onEnable() {
         snsUserProtobufClass = SnsCommentFooter::class.java.getMethod("getCommentInfo").returnType
-        snsUserProtobufClassWxIdField = snsUserProtobufClass.asResolver().firstField { type = String::class }.self
-        parseFromMethod = SnsObject::class.asResolver().firstMethod { name = "parseFrom"; superclass() }.self
+        snsUserProtobufClassWxIdField = snsUserProtobufClass.resolve().firstField { type = String::class }.self
+        parseFromMethod = SnsObject::class.resolve().firstMethod { name = "parseFrom"; superclass() }.self
         WeMomentsContextMenuApi.addProvider(this)
         WeDatabaseListenerApi.addListener(this)
     }

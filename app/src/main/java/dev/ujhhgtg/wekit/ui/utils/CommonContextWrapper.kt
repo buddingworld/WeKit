@@ -13,7 +13,7 @@ import dev.ujhhgtg.wekit.utils.ModuleRes
  * 1. 资源代理: 将 Resources/Theme 代理到 ModuleRes
  * 2. ClassLoader 代理: 重写 getClassLoader() 返回模块原本的加载器
  */
-class CommonContextWrapper private constructor(base: Context?): ContextWrapper(base) {
+class CommonContextWrapper private constructor(base: Context?) : ContextWrapper(base) {
 
     private val mTheme = ModuleRes.resources.newTheme()
 

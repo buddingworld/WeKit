@@ -1,6 +1,5 @@
 package dev.ujhhgtg.wekit.hooks.core
 
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.resolver.ConstructorResolver
 import com.highcapable.kavaref.resolver.MethodResolver
 import de.robv.android.xposed.XC_MethodHook
@@ -11,6 +10,7 @@ import dev.ujhhgtg.wekit.dexkit.dsl.DexDelegateBase
 import dev.ujhhgtg.wekit.dexkit.dsl.DexMethodDelegate
 import dev.ujhhgtg.wekit.utils.HookAction
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
 import java.lang.reflect.Executable
 import kotlin.reflect.KClass
 

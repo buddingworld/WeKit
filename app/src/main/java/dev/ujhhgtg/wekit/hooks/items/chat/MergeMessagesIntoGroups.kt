@@ -2,7 +2,6 @@ package dev.ujhhgtg.wekit.hooks.items.chat
 
 import android.util.SparseBooleanArray
 import android.view.View
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import de.robv.android.xposed.XC_MethodHook
 import dev.ujhhgtg.wekit.hooks.api.core.WeMessageApi
 import dev.ujhhgtg.wekit.hooks.api.core.models.MessageInfo
@@ -10,6 +9,7 @@ import dev.ujhhgtg.wekit.hooks.api.core.models.MessageType
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageViewApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
+import dev.ujhhgtg.wekit.utils.asResolver
 import java.lang.reflect.Field
 
 @HookItem(path = "聊天/合并消息显示", description = "将同一发送者的连续多条消息合并为一组消息显示 (Telegram 风格)")
@@ -64,7 +64,7 @@ object MergeMessagesIntoGroups : SwitchHookItem(), WeChatMessageViewApi.ICreateV
 
         val msgInfo = WeChatMessageViewApi.getMsgInfoFromParam(param)
         if (msgInfo.isSend != 0) return
-        if (MessageType.isSystem(msgInfo.type) || msgInfo.isType(MessageType.PAT)) return
+        if (msgInfo.type?.isSystem ?: false || msgInfo.type == MessageType.PAT) return
 
         val isGroupChat = msgInfo.isInGroupChat
         val currentSender = msgInfo.sender

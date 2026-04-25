@@ -1,7 +1,7 @@
 package dev.ujhhgtg.wekit.hooks.api.core.models
 
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.wekit.hooks.api.core.WeApi
+import dev.ujhhgtg.wekit.utils.asResolver
 import dev.ujhhgtg.wekit.utils.serialization.DefaultJson
 import dev.ujhhgtg.wekit.utils.serialization.XmlJsonParser
 import dev.ujhhgtg.wekit.utils.serialization.asInt
@@ -15,17 +15,9 @@ import kotlinx.serialization.json.jsonArray
 
 class MessageInfo(val instance: Any) {
 
-    @Suppress("UNCHECKED_CAST")
-    private fun <T> getFieldByName(instance: Any, name: String): T {
-        return instance.asResolver()
-            .firstField {
-                this.name = name
-                superclass()
-            }
-            .get()!! as T
-    }
+    val typeCode = getFieldByName<Int>(instance, "field_type")
+    val type = MessageType.fromCode(typeCode)
 
-    val type by lazy { getFieldByName<Int>(instance, "field_type") }
     val id by lazy { getFieldByName<Long>(instance, "field_msgId") }
     val serverId by lazy { getFieldByName<Long>(instance, "field_msgSvrId") }
     val isSend by lazy { getFieldByName<Int>(instance, "field_isSend") }
@@ -41,11 +33,11 @@ class MessageInfo(val instance: Any) {
     val isOfficialAccount = talker.startsWith("gh_")
     val sender by lazy {
         @Suppress("DEPRECATION")
-        if (isType(MessageType.SYSTEM)) {
+        if (typeCode == MessageType.SYSTEM.code) {
             return@lazy "system"
         }
 
-        if (isType(MessageType.PAT)) {
+        if (typeCode == MessageType.PAT.code) {
             val patMsg = PatMessage(content)
             return@lazy patMsg.fromUser
         }
@@ -64,12 +56,6 @@ class MessageInfo(val instance: Any) {
     fun isSelfSender(): Boolean {
         return isSend == 1
     }
-
-    fun isType(type: MessageType): Boolean {
-        return this.type == type.code
-    }
-
-    val isText = MessageType.isText(type)
 
     @Suppress("NOTHING_TO_INLINE")
     inline fun toPatMessage() = PatMessage(content)
@@ -114,5 +100,17 @@ class MessageInfo(val instance: Any) {
         val transferId by lazy { json.getByPath("msg.wcpayinfo.transferid")!!.asString }
         val payerUsername by lazy { json.getByPath("msg.wcpayinfo.payer_username")!!.asString }
         val invalidTime by lazy { json.getByPath("msg.wcpayinfo.invalidtime")!!.asString.toInt() }
+    }
+
+    companion object {
+        @Suppress("UNCHECKED_CAST")
+        private fun <T> getFieldByName(instance: Any, name: String): T {
+            return instance.asResolver()
+                .firstField {
+                    this.name = name
+                    superclass()
+                }
+                .get()!! as T
+        }
     }
 }

@@ -2,10 +2,11 @@ package dev.ujhhgtg.wekit.hooks.items.system
 
 import android.app.Activity
 import android.widget.Button
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.tencent.mm.plugin.webwx.ui.ExtDeviceWXLoginUI
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
+import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.resolve
 
 @HookItem(path = "系统与隐私/自动批准设备登录", description = "其他设备请求登录时自动勾选选项并点击按钮")
 object AutoApproveDeviceLogin : SwitchHookItem() {
@@ -27,7 +28,7 @@ object AutoApproveDeviceLogin : SwitchHookItem() {
             activity.intent.putExtra("intent.key.need.show.privacy.agreement", false)
         }
 
-        targetClass.asResolver().firstMethod { name = "initView" }.hookAfter {
+        targetClass.resolve().firstMethod { name = "initView" }.hookAfter {
             val button = thisObject.asResolver()
                 .firstField {
                     type = Button::class

@@ -2,11 +2,11 @@ package dev.ujhhgtg.wekit.hooks.items.chat
 
 import android.widget.Button
 import androidx.core.view.isVisible
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
+import dev.ujhhgtg.wekit.utils.asResolver
 import org.luckypray.dexkit.DexKitBridge
 
 @HookItem(path = "聊天/自动查看原图", description = "在打开图片和视频时自动点击查看原图")

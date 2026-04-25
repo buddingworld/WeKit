@@ -66,11 +66,11 @@ import dev.ujhhgtg.wekit.preferences.WePrefs
 import dev.ujhhgtg.wekit.ui.utils.GitHubIcon
 import dev.ujhhgtg.wekit.ui.utils.TelegramIcon
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
-import dev.ujhhgtg.wekit.utils.serialization.DefaultJson
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.WeLogger
 import dev.ujhhgtg.wekit.utils.formatEpoch
 import dev.ujhhgtg.wekit.utils.openInSystem
+import dev.ujhhgtg.wekit.utils.serialization.DefaultJson
 import dev.ujhhgtg.wekit.utils.showToast
 import dev.ujhhgtg.wekit.utils.showToastSuspend
 import kotlinx.coroutines.CoroutineScope
@@ -286,17 +286,20 @@ class MainSettingsDialog(context: Context) : BasePrefsDialog(context, BuildConfi
             icon = MaterialSymbols.Outlined.Delete_forever,
             onClick = {
                 showComposeDialog(context) {
-                    AlertDialogContent(title = { Text("清除模块配置") },
+                    AlertDialogContent(
+                        title = { Text("清除模块配置") },
                         text = { Text("确定清除配置? (警告: 此操作不可逆!)") },
                         dismissButton = { TextButton(onDismiss) { Text("取消") } },
-                        confirmButton = { Button(onClick = {
-                            onDismiss()
-                            CoroutineScope(Dispatchers.IO).launch {
-                                showToastSuspend("正在清除...")
-                                WePrefs.default.clear()
-                                showToastSuspend("清除成功!")
-                            }
-                        }) { Text("清除") } })
+                        confirmButton = {
+                            Button(onClick = {
+                                onDismiss()
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    showToastSuspend("正在清除...")
+                                    WePrefs.default.clear()
+                                    showToastSuspend("清除成功!")
+                                }
+                            }) { Text("清除") }
+                        })
                 }
             }
         )

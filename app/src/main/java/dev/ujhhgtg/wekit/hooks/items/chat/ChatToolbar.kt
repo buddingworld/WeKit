@@ -44,7 +44,6 @@ import com.composables.icons.materialsymbols.outlined.Photo_library
 import com.composables.icons.materialsymbols.outlined.Redeem
 import com.composables.icons.materialsymbols.outlined.Video_chat
 import com.composables.icons.materialsymbols.outlined.Voice_chat
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.extension.createInstance
 import com.tencent.mm.pluginsdk.ui.chat.ChatFooter
 import dev.ujhhgtg.comptime.This
@@ -59,7 +58,9 @@ import dev.ujhhgtg.wekit.ui.utils.findViewWhich
 import dev.ujhhgtg.wekit.ui.utils.iterable
 import dev.ujhhgtg.wekit.ui.utils.setLifecycleOwner
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.asResolver
 import dev.ujhhgtg.wekit.utils.now
+import dev.ujhhgtg.wekit.utils.resolve
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.luckypray.dexkit.DexKitBridge
 import kotlin.time.Duration.Companion.seconds
@@ -146,7 +147,7 @@ object ChatToolbar : SwitchHookItem(), IResolvesDex {
             }
         }
 
-        ChatFooter::class.asResolver()
+        ChatFooter::class.resolve()
             .firstConstructor {
                 parameters(Context::class, AttributeSet::class, Int::class)
             }

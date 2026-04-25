@@ -29,7 +29,8 @@ object LaunchInternalUrls : ClickableHookItem(), IResolvesDex {
             var url by remember { mutableStateOf("weixin://") }
             var argsInput by remember { mutableStateOf("") }
 
-            AlertDialogContent(title = { Text("启动微信内部 URL") },
+            AlertDialogContent(
+                title = { Text("启动微信内部 URL") },
                 text = {
                     DefaultColumn {
                         TextField(
@@ -43,14 +44,17 @@ object LaunchInternalUrls : ClickableHookItem(), IResolvesDex {
                     }
                 },
                 dismissButton = { TextButton(onDismiss) { Text("取消") } },
-                confirmButton = { Button(onClick = {
-                    onDismiss()
-                    val args = if (argsInput.isBlank()) emptyList() else argsInput.split("\n")
-                    methodOpenUrl.method.invoke(
-                        // FIXME: getDeclaredConstructor() says no ctor exists?? but Unsafe works????
-                        WeUnsafeApi.allocateInstance(methodOpenUrl.method.declaringClass),
-                        *arrayOf(context, url, args.toTypedArray()))
-                }) { Text("确定") } })
+                confirmButton = {
+                    Button(onClick = {
+                        onDismiss()
+                        val args = if (argsInput.isBlank()) emptyList() else argsInput.split("\n")
+                        methodOpenUrl.method.invoke(
+                            // FIXME: getDeclaredConstructor() says no ctor exists?? but Unsafe works????
+                            WeUnsafeApi.allocateInstance(methodOpenUrl.method.declaringClass),
+                            *arrayOf(context, url, args.toTypedArray())
+                        )
+                    }) { Text("确定") }
+                })
         }
     }
 

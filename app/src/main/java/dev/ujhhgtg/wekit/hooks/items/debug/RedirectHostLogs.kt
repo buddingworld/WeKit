@@ -10,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import com.highcapable.kavaref.condition.type.Modifiers
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.hooks.core.ClickableHookItem
@@ -22,6 +21,7 @@ import dev.ujhhgtg.wekit.ui.content.Button
 import dev.ujhhgtg.wekit.ui.content.DefaultColumn
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.resolve
 
 @HookItem(path = "调试/重定向微信日志", description = "将微信内部日志打印至模块日志")
 object RedirectHostLogs : ClickableHookItem() {
@@ -30,7 +30,7 @@ object RedirectHostLogs : ClickableHookItem() {
     private const val KEY_PREFIX = "redirect_"
 
     override fun onEnable() {
-        com.tencent.mars.xlog.Log::class.asResolver().apply {
+        com.tencent.mars.xlog.Log::class.resolve().apply {
             if (getBoolOrFalse("${KEY_PREFIX}v"))
                 firstMethod {
                     name = "v"
