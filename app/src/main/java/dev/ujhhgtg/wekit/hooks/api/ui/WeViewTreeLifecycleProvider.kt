@@ -6,7 +6,7 @@ import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.ui.utils.LifecycleOwnerProvider
 import dev.ujhhgtg.wekit.ui.utils.rootView
 import dev.ujhhgtg.wekit.ui.utils.setLifecycleOwner
-import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
 
 @HookItem(path = "API/ComposeView 生命周期提供方")
 object WeViewTreeLifecycleProvider : ApiHookItem() {

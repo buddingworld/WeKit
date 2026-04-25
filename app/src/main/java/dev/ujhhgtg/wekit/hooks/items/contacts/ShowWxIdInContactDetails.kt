@@ -6,8 +6,8 @@ import dev.ujhhgtg.wekit.hooks.api.ui.WeContactPrefsScreenApi.ContactInfoItem
 import dev.ujhhgtg.wekit.hooks.api.ui.WeContactPrefsScreenApi.IContactInfoProvider
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.copyToClipboard
-import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.android.copyToClipboard
+import dev.ujhhgtg.wekit.utils.android.showToast
 
 @HookItem(
     path = "联系人与群组/显示微信 ID",

@@ -46,9 +46,9 @@ import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.copyToClipboard
+import dev.ujhhgtg.wekit.utils.android.copyToClipboard
+import dev.ujhhgtg.wekit.utils.android.showToast
 import dev.ujhhgtg.wekit.utils.openInSystem
-import dev.ujhhgtg.wekit.utils.showToast
 
 @HookItem(
     path = "系统与隐私/链接跳转系统打开方式",

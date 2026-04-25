@@ -6,8 +6,8 @@ import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.hooks.core.BaseHookItem
 import dev.ujhhgtg.wekit.preferences.WePrefs
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.paths.KnownPaths
-import dev.ujhhgtg.wekit.utils.paths.createDirectoriesNoThrow
+import dev.ujhhgtg.wekit.utils.fs.KnownPaths
+import dev.ujhhgtg.wekit.utils.fs.createDirectoriesNoThrow
 import dev.ujhhgtg.wekit.utils.unreachable
 import org.json.JSONObject
 import java.nio.file.Path

@@ -64,8 +64,8 @@ import dev.ujhhgtg.wekit.ui.utils.rootView
 import dev.ujhhgtg.wekit.ui.utils.setLifecycleOwner
 import dev.ujhhgtg.wekit.utils.WeLogger
 import dev.ujhhgtg.wekit.utils.WeLogger.exitProcess
-import dev.ujhhgtg.wekit.utils.asResolver
-import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.android.showToast
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
 import java.util.concurrent.CopyOnWriteArrayList
 
 @HookItem(path = "界面美化/主屏幕添加 FAB", description = "向微信主屏幕添加浮动操作按钮")

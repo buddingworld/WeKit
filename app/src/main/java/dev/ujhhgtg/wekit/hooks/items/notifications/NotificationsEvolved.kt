@@ -1,5 +1,6 @@
 package dev.ujhhgtg.wekit.hooks.items.notifications
 
+import android.R
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -25,12 +26,12 @@ import dev.ujhhgtg.wekit.preferences.WePrefs
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.TargetProcesses
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.asResolver
 import dev.ujhhgtg.wekit.utils.collections.LruCache
-import dev.ujhhgtg.wekit.utils.paths.KnownPaths
+import dev.ujhhgtg.wekit.utils.fs.KnownPaths
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 import dev.ujhhgtg.wekit.utils.replaceEmojis
 import dev.ujhhgtg.wekit.utils.replaceRichContent
-import dev.ujhhgtg.wekit.utils.resolve
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -235,7 +236,7 @@ object NotificationsEvolved : SwitchHookItem() {
                 )
 
                 val replyAction = Notification.Action.Builder(
-                    Icon.createWithResource(context, android.R.drawable.ic_menu_send),
+                    Icon.createWithResource(context, R.drawable.ic_menu_send),
                     "回复", replyPendingIntent
                 ).addRemoteInput(remoteInput).build()
 
@@ -249,7 +250,7 @@ object NotificationsEvolved : SwitchHookItem() {
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )
                 val readAction = Notification.Action.Builder(
-                    Icon.createWithResource(context, android.R.drawable.ic_menu_view),
+                    Icon.createWithResource(context, R.drawable.ic_menu_view),
                     "标为已读", readPendingIntent
                 ).build()
 

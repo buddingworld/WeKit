@@ -8,7 +8,7 @@ import dev.ujhhgtg.wekit.hooks.api.net.abc.IWePacketInterceptor
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.paths.KnownPaths
+import dev.ujhhgtg.wekit.utils.fs.KnownPaths
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.div
 import kotlin.io.path.listDirectoryEntries

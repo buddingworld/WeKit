@@ -1,10 +1,10 @@
 package dev.ujhhgtg.wekit.loader.utils
 
-import android.content.Context
+import dev.ujhhgtg.wekit.utils.reflection.ClassLoaders
 
-object HybridClassLoader : ClassLoader(Context::class.java.classLoader) {
+object HybridClassLoader : ClassLoader(ClassLoaders.BOOT) {
 
-    private val bootClassLoader: ClassLoader = Context::class.java.classLoader!!
+    private val bootClassLoader = ClassLoaders.BOOT
     lateinit var moduleParentClassLoader: ClassLoader
     lateinit var hostClassLoader: ClassLoader
 

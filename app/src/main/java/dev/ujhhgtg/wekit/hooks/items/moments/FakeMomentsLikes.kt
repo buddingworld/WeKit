@@ -15,8 +15,8 @@ import dev.ujhhgtg.wekit.ui.content.ContactSelectionDialog
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.ModuleRes
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.resolve
-import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.android.showToast
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.LinkedList

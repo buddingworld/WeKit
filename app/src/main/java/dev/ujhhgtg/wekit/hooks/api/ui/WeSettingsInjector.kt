@@ -7,7 +7,6 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import com.android.dx.stock.ProxyBuilder
-import com.highcapable.kavaref.extension.ClassLoaderProvider
 import com.highcapable.kavaref.extension.createInstance
 import com.highcapable.kavaref.extension.toClass
 import com.highcapable.kavaref.extension.toClassOrNull
@@ -30,10 +29,11 @@ import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.ui.content.MainSettingsDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.asResolver
-import dev.ujhhgtg.wekit.utils.paths.KnownPaths
-import dev.ujhhgtg.wekit.utils.paths.createDirectoriesNoThrow
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.fs.KnownPaths
+import dev.ujhhgtg.wekit.utils.fs.createDirectoriesNoThrow
+import dev.ujhhgtg.wekit.utils.reflection.ClassLoaders
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 import org.luckypray.dexkit.DexKitBridge
 import org.luckypray.dexkit.query.enums.StringMatchType
 import java.lang.reflect.InvocationHandler
@@ -321,7 +321,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
 
             ProxyBuilder.forClass(classBaseSettingItem.clazz)
                 .dexCache((KnownPaths.moduleData / "generated_proxy_classes").createDirectoriesNoThrow().toFile())
-                .parentClassLoader(ClassLoaderProvider.classLoader!!)
+                .parentClassLoader(ClassLoaders.HOST)
                 // AppCompactActivity is shipped with the host app itself, so we mustn't use AppCompatActivity::class here
                 .constructorArgTypes("androidx.appcompat.app.AppCompatActivity".toClass())
                 .handler(handler)

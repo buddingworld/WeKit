@@ -10,7 +10,7 @@ import dev.ujhhgtg.wekit.dexkit.dsl.DexDelegateBase
 import dev.ujhhgtg.wekit.dexkit.dsl.DexMethodDelegate
 import dev.ujhhgtg.wekit.utils.HookAction
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
 import java.lang.reflect.Executable
 import kotlin.reflect.KClass
 

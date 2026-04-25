@@ -1,4 +1,4 @@
-package dev.ujhhgtg.wekit.utils
+package dev.ujhhgtg.wekit.utils.android
 
 import android.annotation.SuppressLint
 import android.content.ComponentName
@@ -8,17 +8,17 @@ import android.content.pm.PackageManager
 
 @SuppressLint("QueryPermissionsNeeded")
 fun ComponentName.getEnabled(ctx: Context): Boolean {
-    val packageManager: PackageManager = ctx.packageManager
-    val list = packageManager.queryIntentActivities(
+    val pm: PackageManager = ctx.packageManager
+    val list = pm.queryIntentActivities(
         Intent().setComponent(this), PackageManager.MATCH_DEFAULT_ONLY
     )
     return list.isNotEmpty()
 }
 
 fun ComponentName.setEnabled(ctx: Context, enabled: Boolean) {
-    val packageManager: PackageManager = ctx.packageManager
+    val pm: PackageManager = ctx.packageManager
     if (this.getEnabled(ctx) == enabled) return
-    packageManager.setComponentEnabledSetting(
+    pm.setComponentEnabledSetting(
         this,
         if (enabled) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else
             PackageManager.COMPONENT_ENABLED_STATE_DISABLED,

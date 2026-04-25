@@ -3,7 +3,7 @@ package dev.ujhhgtg.wekit.hooks.api.core
 import android.app.Activity
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 import java.lang.ref.WeakReference
 
 @HookItem(path = "API/当前活动跟踪服务", description = "跟踪当前处于屏幕上的活动")

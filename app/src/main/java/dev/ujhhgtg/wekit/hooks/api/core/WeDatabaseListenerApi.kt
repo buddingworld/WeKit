@@ -3,6 +3,7 @@ package dev.ujhhgtg.wekit.hooks.api.core
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import com.highcapable.kavaref.extension.VariousClass
+import com.tencent.wcdb.database.SQLiteDatabase
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.constants.PreferenceKeys
 import dev.ujhhgtg.wekit.constants.WeChatVersion
@@ -11,7 +12,7 @@ import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.preferences.WePrefs
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 import java.util.concurrent.CopyOnWriteArrayList
 
 @SuppressLint("DiscouragedApi")
@@ -98,7 +99,7 @@ object WeDatabaseListenerApi : ApiHookItem() {
     // ==================== Insert Hook ====================
 
     private fun hookDatabaseInsert() {
-        com.tencent.wcdb.database.SQLiteDatabase::class.resolve()
+        SQLiteDatabase::class.resolve()
             .firstMethod {
                 name = "insertWithOnConflict"
                 parameters(String::class, String::class, ContentValues::class, Int::class)
@@ -206,7 +207,7 @@ object WeDatabaseListenerApi : ApiHookItem() {
     }
 
     private fun hookOldQueryMethod() {
-        com.tencent.wcdb.database.SQLiteDatabase::class.resolve().firstMethod {
+        SQLiteDatabase::class.resolve().firstMethod {
             name = "rawQueryWithFactory"
             parameterCount = 5
         }.hookBefore {

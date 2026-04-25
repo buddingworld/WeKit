@@ -1,8 +1,11 @@
-package dev.ujhhgtg.wekit.utils
+@file:Suppress("NOTHING_TO_INLINE")
+
+package dev.ujhhgtg.wekit.utils.android
 
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import dev.ujhhgtg.wekit.utils.HostInfo
 
 fun copyToClipboard(context: Context, content: String) {
     val clipboard =
@@ -11,5 +14,4 @@ fun copyToClipboard(context: Context, content: String) {
     clipboard.setPrimaryClip(clip)
 }
 
-@Suppress("NOTHING_TO_INLINE")
 inline fun copyToClipboard(content: String) = copyToClipboard(HostInfo.application, content)

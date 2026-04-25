@@ -27,9 +27,9 @@ import dev.ujhhgtg.wekit.preferences.WePrefs
 import dev.ujhhgtg.wekit.ui.content.ContactSelectionDialog
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.asResolver
-import dev.ujhhgtg.wekit.utils.resolve
-import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.android.showToast
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 import org.luckypray.dexkit.DexKitBridge
 import java.lang.reflect.Field
 import kotlin.math.sqrt

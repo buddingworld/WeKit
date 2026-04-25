@@ -12,7 +12,7 @@ import dev.ujhhgtg.wekit.ui.content.DexResolverDialogContent
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.TargetProcesses
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.android.showToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope

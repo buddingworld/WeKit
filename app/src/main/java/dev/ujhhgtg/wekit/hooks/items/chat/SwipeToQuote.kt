@@ -16,8 +16,8 @@ import dev.ujhhgtg.wekit.hooks.api.core.WeServiceApi
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageViewApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.asResolver
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 import org.luckypray.dexkit.DexKitBridge
 import java.util.Collections
 import java.util.WeakHashMap

@@ -8,7 +8,7 @@ import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 import java.util.concurrent.CopyOnWriteArrayList
 
 @HookItem(path = "API/活动启动监听服务", description = "提供 startActivity 监听能力")

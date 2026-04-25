@@ -58,9 +58,9 @@ import dev.ujhhgtg.wekit.ui.utils.findViewWhich
 import dev.ujhhgtg.wekit.ui.utils.iterable
 import dev.ujhhgtg.wekit.ui.utils.setLifecycleOwner
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.asResolver
 import dev.ujhhgtg.wekit.utils.now
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.luckypray.dexkit.DexKitBridge
 import kotlin.time.Duration.Companion.seconds

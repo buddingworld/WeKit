@@ -48,8 +48,8 @@ import dev.ujhhgtg.wekit.utils.EncryptedData
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.TargetProcesses
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.resolve
-import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.android.showToast
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 
 
 @HookItem(path = "红包与支付/指纹支付", description = "使用指纹快捷确认支付")

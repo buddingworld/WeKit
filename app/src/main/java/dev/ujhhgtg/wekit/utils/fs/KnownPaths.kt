@@ -1,4 +1,4 @@
-package dev.ujhhgtg.wekit.utils.paths
+package dev.ujhhgtg.wekit.utils.fs
 
 import android.os.Environment
 import dev.ujhhgtg.wekit.BuildConfig

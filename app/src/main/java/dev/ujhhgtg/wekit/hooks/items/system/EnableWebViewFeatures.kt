@@ -7,8 +7,8 @@ import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.asResolver
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 import org.luckypray.dexkit.DexKitBridge
 
 @HookItem(path = "系统与隐私/强制启用 WebView 菜单", description = "强制显示 WebView 页面右上角菜单按钮")

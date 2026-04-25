@@ -103,9 +103,11 @@ fun OsmLocationPickerDialogContent(
             HorizontalDivider()
 
             // ── Map ───────────────────────────────────────────────────
-            Box(modifier = Modifier
-                .weight(1f)
-                .clipToBounds()) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clipToBounds()
+            ) {
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
                     factory = { ctx ->

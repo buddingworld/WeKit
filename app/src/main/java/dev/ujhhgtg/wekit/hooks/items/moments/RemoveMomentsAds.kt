@@ -5,7 +5,7 @@ import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 
 @HookItem(path = "朋友圈/拦截朋友圈广告", description = "拦截朋友圈广告")
 object RemoveMomentsAds : SwitchHookItem() {

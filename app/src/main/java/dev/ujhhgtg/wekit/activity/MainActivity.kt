@@ -61,13 +61,13 @@ import dev.ujhhgtg.wekit.ui.utils.AppTheme
 import dev.ujhhgtg.wekit.ui.utils.GitHubIcon
 import dev.ujhhgtg.wekit.ui.utils.TelegramIcon
 import dev.ujhhgtg.wekit.utils.HostInfo
-import dev.ujhhgtg.wekit.utils.androidUserId
+import dev.ujhhgtg.wekit.utils.android.androidUserId
+import dev.ujhhgtg.wekit.utils.android.getEnabled
+import dev.ujhhgtg.wekit.utils.android.setEnabled
+import dev.ujhhgtg.wekit.utils.android.showToast
 import dev.ujhhgtg.wekit.utils.formatEpoch
-import dev.ujhhgtg.wekit.utils.getEnabled
 import dev.ujhhgtg.wekit.utils.hook_status.HookStatus
 import dev.ujhhgtg.wekit.utils.openInSystem
-import dev.ujhhgtg.wekit.utils.setEnabled
-import dev.ujhhgtg.wekit.utils.showToast
 
 
 class MainActivity : ComponentActivity() {
@@ -375,8 +375,8 @@ private fun AppContent(onUrlClick: (String) -> Unit) {
                     text = {
                         Text(
                             "本操作将尝试修复微信热更新导致的模块不加载\n将删除以下路径的文件, 请确认无误后再删除!\n${
-                            paths.joinToString("\n") { "- $it" }
-                        }"
+                                paths.joinToString("\n") { "- $it" }
+                            }"
                         )
                     },
                     dismissButton = {

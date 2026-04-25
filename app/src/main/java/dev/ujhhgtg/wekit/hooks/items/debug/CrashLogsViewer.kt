@@ -40,11 +40,11 @@ import dev.ujhhgtg.wekit.ui.content.Button
 import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.copyToClipboard
+import dev.ujhhgtg.wekit.utils.android.copyToClipboard
+import dev.ujhhgtg.wekit.utils.android.showToast
 import dev.ujhhgtg.wekit.utils.crash.CrashLogsManager
 import dev.ujhhgtg.wekit.utils.formatBytesSize
 import dev.ujhhgtg.wekit.utils.formatEpoch
-import dev.ujhhgtg.wekit.utils.showToast
 import java.nio.file.Path
 import kotlin.io.path.fileSize
 import kotlin.io.path.getLastModifiedTime

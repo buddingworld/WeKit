@@ -5,8 +5,8 @@ import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.asResolver
 import dev.ujhhgtg.wekit.utils.enumValueOfClass
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
 import org.luckypray.dexkit.DexKitBridge
 
 @HookItem(path = "聊天/引用消息直达", description = "点击被引用消息时直接跳转至对应消息")

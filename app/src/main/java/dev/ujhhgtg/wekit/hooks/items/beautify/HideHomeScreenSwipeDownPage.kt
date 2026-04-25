@@ -7,7 +7,7 @@ import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.hooks.items.chat.ConversationGrouping
 import dev.ujhhgtg.wekit.utils.invokeOriginal
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 
 @HookItem(path = "界面美化/隐藏主页下滑「最近」页", description = "禁用主页下滑功能")
 object HideHomeScreenSwipeDownPage : SwitchHookItem() {

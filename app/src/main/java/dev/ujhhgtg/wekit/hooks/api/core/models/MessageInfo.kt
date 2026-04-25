@@ -1,7 +1,7 @@
 package dev.ujhhgtg.wekit.hooks.api.core.models
 
 import dev.ujhhgtg.wekit.hooks.api.core.WeApi
-import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
 import dev.ujhhgtg.wekit.utils.serialization.DefaultJson
 import dev.ujhhgtg.wekit.utils.serialization.XmlJsonParser
 import dev.ujhhgtg.wekit.utils.serialization.asInt

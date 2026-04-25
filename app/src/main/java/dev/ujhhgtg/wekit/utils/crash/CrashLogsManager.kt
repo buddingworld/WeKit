@@ -2,7 +2,7 @@ package dev.ujhhgtg.wekit.utils.crash
 
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.paths.KnownPaths
+import dev.ujhhgtg.wekit.utils.fs.KnownPaths
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path

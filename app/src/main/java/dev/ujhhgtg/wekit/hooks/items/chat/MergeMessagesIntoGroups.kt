@@ -9,7 +9,7 @@ import dev.ujhhgtg.wekit.hooks.api.core.models.MessageType
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageViewApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
 import java.lang.reflect.Field
 
 @HookItem(path = "聊天/合并消息显示", description = "将同一发送者的连续多条消息合并为一组消息显示 (Telegram 风格)")

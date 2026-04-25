@@ -10,7 +10,7 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentActivity
-import dev.ujhhgtg.wekit.utils.isDarkMode
+import dev.ujhhgtg.wekit.utils.android.isDarkMode
 
 class StubFragmentActivity : FragmentActivity() {
 

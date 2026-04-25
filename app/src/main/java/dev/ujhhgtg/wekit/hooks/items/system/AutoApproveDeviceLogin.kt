@@ -5,8 +5,8 @@ import android.widget.Button
 import com.tencent.mm.plugin.webwx.ui.ExtDeviceWXLoginUI
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.asResolver
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 
 @HookItem(path = "系统与隐私/自动批准设备登录", description = "其他设备请求登录时自动勾选选项并点击按钮")
 object AutoApproveDeviceLogin : SwitchHookItem() {

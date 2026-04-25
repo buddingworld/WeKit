@@ -1,7 +1,7 @@
 // i don't want to bother forking KavaRef
 @file:Suppress("NOTHING_TO_INLINE", "INVISIBLE_MEMBER", "INVISIBLE_REFERENCE", "NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
 
-package dev.ujhhgtg.wekit.utils
+package dev.ujhhgtg.wekit.utils.reflection
 
 import com.highcapable.kavaref.KavaRef
 import com.highcapable.kavaref.condition.base.MemberCondition.Configuration.Companion.createConfiguration

@@ -3,7 +3,7 @@ package dev.ujhhgtg.wekit.hooks.items.miniapps
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 import org.json.JSONObject
 
 @HookItem(path = "小程序/移除视频广告", description = "跳过小程序视频广告")

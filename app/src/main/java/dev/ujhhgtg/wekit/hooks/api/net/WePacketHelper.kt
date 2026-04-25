@@ -3,7 +3,6 @@ package dev.ujhhgtg.wekit.hooks.api.net
 import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
-import com.highcapable.kavaref.extension.ClassLoaderProvider
 import com.highcapable.kavaref.extension.isSubclassOf
 import com.highcapable.kavaref.extension.toClass
 import de.robv.android.xposed.XposedHelpers
@@ -15,6 +14,7 @@ import dev.ujhhgtg.wekit.hooks.api.net.abc.WeRequestCallback
 import dev.ujhhgtg.wekit.hooks.core.ApiHookItem
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.reflection.ClassLoaders
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -396,7 +396,7 @@ object WePacketHelper : ApiHookItem(), IResolvesDex {
         callback: WeRequestCallback? = null
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val cl = ClassLoaderProvider.classLoader!!
+            val cl = ClassLoaders.HOST
             try {
                 var jsonObj = JSONObject(jsonPayload)
                 var nativeNetScene: Any? = null

@@ -35,8 +35,8 @@ import dev.ujhhgtg.wekit.dexkit.cache.DexCacheManager
 import dev.ujhhgtg.wekit.hooks.core.BaseHookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
 import dev.ujhhgtg.wekit.utils.WeLogger.exitProcess
-import dev.ujhhgtg.wekit.utils.copyToClipboard
-import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.android.copyToClipboard
+import dev.ujhhgtg.wekit.utils.android.showToast
 import dev.ujhhgtg.wekit.utils.unreachable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

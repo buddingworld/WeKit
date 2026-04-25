@@ -8,7 +8,7 @@ import dev.ujhhgtg.wekit.constants.PackageNames
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 
 @HookItem(path = "系统与隐私/隐藏模块应用", description = "在不影响模块功能的情况下防止微信查询模块安装状态 (实验性)")
 object HideModuleFromAppList : SwitchHookItem() {

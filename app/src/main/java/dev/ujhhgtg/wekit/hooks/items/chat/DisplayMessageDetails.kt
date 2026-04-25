@@ -17,8 +17,8 @@ import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.Button
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.ModuleRes
-import dev.ujhhgtg.wekit.utils.copyToClipboard
-import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.android.copyToClipboard
+import dev.ujhhgtg.wekit.utils.android.showToast
 
 @HookItem(path = "聊天/显示消息详情", description = "向消息长按菜单添加菜单项, 可查看消息详情")
 object DisplayMessageDetails : SwitchHookItem(),

@@ -2,14 +2,16 @@ package dev.ujhhgtg.wekit.loader.startup
 
 import android.app.Instrumentation
 import com.highcapable.kavaref.extension.ClassLoaderProvider
+import com.tencent.mm.app.Application
 import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.loader.abc.IHookBridge
 import dev.ujhhgtg.wekit.loader.abc.ILoaderService
 import dev.ujhhgtg.wekit.loader.utils.HybridClassLoader
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.asResolver
 import dev.ujhhgtg.wekit.utils.hookAfterDirectly
-import dev.ujhhgtg.wekit.utils.resolve
+import dev.ujhhgtg.wekit.utils.reflection.ClassLoaders
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.resolve
 
 object UnifiedEntryPoint {
 
@@ -22,7 +24,7 @@ object UnifiedEntryPoint {
         modulePath: String
     ) {
         ClassLoaderProvider.classLoader = hostClassLoader
-        val self = UnifiedEntryPoint::class.java.classLoader!!
+        val self = ClassLoaders.MODULE
         val selfParent = self.parent
         HybridClassLoader.moduleParentClassLoader = selfParent
         HybridClassLoader.hostClassLoader = hostClassLoader
@@ -30,7 +32,7 @@ object UnifiedEntryPoint {
             .firstField { name = "parent"; superclass() }
             .set(HybridClassLoader)
 
-        com.tencent.mm.app.Application::class.resolve()
+        Application::class.resolve()
             .firstMethod { name = "attachBaseContext" }
             .hookAfterDirectly {
                 // Hook Instrumentation.callApplicationOnCreate 以确保在 Tinker 热更新完成后再进行延迟初始化

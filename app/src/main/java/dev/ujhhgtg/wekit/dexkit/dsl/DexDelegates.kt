@@ -1,12 +1,12 @@
 package dev.ujhhgtg.wekit.dexkit.dsl
 
-import com.highcapable.kavaref.extension.ClassLoaderProvider
 import com.highcapable.kavaref.extension.toClassOrNull
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.dexkit.DexMethodDescriptor
 import dev.ujhhgtg.wekit.hooks.core.BaseHookItem
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.reflection.ClassLoaders
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
 import org.luckypray.dexkit.DexKitBridge
 import org.luckypray.dexkit.query.FindClass
 import org.luckypray.dexkit.query.FindMethod
@@ -119,7 +119,7 @@ class DexMethodDelegate internal constructor(
             if (descriptor != null && descriptor!!.name == "Lcom/tencent/mm/ui/LauncherUI;->()Lcom/tencent/mm/ui/LauncherUI;")
                 error("Method resolution has failed: $key")
             if (cachedMethod == null && descriptor != null)
-                cachedMethod = descriptor!!.getMethodInstance(ClassLoaderProvider.classLoader!!)
+                cachedMethod = descriptor!!.getMethodInstance(ClassLoaders.HOST)
             return cachedMethod ?: error("Method not found for key: $key")
         }
 
@@ -198,7 +198,7 @@ class DexConstructorDelegate internal constructor(
     val constructor: Constructor<*>
         get() {
             if (cachedConstructor == null && descriptor != null)
-                cachedConstructor = descriptor!!.getConstructorInstance(ClassLoaderProvider.classLoader!!)
+                cachedConstructor = descriptor!!.getConstructorInstance(ClassLoaders.HOST)
             return cachedConstructor ?: error("Constructor not found for key: $key")
         }
 

@@ -34,7 +34,7 @@ import dev.ujhhgtg.wekit.ui.content.DefaultColumn
 import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.android.showToast
 import org.json.JSONObject
 import org.luckypray.dexkit.DexKitBridge
 import java.util.concurrent.ConcurrentHashMap

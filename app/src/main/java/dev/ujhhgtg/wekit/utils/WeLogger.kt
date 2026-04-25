@@ -2,8 +2,8 @@ package dev.ujhhgtg.wekit.utils
 
 import android.util.Log
 import dev.ujhhgtg.wekit.BuildConfig
-import dev.ujhhgtg.wekit.utils.paths.KnownPaths
-import dev.ujhhgtg.wekit.utils.paths.createDirectoriesNoThrow
+import dev.ujhhgtg.wekit.utils.fs.KnownPaths
+import dev.ujhhgtg.wekit.utils.fs.createDirectoriesNoThrow
 import java.io.BufferedWriter
 import java.io.FileWriter
 import java.time.LocalDate

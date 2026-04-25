@@ -16,7 +16,7 @@ import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.Button
 import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
-import dev.ujhhgtg.wekit.utils.showToast
+import dev.ujhhgtg.wekit.utils.android.showToast
 import org.luckypray.dexkit.DexKitBridge
 
 @HookItem(path = "聊天/伪装语音时长", description = "预设定伪装发送语音显示的时长")

@@ -1,7 +1,8 @@
-package dev.ujhhgtg.wekit.utils
+package dev.ujhhgtg.wekit.utils.android
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Process
 import android.os.UserManager
 
 inline val Context.isDarkMode
@@ -11,6 +12,6 @@ inline val Context.androidUserId: Long
     get() {
         val userManager =
             this.getSystemService(Context.USER_SERVICE) as UserManager
-        val userHandle = android.os.Process.myUserHandle()
+        val userHandle = Process.myUserHandle()
         return userManager.getSerialNumberForUser(userHandle)
     }

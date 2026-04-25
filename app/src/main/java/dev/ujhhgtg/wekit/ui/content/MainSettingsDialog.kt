@@ -68,11 +68,11 @@ import dev.ujhhgtg.wekit.ui.utils.TelegramIcon
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.android.showToast
+import dev.ujhhgtg.wekit.utils.android.showToastSuspend
 import dev.ujhhgtg.wekit.utils.formatEpoch
 import dev.ujhhgtg.wekit.utils.openInSystem
 import dev.ujhhgtg.wekit.utils.serialization.DefaultJson
-import dev.ujhhgtg.wekit.utils.showToast
-import dev.ujhhgtg.wekit.utils.showToastSuspend
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

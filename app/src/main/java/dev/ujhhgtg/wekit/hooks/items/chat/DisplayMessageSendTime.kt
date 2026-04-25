@@ -11,9 +11,9 @@ import de.robv.android.xposed.XC_MethodHook
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageViewApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.asResolver
+import dev.ujhhgtg.wekit.utils.android.isDarkMode
 import dev.ujhhgtg.wekit.utils.formatEpoch
-import dev.ujhhgtg.wekit.utils.isDarkMode
+import dev.ujhhgtg.wekit.utils.reflection.asResolver
 
 
 @HookItem(path = "聊天/显示消息时间", description = "显示精确消息发送时间")

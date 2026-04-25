@@ -6,9 +6,9 @@ import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.android.showToast
 import dev.ujhhgtg.wekit.utils.crash.CrashLogsManager
 import dev.ujhhgtg.wekit.utils.crash.NativeCrashHandler
-import dev.ujhhgtg.wekit.utils.showToast
 
 @HookItem(
     path = "调试/崩溃拦截 (Native)",

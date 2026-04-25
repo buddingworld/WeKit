@@ -1,4 +1,4 @@
-package dev.ujhhgtg.wekit.utils.paths
+package dev.ujhhgtg.wekit.utils.fs
 
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
