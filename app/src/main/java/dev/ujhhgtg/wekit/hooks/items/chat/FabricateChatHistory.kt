@@ -211,14 +211,14 @@ private fun MessageRowEditor(
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp)) {
+        Column(modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = 12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = selectedContact?.nickname?.takeIf { it.isNotBlank() } ?: "未选择发送者!",
+                        text = selectedContact?.nickname?.takeIf { it.isNotBlank() } ?: "选择发送者 →",
                         style = MaterialTheme.typography.titleSmall
                     )
                     if (selectedContact != null) {
