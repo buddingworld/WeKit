@@ -173,6 +173,44 @@ object JsApiExposer {
             }
         )
 
+        // http.sendCgi(uri, cgiId, funcId, routeId, jsonPayload) -> String
+        ScriptableObject.putProperty(
+            httpObj, "sendCgi",
+            object : BaseFunction() {
+                override fun call(
+                    cx: Context,
+                    scope: Scriptable,
+                    thisObj: Scriptable,
+                    args: Array<Any?>
+                ): Any? {
+                    val uri = args.getOrNull(0)?.toString() ?: return "URI cannot be empty"
+                    val cgiId = (args.getOrNull(1) as? Number)?.toInt() ?: return "cgiId must be a number"
+                    val funcId = (args.getOrNull(2) as? Number)?.toInt() ?: return "funcId must be a number"
+                    val routeId = (args.getOrNull(3) as? Number)?.toInt() ?: return "routeId must be a number"
+                    val jsonPayload = args.getOrNull(4)?.toString() ?: return "jsonPayload cannot be empty"
+
+                    var result: String? = null
+                    val latch = java.util.concurrent.CountDownLatch(1)
+
+                    dev.ujhhgtg.wekit.hooks.api.net.WePacketHelper.sendCgi(
+                        uri, cgiId, funcId, routeId, jsonPayload
+                    ) {
+                        onSuccess { json, _ ->
+                            result = json
+                            latch.countDown()
+                        }
+                        onFailure { _, _, errMsg ->
+                            result = errMsg
+                            latch.countDown()
+                        }
+                    }
+
+                    latch.await()
+                    return result
+                }
+            }
+        )
+
         ScriptableObject.putProperty(scope, "http", httpObj)
     }
 
