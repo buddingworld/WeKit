@@ -90,6 +90,17 @@ declare namespace http {
      * }
      */
     function download(url: string): DownloadResult;
+    
+    /**
+     * 发送 CGI 请求
+     * @param uri 请求的 URI
+     * @param cgiId 请求的 CGI ID
+     * @param funcId 请求的 Func ID
+     * @param routeId 请求的 Route ID
+     * @param jsonPayload JSON 负载字符串
+     * @returns 成功返回 JSON 字符串，失败返回错误信息字符串
+     */
+    function sendCgi(uri: string, cgiId: number, funcId: number, routeId: number, jsonPayload: string): string;
 }
 
 declare namespace storage {
