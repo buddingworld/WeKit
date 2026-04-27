@@ -89,3 +89,22 @@ jobs:
           WEKIT_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew assembleRelease --warning-mode all --stacktrace
 
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: wekit-release-apk
+          # 这里的路径取决于你 Gradle 的输出位置，通常是下面这个
+          path: app/build/outputs/apk/release/*.apk
+
+      - name: Create Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Release v1.0.${{ github.run_number }}
+          draft: false
+          prerelease: false
+          files: |
+            app/build/outputs/apk/release/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
