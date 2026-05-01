@@ -46,10 +46,10 @@ private const val BASE_URL =
     "https://github.com/Ujhhgtg/WeKit/releases/download/CI"
 
 private val ABI_APK_MAP = mapOf(
-    "arm64-v8a"   to "$BASE_URL/app-arm64-v8a-release.apk",
+    "arm64-v8a" to "$BASE_URL/app-arm64-v8a-release.apk",
     "armeabi-v7a" to "$BASE_URL/app-armeabi-v7a-release.apk",
-    "x86"         to "$BASE_URL/app-x86-release.apk",
-    "x86_64"      to "$BASE_URL/app-x86_64-release.apk",
+    "x86" to "$BASE_URL/app-x86-release.apk",
+    "x86_64" to "$BASE_URL/app-x86_64-release.apk",
 )
 private const val UNIVERSAL_APK = "$BASE_URL/app-universal-release.apk"
 private const val UPDATE_JSON_URL = "$BASE_URL/update.json"
@@ -83,8 +83,9 @@ object AppUpdater {
 
     private val httpClient by lazy {
         OkHttpClient.Builder()
-            .connectTimeout(15, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .callTimeout(10, TimeUnit.SECONDS)
             .followRedirects(true)
             .build()
     }
@@ -106,7 +107,9 @@ object AppUpdater {
             } else {
                 UpdateResult.UpToDate
             }
-        }.getOrElse { UpdateResult.Error(it) }
+        }.getOrElse {
+            UpdateResult.Error(it)
+        }
     }
 
     /**

@@ -260,6 +260,7 @@ object WeSettingsInjector : ApiHookItem(), IResolvesDex {
     private const val WEKIT_SETTING_ITEM_NAME_RES_ID = -1337
 
     private val GROUP_SETTING_ITEM_CLASS by lazy { SettingGroupMain::class.java }
+
     // or SettingGroupPrivacyPermission & SettingGroupNotify
     private val PARENT_SETTING_ITEM_CLASS by lazy { SettingAdditionHeaderSearch::class.java }
     private val CHILD_SETTING_ITEM_CLASS by lazy { SettingGroupPersonalInfo::class.java }

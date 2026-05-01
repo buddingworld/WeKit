@@ -315,11 +315,11 @@ class MainSettingsDialog(context: Context) : BasePrefsDialog(context, BuildConfi
             summary = "立即检查模块是否有新版本并自动下载",
             icon = MaterialSymbols.Outlined.Update,
             onClick = {
-                CoroutineScope(Dispatchers.Default).launch {
+                CoroutineScope(Dispatchers.Main).launch {
                     showToastSuspend("正在检查更新...")
                     when (val result = AppUpdater.checkForUpdate()) {
                         UpdateResult.UpToDate -> showToastSuspend("已是最新版本")
-                        is UpdateResult.UpdateAvailable -> withContext(Dispatchers.Main) {
+                        is UpdateResult.UpdateAvailable -> {
                             showComposeDialog(context) {
                                 AlertDialogContent(
                                     title = { Text("检测到新版本") },

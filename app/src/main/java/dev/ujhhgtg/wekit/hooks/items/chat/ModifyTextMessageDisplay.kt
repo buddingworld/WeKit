@@ -40,12 +40,15 @@ object ModifyTextMessageDisplay : SwitchHookItem(),
                 { msgInfo -> msgInfo.type?.isText ?: false }
             ) { view, _, _ ->
                 showComposeDialog(view.context) {
-                    var input by remember { mutableStateOf(
-                        view.asResolver()
-                            .firstField {
-                                type = CharSequence::class
-                                superclass()
-                            }.get<CharSequence>().toString()) }
+                    var input by remember {
+                        mutableStateOf(
+                            view.asResolver()
+                                .firstField {
+                                    type = CharSequence::class
+                                    superclass()
+                                }.get<CharSequence>().toString()
+                        )
+                    }
 
                     AlertDialogContent(
                         title = { Text("修改消息显示") },

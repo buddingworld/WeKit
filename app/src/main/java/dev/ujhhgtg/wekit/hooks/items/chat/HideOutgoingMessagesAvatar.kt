@@ -43,8 +43,7 @@ object HideOutgoingMessagesAvatar : SwitchHookItem(), WeChatMessageViewApi.ICrea
                 (layoutParams as? ViewGroup.MarginLayoutParams? ?: return).rightMargin = 20
                 requestLayout()
             }
-        }
-        else {
+        } else {
             avatar.visibility = View.GONE
         }
     }

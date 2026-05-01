@@ -156,9 +156,11 @@ object XmlJsonParser {
                                 config.convertNilAttributeToNull && attrName == NULL_ATTR && attrValue.toBooleanStrictOrNull() == true -> {
                                     nilAttributeFound = true
                                 }
+
                                 config.xsiTypeMap.isNotEmpty() && attrName == TYPE_ATTR -> {
                                     xmlXsiTypeConverter = config.xsiTypeMap[attrValue]
                                 }
+
                                 !nilAttributeFound -> {
                                     jsonObject.accumulate(
                                         attrName,
