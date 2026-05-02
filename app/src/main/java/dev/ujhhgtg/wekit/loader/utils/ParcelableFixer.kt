@@ -12,7 +12,9 @@ object ParcelableFixer {
 
     private val TAG = nameOf(ParcelableFixer)
 
-    private var moduleClassLoader: ClassLoader? = null
+    lateinit var hybridClassLoader: ClassLoader
+        private set
+
     private var isInit = false
 
     @Suppress("unused")
@@ -20,17 +22,15 @@ object ParcelableFixer {
         if (isInit) return
         isInit = true
 
-        this.moduleClassLoader = object : ClassLoader(ClassLoaders.HOST) {
+        this.hybridClassLoader = object : ClassLoader(ClassLoaders.HOST) {
             override fun findClass(name: String): Class<*> = ClassLoaders.MODULE.loadClass(name)
         }
 
         hookIntentMethods()
     }
 
-    fun getHybridClassLoader(): ClassLoader? = moduleClassLoader
-
     private fun fixIntentExtrasClassLoader(intent: Intent?) {
-        val cl = moduleClassLoader ?: return
+        val cl = hybridClassLoader
         runCatching { intent?.setExtrasClassLoader(cl) }
     }
 
@@ -41,7 +41,7 @@ object ParcelableFixer {
             }
 
             override fun afterHookedMethod(param: MethodHookParam) {
-                val cl = moduleClassLoader ?: return
+                val cl = hybridClassLoader
                 (param.result as? Bundle)?.classLoader = cl
             }
         }

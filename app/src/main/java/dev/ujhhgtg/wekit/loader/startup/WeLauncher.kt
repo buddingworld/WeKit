@@ -9,6 +9,7 @@ import dev.ujhhgtg.wekit.constants.PackageNames
 import dev.ujhhgtg.wekit.dexkit.cache.DexCacheManager
 import dev.ujhhgtg.wekit.hooks.core.HookItemsLoader
 import dev.ujhhgtg.wekit.loader.utils.ActivityProxy
+import dev.ujhhgtg.wekit.loader.utils.ParcelableFixer
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.ModuleRes
 import dev.ujhhgtg.wekit.utils.RuntimeConfig
@@ -22,8 +23,7 @@ object WeLauncher {
     fun init(context: Context) {
         WeLogger.d(TAG, "loading in process name=${TargetProcesses.currentName}, type=${TargetProcesses.currentType}")
 
-        // FIXME: removed for now since unused
-//        ParcelableFixer.init()
+        ParcelableFixer.init()
 
         DexCacheManager.init(HostInfo.versionName)
 

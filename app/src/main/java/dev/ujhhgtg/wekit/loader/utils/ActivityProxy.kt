@@ -37,11 +37,12 @@ import java.util.concurrent.ConcurrentHashMap
 object ActivityProxy {
 
     private val TAG = This.Class.simpleName
-    private var stubHooked = false
+    private var initialized = false
 
     @SuppressLint("PrivateApi", "DiscouragedPrivateApi")
     fun init(ctx: Context) {
-        if (stubHooked) return
+        if (initialized) return
+
         runCatching {
             val clazzActivityThread = Class.forName("android.app.ActivityThread")
             val currentActivityThread = clazzActivityThread
@@ -75,7 +76,7 @@ object ActivityProxy {
             hookIActivityManager()
             hookPackageManager(ctx, requireNotNull(currentActivityThread), clazzActivityThread)
 
-            stubHooked = true
+            initialized = true
         }.onFailure { WeLogger.e(TAG, "failed to init stub activity hooks", it) }
     }
 
@@ -195,8 +196,7 @@ object ActivityProxy {
                 setDataAndType(raw.data, raw.type)
                 raw.categories?.forEach { addCategory(it) }
                 putExtra(ActProxyMgr.ACTIVITY_PROXY_INTENT_TOKEN, token)
-                // FIXME: removed for now since unused
-//                ParcelableFixer.getHybridClassLoader()?.let { setExtrasClassLoader(it) }
+                setExtrasClassLoader(ParcelableFixer.hybridClassLoader)
             }.also {
                 WeLogger.i(
                     TAG,
@@ -219,8 +219,8 @@ object ActivityProxy {
 
         private fun unwrapIntent(wrapper: Intent?): Intent? {
             wrapper ?: return null
-            val cl = ParcelableFixer.getHybridClassLoader()
-            cl?.let { wrapper.setExtrasClassLoader(it) }
+            val cl = ParcelableFixer.hybridClassLoader
+            wrapper.setExtrasClassLoader(cl)
             if (!wrapper.hasExtra(ActProxyMgr.ACTIVITY_PROXY_INTENT_TOKEN)) return null
 
             val token = wrapper.getStringExtra(ActProxyMgr.ACTIVITY_PROXY_INTENT_TOKEN)
@@ -228,10 +228,8 @@ object ActivityProxy {
                 WeLogger.w(TAG, "Token expired or lost in Handler: $token")
                 return null
             }
-            cl?.let {
-                real.setExtrasClassLoader(it)
-                real.extras?.classLoader = it
-            }
+            real.setExtrasClassLoader(cl)
+            real.extras?.classLoader = cl
             return real
         }
 
@@ -270,11 +268,12 @@ object ActivityProxy {
         private fun tryRecoverIntent(intent: Intent?): Intent? {
             intent ?: return null
             if (!intent.hasExtra(ActProxyMgr.ACTIVITY_PROXY_INTENT_TOKEN)) return null
-            val cl = ParcelableFixer.getHybridClassLoader()
-            cl?.let { intent.setExtrasClassLoader(it) }
+            val cl = ParcelableFixer.hybridClassLoader
+            intent.setExtrasClassLoader(cl)
             val token = intent.getStringExtra(ActProxyMgr.ACTIVITY_PROXY_INTENT_TOKEN)
             return IntentTokenCache.getAndRemove(token)?.also { real ->
-                cl?.let { real.setExtrasClassLoader(it); real.extras?.classLoader = it }
+                real.setExtrasClassLoader(cl)
+                real.extras?.classLoader = cl
             }
         }
 
@@ -327,15 +326,14 @@ object ActivityProxy {
         override fun callActivityOnCreate(activity: Activity, icicle: Bundle?) {
             if (ActProxyMgr.isModuleProxyActivity(activity.javaClass.name)) {
                 checkAndInjectResources(activity)
-                ParcelableFixer.getHybridClassLoader()?.let { cl ->
-                    runCatching {
-                        Activity::class.java.getDeclaredField("mClassLoader")
-                            .makeAccessible().set(activity, cl)
-                    }
-                    activity.intent?.let { intent ->
-                        intent.setExtrasClassLoader(cl)
-                        intent.extras?.classLoader = cl
-                    }
+                val cl = ParcelableFixer.hybridClassLoader
+                runCatching {
+                    Activity::class.java.getDeclaredField("mClassLoader")
+                        .makeAccessible().set(activity, cl)
+                }
+                activity.intent?.let { intent ->
+                    intent.setExtrasClassLoader(cl)
+                    intent.extras?.classLoader = cl
                 }
             }
             base.callActivityOnCreate(activity, icicle)
