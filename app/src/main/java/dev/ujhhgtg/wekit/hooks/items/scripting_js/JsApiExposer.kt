@@ -66,7 +66,6 @@ object JsApiExposer {
         exposeLogApis(scope)
         exposeStorageApis(scope)
         exposeDateTimeApis(scope)
-        exposeTaskApis(scope)
         exposeXposedApis(scope)
         exposeWeChatApis(scope, talker)
     }
