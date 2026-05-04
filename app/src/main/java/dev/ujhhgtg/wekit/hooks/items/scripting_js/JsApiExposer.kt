@@ -818,9 +818,9 @@ object JsApiExposer {
                     args: Array<Any?>
                 ): Any? {
                     val uri = args.getOrNull(0)?.toString() ?: return Undefined.instance
-                    val cgiId = (args.getOrNull(1) as? Int) ?: return Undefined.instance
-                    val funcId = (args.getOrNull(2) as? Int) ?: return Undefined.instance
-                    val routeId = (args.getOrNull(3) as? Int) ?: return Undefined.instance
+                    val cgiId = (args.getOrNull(1) as? Number)?.toInt() ?: return Undefined.instance
+                    val funcId = (args.getOrNull(2) as? Number)?.toInt() ?: return Undefined.instance
+                    val routeId = (args.getOrNull(3) as? Number)?.toInt() ?: return Undefined.instance
                     val jsonPayload = args.getOrNull(4)?.toString() ?: return Undefined.instance
 
                     var result: String? = null
@@ -839,8 +839,10 @@ object JsApiExposer {
                         }
                     }
 
-                    latch.await()
-                    return result
+                    if (!latch.await(30, java.util.concurrent.TimeUnit.SECONDS)) {
+                        result = "Error: Timeout waiting for CGI response"
+                    }
+                    return result ?: "Error: Unknown error (result is null)"
                 }
             }
         )
