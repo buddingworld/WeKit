@@ -822,6 +822,7 @@ object JsApiExposer {
                     val funcId = (args.getOrNull(2) as? Number)?.toInt() ?: return Undefined.instance
                     val routeId = (args.getOrNull(3) as? Number)?.toInt() ?: return Undefined.instance
                     val jsonPayload = args.getOrNull(4)?.toString() ?: return Undefined.instance
+                    var cgiTimeout = (args.getOrNull(5) as? Number)?.toInt() ?: 30
 
                     var result: String? = null
                     val latch = CountDownLatch(1)
@@ -839,7 +840,7 @@ object JsApiExposer {
                         }
                     }
 
-                    if (!latch.await(30, java.util.concurrent.TimeUnit.SECONDS)) {
+                    if (!latch.await(cgiTimeout, java.util.concurrent.TimeUnit.SECONDS)) {
                         result = "Error: Timeout waiting for CGI response"
                     }
                     return result ?: "Error: Unknown error (result is null)"
