@@ -840,7 +840,7 @@ object JsApiExposer {
                         }
                     }
 
-                    if (!latch.await(cgiTimeout, java.util.concurrent.TimeUnit.SECONDS)) {
+                    if (!latch.await(cgiTimeout.toLong(), java.util.concurrent.TimeUnit.SECONDS)) {
                         result = "Error: Timeout waiting for CGI response"
                     }
                     return result ?: "Error: Unknown error (result is null)"
