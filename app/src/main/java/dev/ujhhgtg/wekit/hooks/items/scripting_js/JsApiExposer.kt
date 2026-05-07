@@ -45,6 +45,9 @@ import kotlin.io.path.fileSize
 import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import java.util.Calendar
+import java.util.Timer
+import java.util.TimerTask
 import kotlin.concurrent.thread
 
 object JsApiExposer {
@@ -1078,27 +1081,38 @@ object JsApiExposer {
                     val interval = (args.getOrNull(1) as? Number)?.toLong() ?: (24L * 60 * 60 * 1000)
                     val count = (args.getOrNull(2) as? Number)?.toInt() ?: 0
 
-                    thread(name = "JsTaskTimerThread") {
-                        var executedCount = 0
-                        while (count == 0 || executedCount < count) {
-                            try {
-                                Thread.sleep(interval)
-                            } catch (e: InterruptedException) {
-                                break
-                            }
+                    val timer = Timer("JsTaskTimerThread", true)
+                    var executedCount = 0
 
-                            val newCx = Context.enter()
-                            newCx.isInterpretedMode = true
-                            try {
-                                func.call(newCx, scope, scope, emptyArray())
-                            } catch (e: Exception) {
-                                WeLogger.e(TAG, "task.runTimer failed", e)
-                            } finally {
-                                Context.exit()
-                            }
-                            executedCount++
+                    fun scheduleNext() {
+                        if (count != 0 && executedCount >= count) {
+                            timer.cancel()
+                            return
                         }
+
+                        val calendar = Calendar.getInstance()
+                        calendar.timeInMillis = System.currentTimeMillis() + interval
+                        val nextRunTime = calendar.time
+
+                        timer.schedule(object : TimerTask() {
+                            override fun run() {
+                                val newCx = Context.enter()
+                                newCx.isInterpretedMode = true
+                                try {
+                                    func.call(newCx, scope, scope, emptyArray())
+                                } catch (e: Exception) {
+                                    WeLogger.e(TAG, "task.runTimer failed (Calendar/Timer)", e)
+                                } finally {
+                                    Context.exit()
+                                }
+                                executedCount++
+                                scheduleNext() // 每次执行完安排下一次
+                            }
+                        }, nextRunTime)
                     }
+
+                    // 安排第一次执行
+                    scheduleNext()
 
                     return Undefined.instance
                 }
