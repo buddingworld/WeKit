@@ -1,9 +1,7 @@
 package dev.ujhhgtg.wekit.hooks.items.scripting_js
 
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import androidx.core.content.ContextCompat
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.hooks.api.core.WeApi
@@ -48,10 +46,6 @@ import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Intent
-import android.content.IntentFilter
 import dev.ujhhgtg.wekit.utils.HostInfo
 import kotlin.concurrent.thread
 
@@ -1090,18 +1084,12 @@ object JsApiExposer {
                         val hostApp = HostInfo.application
                         val alarmManager = hostApp.getSystemService(android.content.Context.ALARM_SERVICE) as? AlarmManager
                         if (alarmManager != null) {
-                            val action = "dev.ujhhgtg.wekit.action.JS_TIMER_${System.currentTimeMillis()}_${(Math.random() * 1000).toInt()}"
-                            val intent = Intent(action)
-                            val pendingIntent = PendingIntent.getBroadcast(
-                                hostApp, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                            )
-
                             var executedCount = 0
-                            val receiver = object : BroadcastReceiver() {
-                                override fun onReceive(context: android.content.Context?, intent: Intent?) {
+                            val handler = Handler(Looper.getMainLooper())
+
+                            val listener = object : AlarmManager.OnAlarmListener {
+                                override fun onAlarm() {
                                     if (count != 0 && executedCount >= count) {
-                                        alarmManager.cancel(pendingIntent)
-                                        hostApp.unregisterReceiver(this)
                                         return
                                     }
 
@@ -1116,24 +1104,35 @@ object JsApiExposer {
                                             Context.exit()
                                         }
                                     }
+
                                     executedCount++
+
+                                    if (count == 0 || executedCount < count) {
+                                        // 安排下一次执行
+                                        try {
+                                            alarmManager.set(
+                                                AlarmManager.RTC_WAKEUP,
+                                                System.currentTimeMillis() + interval,
+                                                "JsTimer",
+                                                this,
+                                                handler
+                                            )
+                                        } catch (e: Exception) {
+                                            WeLogger.e(TAG, "Failed to reschedule next alarm", e)
+                                        }
+                                    }
                                 }
                             }
 
-                            // 注册广播接收器，只接收特定 action
-                            ContextCompat.registerReceiver(
-                                hostApp, receiver, IntentFilter(action),
-                                ContextCompat.RECEIVER_NOT_EXPORTED
-                            )
-
-                            // 设置周期性唤醒闹钟
-                            alarmManager.setRepeating(
+                            // 安排第一次执行
+                            alarmManager.set(
                                 AlarmManager.RTC_WAKEUP,
                                 System.currentTimeMillis() + interval,
-                                interval,
-                                pendingIntent
+                                "JsTimer",
+                                listener,
+                                handler
                             )
-                            WeLogger.i(TAG, "AlarmManager scheduled for JS runTimer with interval $interval ms")
+                            WeLogger.i(TAG, "AlarmManager (OnAlarmListener) scheduled for JS runTimer with interval $interval ms")
                         } else {
                             WeLogger.w(TAG, "Failed to get AlarmManager")
                         }
