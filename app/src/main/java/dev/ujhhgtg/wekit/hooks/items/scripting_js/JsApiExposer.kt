@@ -1126,7 +1126,7 @@ object JsApiExposer {
                                 ContextCompat.RECEIVER_NOT_EXPORTED
                             )
 
-                            // 设置周期性唤醒闹钟
+                            // 设置周期性唤醒闹钟 
                             alarmManager.setRepeating(
                                 AlarmManager.RTC_WAKEUP,
                                 System.currentTimeMillis() + interval,
