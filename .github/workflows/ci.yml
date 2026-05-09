@@ -87,7 +87,7 @@ jobs:
             TAG_NAME=${GITHUB_REF#refs/tags/}
             VERSION_NAME="${TAG_NAME#v}"
           else
-            VERSION_NAME=$(git rev-parse --short HEAD)
+            VERSION_NAME=$(date +'%y%m%d%H%M')
             TAG_NAME="v${VERSION_NAME}"
           fi
           echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
