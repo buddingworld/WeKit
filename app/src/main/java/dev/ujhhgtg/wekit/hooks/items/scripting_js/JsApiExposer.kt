@@ -3,6 +3,7 @@ package dev.ujhhgtg.wekit.hooks.items.scripting_js
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import androidx.core.content.ContextCompat
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.hooks.api.core.WeApi
@@ -1120,11 +1121,10 @@ object JsApiExposer {
                             }
 
                             // 注册广播接收器，只接收特定 action
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                hostApp.registerReceiver(receiver, IntentFilter(action), android.content.Context.RECEIVER_NOT_EXPORTED)
-                            } else {
-                                hostApp.registerReceiver(receiver, IntentFilter(action))
-                            }
+                            ContextCompat.registerReceiver(
+                                hostApp, receiver, IntentFilter(action),
+                                ContextCompat.RECEIVER_NOT_EXPORTED
+                            )
 
                             // 设置周期性唤醒闹钟
                             alarmManager.setRepeating(

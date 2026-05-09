@@ -1,5 +1,6 @@
 package dev.ujhhgtg.wekit.utils
 
+import androidx.core.content.ContextCompat
 import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -195,12 +196,10 @@ object AppUpdater {
                 }
 
                 val filter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
-                } else {
-                    @Suppress("UnspecifiedRegisterReceiverFlag")
-                    context.registerReceiver(receiver, filter)
-                }
+                ContextCompat.registerReceiver(
+                    context, receiver, filter,
+                    ContextCompat.RECEIVER_NOT_EXPORTED
+                )
 
                 cont.invokeOnCancellation {
                     runCatching { context.unregisterReceiver(receiver) }

@@ -1,6 +1,7 @@
 package dev.ujhhgtg.wekit.hooks.items.contacts
 
 import android.os.Build
+import androidx.core.content.ContextCompat
 import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -150,11 +151,10 @@ object HideContacts : ClickableHookItem(), IResolvesDex {
                 addAction(Intent.ACTION_SCREEN_OFF)
                 addAction(Intent.ACTION_USER_PRESENT)
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.registerReceiver(ScreenOffReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-            } else {
-                context.registerReceiver(ScreenOffReceiver, filter)
-            }
+            ContextCompat.registerReceiver(
+                context, ScreenOffReceiver, filter,
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
             WeLogger.d(TAG, "registered screen off receiver")
         }
 
