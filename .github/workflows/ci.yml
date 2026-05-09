@@ -1,6 +1,14 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - '**'
   workflow_dispatch:
     inputs:
       tag_name:

@@ -45,9 +45,12 @@ import kotlin.io.path.fileSize
 import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import java.util.Calendar
-import java.util.Timer
-import java.util.TimerTask
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Intent
+import android.content.IntentFilter
+import dev.ujhhgtg.wekit.utils.HostInfo
 import kotlin.concurrent.thread
 
 object JsApiExposer {
@@ -1081,38 +1084,57 @@ object JsApiExposer {
                     val interval = (args.getOrNull(1) as? Number)?.toLong() ?: (24L * 60 * 60 * 1000)
                     val count = (args.getOrNull(2) as? Number)?.toInt() ?: 0
 
-                    val timer = Timer("JsTaskTimerThread", true)
-                    var executedCount = 0
+                    try {
+                        val hostApp = HostInfo.application
+                        val alarmManager = hostApp.getSystemService(android.content.Context.ALARM_SERVICE) as? AlarmManager
+                        if (alarmManager != null) {
+                            val action = "dev.ujhhgtg.wekit.action.JS_TIMER_${System.currentTimeMillis()}_${(Math.random() * 1000).toInt()}"
+                            val intent = Intent(action)
+                            val pendingIntent = PendingIntent.getBroadcast(
+                                hostApp, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                            )
 
-                    fun scheduleNext() {
-                        if (count != 0 && executedCount >= count) {
-                            timer.cancel()
-                            return
-                        }
+                            var executedCount = 0
+                            val receiver = object : BroadcastReceiver() {
+                                override fun onReceive(context: android.content.Context?, intent: Intent?) {
+                                    if (count != 0 && executedCount >= count) {
+                                        alarmManager.cancel(pendingIntent)
+                                        hostApp.unregisterReceiver(this)
+                                        return
+                                    }
 
-                        val calendar = Calendar.getInstance()
-                        calendar.timeInMillis = System.currentTimeMillis() + interval
-                        val nextRunTime = calendar.time
-
-                        timer.schedule(object : TimerTask() {
-                            override fun run() {
-                                val newCx = Context.enter()
-                                newCx.isInterpretedMode = true
-                                try {
-                                    func.call(newCx, scope, scope, emptyArray())
-                                } catch (e: Exception) {
-                                    WeLogger.e(TAG, "task.runTimer failed (Calendar/Timer)", e)
-                                } finally {
-                                    Context.exit()
+                                    thread(name = "JsTaskTimerThread") {
+                                        val newCx = Context.enter()
+                                        newCx.isInterpretedMode = true
+                                        try {
+                                            func.call(newCx, scope, scope, emptyArray())
+                                        } catch (e: Exception) {
+                                            WeLogger.e(TAG, "task.runTimer failed (AlarmManager)", e)
+                                        } finally {
+                                            Context.exit()
+                                        }
+                                    }
+                                    executedCount++
                                 }
-                                executedCount++
-                                scheduleNext() // 每次执行完安排下一次
                             }
-                        }, nextRunTime)
-                    }
 
-                    // 安排第一次执行
-                    scheduleNext()
+                            // 注册广播接收器，只接收特定 action
+                            hostApp.registerReceiver(receiver, IntentFilter(action))
+
+                            // 设置周期性唤醒闹钟
+                            alarmManager.setRepeating(
+                                AlarmManager.RTC_WAKEUP,
+                                System.currentTimeMillis() + interval,
+                                interval,
+                                pendingIntent
+                            )
+                            WeLogger.i(TAG, "AlarmManager scheduled for JS runTimer with interval $interval ms")
+                        } else {
+                            WeLogger.w(TAG, "Failed to get AlarmManager")
+                        }
+                    } catch (e: Exception) {
+                        WeLogger.e(TAG, "Error setting up AlarmManager", e)
+                    }
 
                     return Undefined.instance
                 }
