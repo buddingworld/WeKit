@@ -826,10 +826,24 @@ object JsApiExposer {
                         uri, cgiId, funcId, routeId, jsonPayload
                     ) {
                         onSuccess { json, _ ->
-                            onSuccess.call(cx, scope, thisObj, arrayOf(json))
+                            val currentCx = Context.enter()
+                            try {
+                                onSuccess.call(currentCx, scope, thisObj, arrayOf(json))
+                            } catch (e: Exception) {
+                                WeLogger.e(TAG, "sendCgi onSuccess callback failed", e)
+                            } finally {
+                                Context.exit()
+                            }
                         }
                         onFailure { _, _, errMsg ->
-                            onFailure.call(cx, scope, thisObj, arrayOf(errMsg))
+                            val currentCx = Context.enter()
+                            try {
+                                onFailure.call(currentCx, scope, thisObj, arrayOf(errMsg))
+                            } catch (e: Exception) {
+                                WeLogger.e(TAG, "sendCgi onFailure callback failed", e)
+                            } finally {
+                                Context.exit()
+                            }
                         }
                     }
 
@@ -964,12 +978,19 @@ object JsApiExposer {
                             return Undefined.instance
                         }
                         method.hookBeforeDirectly {
-                            val jsThis = thisObject?.let { Context.javaToJS(it, scope, cx) }
-                            val jsArgs = args.let { Context.javaToJS(it, scope, cx) }
-                                ?: Undefined.instance
-                            val hookResult = hookFunc.call(cx, scope, thisObj, arrayOf(jsThis, jsArgs))
-                            if (hookResult != null && hookResult !is Undefined) {
-                                result = hookResult
+                            val currentCx = Context.enter()
+                            try {
+                                val jsThis = thisObject?.let { Context.javaToJS(it, scope, currentCx) }
+                                val jsArgs = args.let { Context.javaToJS(it, scope, currentCx) }
+                                    ?: Undefined.instance
+                                val hookResult = hookFunc.call(currentCx, scope, thisObj, arrayOf(jsThis, jsArgs))
+                                if (hookResult != null && hookResult !is Undefined) {
+                                    result = hookResult
+                                }
+                            } catch (e: Exception) {
+                                WeLogger.e(TAG_XPOSED_API, "xposed.hookBefore callback failed", e)
+                            } finally {
+                                Context.exit()
                             }
                         }
                     } catch (e: Exception) {
@@ -1001,14 +1022,21 @@ object JsApiExposer {
                             return Undefined.instance
                         }
                         method.hookAfterDirectly {
-                            val jsThis = thisObject?.let { Context.javaToJS(it, scope, cx) }
-                            val jsArgs = args.let { Context.javaToJS(it, scope, cx) }
-                                ?: Undefined.instance
-                            val jsResult = result?.let { Context.javaToJS(it, scope, cx) }
-                                ?: Undefined.instance
-                            val hookResult = hookFunc.call(cx, scope, thisObj, arrayOf(jsThis, jsArgs, jsResult))
-                            if (hookResult != null && hookResult !is Undefined) {
-                                result = hookResult
+                            val currentCx = Context.enter()
+                            try {
+                                val jsThis = thisObject?.let { Context.javaToJS(it, scope, currentCx) }
+                                val jsArgs = args.let { Context.javaToJS(it, scope, currentCx) }
+                                    ?: Undefined.instance
+                                val jsResult = result?.let { Context.javaToJS(it, scope, currentCx) }
+                                    ?: Undefined.instance
+                                val hookResult = hookFunc.call(currentCx, scope, thisObj, arrayOf(jsThis, jsArgs, jsResult))
+                                if (hookResult != null && hookResult !is Undefined) {
+                                    result = hookResult
+                                }
+                            } catch (e: Exception) {
+                                WeLogger.e(TAG_XPOSED_API, "xposed.hookAfter callback failed", e)
+                            } finally {
+                                Context.exit()
                             }
                         }
                     } catch (e: Exception) {
