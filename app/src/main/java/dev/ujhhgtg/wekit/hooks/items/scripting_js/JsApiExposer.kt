@@ -1,9 +1,7 @@
 package dev.ujhhgtg.wekit.hooks.items.scripting_js
 
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import androidx.core.content.ContextCompat
 import com.highcapable.kavaref.extension.toClass
 import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.hooks.api.core.WeApi
@@ -35,11 +33,10 @@ import org.mozilla.javascript.ScriptableObject
 import org.mozilla.javascript.Undefined
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.div
 import kotlin.io.path.exists
@@ -47,13 +44,6 @@ import kotlin.io.path.fileSize
 import kotlin.io.path.outputStream
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Intent
-import android.content.IntentFilter
-import dev.ujhhgtg.wekit.utils.HostInfo
-import kotlin.concurrent.thread
 
 object JsApiExposer {
     private val TAG = This.Class.simpleName
@@ -75,8 +65,8 @@ object JsApiExposer {
         exposeStorageApis(scope)
         exposeDateTimeApis(scope)
         exposeXposedApis(scope)
-        exposeWeChatApis(scope, talker)
         exposeTaskApis(scope)
+        exposeWeChatApis(scope, talker)
     }
 
     private const val MAX_CACHE_SIZE_IN_MIB = 500
@@ -175,7 +165,7 @@ object JsApiExposer {
                             )
                             cacheDir.deleteRecursively()
                         }
-                        cacheDir.createDirectories()
+                        cacheDir.createDirectoriesNoThrow()
 
                         val destFile = cacheDir.resolve(filename)
 
@@ -443,7 +433,6 @@ object JsApiExposer {
     private fun exposeDateTimeApis(scope: ScriptableObject) {
         val dtObj = NativeObject()
 
-        // time.sleepS(seconds)
         ScriptableObject.putProperty(
             dtObj, "sleepS",
             object : BaseFunction() {
@@ -458,7 +447,7 @@ object JsApiExposer {
                         try {
                             Thread.sleep(seconds * 1000)
                         } catch (e: InterruptedException) {
-                            WeLogger.w(TAG_LOG_API, "Sleep interrupted", e)
+                            WeLogger.w(TAG_LOG_API, "datetime.sleep interrupted", e)
                             Thread.currentThread().interrupt()
                         }
                     }
@@ -467,7 +456,6 @@ object JsApiExposer {
             }
         )
 
-        // time.sleepMs(milliseconds)
         ScriptableObject.putProperty(
             dtObj, "sleepMs",
             object : BaseFunction() {
@@ -482,7 +470,7 @@ object JsApiExposer {
                         try {
                             Thread.sleep(ms)
                         } catch (e: InterruptedException) {
-                            WeLogger.w(TAG_LOG_API, "Sleep interrupted", e)
+                            WeLogger.w(TAG_LOG_API, "datetime.sleep interrupted", e)
                             Thread.currentThread().interrupt()
                         }
                     }
@@ -491,7 +479,6 @@ object JsApiExposer {
             }
         )
 
-        // time.getCurrentUnixEpoch()
         ScriptableObject.putProperty(
             dtObj, "getCurrentUnixEpoch",
             object : BaseFunction() {
@@ -832,28 +819,21 @@ object JsApiExposer {
                     val funcId = (args.getOrNull(2) as? Number)?.toInt() ?: return Undefined.instance
                     val routeId = (args.getOrNull(3) as? Number)?.toInt() ?: return Undefined.instance
                     val jsonPayload = args.getOrNull(4)?.toString() ?: return Undefined.instance
-                    var cgiTimeout = (args.getOrNull(5) as? Number)?.toInt() ?: 30
-
-                    var result: String? = null
-                    val latch = CountDownLatch(1)
+                    val onSuccess = args.getOrNull(5) as? org.mozilla.javascript.Function ?: return Undefined.instance
+                    val onFailure = args.getOrNull(6) as? org.mozilla.javascript.Function ?: return Undefined.instance
 
                     WePacketHelper.sendCgi(
                         uri, cgiId, funcId, routeId, jsonPayload
                     ) {
                         onSuccess { json, _ ->
-                            result = json
-                            latch.countDown()
+                            onSuccess.call(cx, scope, thisObj, arrayOf(json))
                         }
                         onFailure { _, _, errMsg ->
-                            result = errMsg
-                            latch.countDown()
+                            onFailure.call(cx, scope, thisObj, arrayOf(errMsg))
                         }
                     }
 
-                    if (!latch.await(cgiTimeout.toLong(), java.util.concurrent.TimeUnit.SECONDS)) {
-                        result = "Error: Timeout waiting for CGI response"
-                    }
-                    return result ?: "Error: Unknown error (result is null)"
+                    return Undefined.instance
                 }
             }
         )
@@ -993,7 +973,7 @@ object JsApiExposer {
                             }
                         }
                     } catch (e: Exception) {
-                        WeLogger.e(TAG_XPOSED_API, "xposed.before failed", e)
+                        WeLogger.e(TAG_XPOSED_API, "xposed.hookBefore failed", e)
                     }
                     return Undefined.instance
                 }
@@ -1032,7 +1012,7 @@ object JsApiExposer {
                             }
                         }
                     } catch (e: Exception) {
-                        WeLogger.e(TAG_XPOSED_API, "xposed.after failed", e)
+                        WeLogger.e(TAG_XPOSED_API, "xposed.hookAfter failed", e)
                     }
                     return Undefined.instance
                 }
@@ -1046,7 +1026,7 @@ object JsApiExposer {
         val taskObj = NativeObject()
 
         ScriptableObject.putProperty(
-            taskObj, "runAsync",
+            taskObj, "run",
             object : BaseFunction() {
                 override fun call(
                     cx: Context,
@@ -1054,91 +1034,19 @@ object JsApiExposer {
                     thisObj: Scriptable,
                     args: Array<Any?>
                 ): Any {
-                    val func = args.getOrNull(0) as? org.mozilla.javascript.Function ?: return Undefined.instance
+                    val func = args.getOrNull(0) as? org.mozilla.javascript.Function
+                        ?: return Undefined.instance
 
-                    thread(name = "JsTaskAsyncThread") {
-                        val newCx = Context.enter()
-                        newCx.isInterpretedMode = true
+                    thread(name = "JsTaskThread") {
+                        val threadCx = Context.enter()
                         try {
-                            func.call(newCx, scope, scope, emptyArray())
+                            val threadScope = threadCx.init()
+                            func.call(threadCx, threadScope, thisObj, emptyArray())
                         } catch (e: Exception) {
-                            WeLogger.e(TAG, "task.runAsync failed", e)
+                            WeLogger.e(TAG, "task.run failed", e)
                         } finally {
                             Context.exit()
                         }
-                    }
-
-                    return Undefined.instance
-                }
-            }
-        )
-
-        ScriptableObject.putProperty(
-            taskObj, "runTimer",
-            object : BaseFunction() {
-                override fun call(
-                    cx: Context,
-                    scope: Scriptable,
-                    thisObj: Scriptable,
-                    args: Array<Any?>
-                ): Any {
-                    val func = args.getOrNull(0) as? org.mozilla.javascript.Function ?: return Undefined.instance
-                    val interval = (args.getOrNull(1) as? Number)?.toLong() ?: (24L * 60 * 60 * 1000)
-                    val count = (args.getOrNull(2) as? Number)?.toInt() ?: 0
-
-                    try {
-                        val hostApp = HostInfo.application
-                        val alarmManager = hostApp.getSystemService(android.content.Context.ALARM_SERVICE) as? AlarmManager
-                        if (alarmManager != null) {
-                            val action = "dev.ujhhgtg.wekit.action.JS_TIMER_${System.currentTimeMillis()}_${(Math.random() * 1000).toInt()}"
-                            val intent = Intent(action)
-                            val pendingIntent = PendingIntent.getBroadcast(
-                                hostApp, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                            )
-
-                            var executedCount = 0
-                            val receiver = object : BroadcastReceiver() {
-                                override fun onReceive(context: android.content.Context?, intent: Intent?) {
-                                    if (count != 0 && executedCount >= count) {
-                                        alarmManager.cancel(pendingIntent)
-                                        hostApp.unregisterReceiver(this)
-                                        return
-                                    }
-
-                                    thread(name = "JsTaskTimerThread") {
-                                        val newCx = Context.enter()
-                                        newCx.isInterpretedMode = true
-                                        try {
-                                            func.call(newCx, scope, scope, emptyArray())
-                                        } catch (e: Exception) {
-                                            WeLogger.e(TAG, "task.runTimer failed (AlarmManager)", e)
-                                        } finally {
-                                            Context.exit()
-                                        }
-                                    }
-                                    executedCount++
-                                }
-                            }
-
-                            // 注册广播接收器，只接收特定 action
-                            ContextCompat.registerReceiver(
-                                hostApp, receiver, IntentFilter(action),
-                                ContextCompat.RECEIVER_NOT_EXPORTED
-                            )
-
-                            // 设置周期性唤醒闹钟 
-                            alarmManager.setRepeating(
-                                AlarmManager.RTC_WAKEUP,
-                                System.currentTimeMillis() + interval,
-                                interval,
-                                pendingIntent
-                            )
-                            WeLogger.i(TAG, "AlarmManager scheduled for JS runTimer with interval $interval ms")
-                        } else {
-                            WeLogger.w(TAG, "Failed to get AlarmManager")
-                        }
-                    } catch (e: Exception) {
-                        WeLogger.e(TAG, "Error setting up AlarmManager", e)
                     }
 
                     return Undefined.instance

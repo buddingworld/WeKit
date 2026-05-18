@@ -1,7 +1,6 @@
 package dev.ujhhgtg.wekit.hooks.items.chat
 
 import dev.ujhhgtg.comptime.nameOf
-import dev.ujhhgtg.wekit.R
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
 import dev.ujhhgtg.wekit.dexkit.dsl.dexMethod
@@ -10,8 +9,8 @@ import dev.ujhhgtg.wekit.hooks.api.core.models.MessageType
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageContextMenuApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
+import dev.ujhhgtg.wekit.ui.utils.DownloadIcon
 import dev.ujhhgtg.wekit.utils.AudioUtils
-import dev.ujhhgtg.wekit.utils.ModuleRes
 import dev.ujhhgtg.wekit.utils.WeLogger
 import dev.ujhhgtg.wekit.utils.android.showToastSuspend
 import dev.ujhhgtg.wekit.utils.fs.KnownPaths
@@ -68,7 +67,7 @@ object SaveVoicesToLocalStorage : SwitchHookItem(), IResolvesDex,
             WeChatMessageContextMenuApi.MenuItem(
                 777003,
                 "存本地",
-                { ModuleRes.getDrawable(R.drawable.download_24px)!! },
+                DownloadIcon,
                 { msgInfo -> msgInfo.typeCode == MessageType.VOICE.code }
             ) { _, _, msgInfo ->
                 CoroutineScope(Dispatchers.IO).launch {

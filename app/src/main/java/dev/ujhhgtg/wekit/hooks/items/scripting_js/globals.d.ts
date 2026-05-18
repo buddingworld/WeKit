@@ -184,33 +184,10 @@ declare namespace storage {
     function isEmpty(): boolean;
 }
 
-declare namespace task {
-    /**
-     * 异步执行 JavaScript 函数。
-     * @param func 要异步执行的函数
-     * @example
-     * task.runAsync(function() {
-     *     log.i("异步任务执行...");
-     * });
-     */
-    function runAsync(func: () => void): void;
-
-    /**
-     * 定时执行 JavaScript 函数。
-     * @param func 要定时执行的函数
-     * @param interval 两次执行之间的时间间隔（毫秒）。默认是 86400000 (24小时)。
-     * @param count 执行的总次数。0 表示无限次执行。
-     * @example
-     * task.runTimer(function() {
-     *     log.i("定时任务执行...");
-     * }, 60000, 0); // 每 60000 毫秒 (1分钟) 执行一次，无限次执行
-     */
-    function runTimer(func: () => void, interval?: number, count?: number): void;
-}
-
 declare namespace datetime {
     /**
      * 休眠指定的秒数
+     * @param seconds 休眠的秒数
      * @example
      * log.i("开始等待...");
      * time.sleepS(3);
@@ -336,15 +313,22 @@ declare namespace wechat {
     // --- 其他 API ---
 
     /**
-     * 发送 CGI 请求
+     * 异步发送 CGI 请求
      * @param uri 请求的 URI
      * @param cgiId 请求的 CGI ID
      * @param funcId 请求的 Func ID
      * @param routeId 请求的 Route ID
      * @param jsonPayload JSON 负载字符串
-     * @returns 成功返回 JSON 字符串，失败返回错误信息字符串
+     * @param onSuccess 成功回调，接收 JSON 字符串
+     * @param onFailure 失败回调，接收错误信息字符串
+     * @example
+     * sendCgi("/cgi-bin/mmbiz-bin/xxx", 123, 0, 0, '{"key":"value"}', function(json) {
+     *   log.i("Success:", json);
+     * }, function(err) {
+     *   log.e("Failed:", err);
+     * });
      */
-    function sendCgi(uri: string, cgiId: number, funcId: number, routeId: number, jsonPayload: string): string;
+    function sendCgi(uri: string, cgiId: number, funcId: number, routeId: number, jsonPayload: string, onSuccess?: (json: string) => void, onFailure?: (errMsg: string) => void): void;
 
     /**
      * 获取当前用户的微信 ID
@@ -357,6 +341,19 @@ declare namespace wechat {
      * @returns 当前用户的微信号字符串
      */
     declare function getSelfCustomWxId(): string;
+}
+
+declare namespace task {
+    /**
+     * 在独立线程中执行一个函数，避免阻塞主脚本执行
+     * @param fn 要执行的函数。将在新线程的独立 JS 上下文中运行
+     * @example
+     * task.run(function() {
+     *   const resp = http.get("https://api.example.com/data");
+     *   log.i("Got response:", resp.body);
+     * });
+     */
+    function run(fn: () => void): void;
 }
 
 declare namespace xposed {

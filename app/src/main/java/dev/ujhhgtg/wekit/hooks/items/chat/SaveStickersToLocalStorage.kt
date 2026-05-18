@@ -3,13 +3,12 @@ package dev.ujhhgtg.wekit.hooks.items.chat
 import com.highcapable.kavaref.condition.type.Modifiers
 import com.tencent.mm.plugin.gif.MMWXGFJNI
 import dev.ujhhgtg.comptime.nameOf
-import dev.ujhhgtg.wekit.R
 import dev.ujhhgtg.wekit.dexkit.abc.IResolvesDex
 import dev.ujhhgtg.wekit.dexkit.dsl.dexClass
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageContextMenuApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.ModuleRes
+import dev.ujhhgtg.wekit.ui.utils.DownloadIcon
 import dev.ujhhgtg.wekit.utils.WeLogger
 import dev.ujhhgtg.wekit.utils.android.showToastSuspend
 import dev.ujhhgtg.wekit.utils.fs.KnownPaths
@@ -58,7 +57,7 @@ object SaveStickersToLocalStorage : SwitchHookItem(), IResolvesDex,
             WeChatMessageContextMenuApi.MenuItem(
                 777001,
                 "存本地",
-                { ModuleRes.getDrawable(R.drawable.download_24px)!! },
+                DownloadIcon,
                 { msgInfo -> msgInfo.type?.isSticker ?: false }
             ) { _, _, msgInfo ->
                 val md5 = msgInfo.imagePath

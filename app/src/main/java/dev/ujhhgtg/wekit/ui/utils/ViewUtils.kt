@@ -7,7 +7,7 @@ import android.widget.ListAdapter
 import dev.ujhhgtg.wekit.utils.HostInfo
 
 fun <T : View> View.findViewByClassName(className: String): T? {
-    if (this.javaClass.name == className || this.javaClass.simpleName == className) {
+    if (javaClass.name == className || javaClass.simpleName == className) {
         @Suppress("UNCHECKED_CAST")
         return this as T
     }
@@ -25,7 +25,7 @@ fun <T : View> View.findViewByClassName(className: String): T? {
 fun <T : View> View.findViewsByClassName(className: String): List<T> {
     val results = mutableListOf<T>()
 
-    if (this.javaClass.name == className || this.javaClass.simpleName == className) {
+    if (javaClass.name == className || javaClass.simpleName == className) {
         @Suppress("UNCHECKED_CAST")
         results.add(this as T)
     }
@@ -100,7 +100,7 @@ fun ListAdapter.iterable(parent: ViewGroup): Iterable<View> =
     Iterable { iterator(parent) }
 
 inline val Activity.rootView: ViewGroup
-    get() = this.findViewById(android.R.id.content)
+    get() = findViewById(android.R.id.content)
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun Int.dpToPx(): Int =

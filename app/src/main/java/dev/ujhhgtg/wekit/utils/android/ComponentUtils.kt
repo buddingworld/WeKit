@@ -17,7 +17,7 @@ fun ComponentName.getEnabled(ctx: Context): Boolean {
 
 fun ComponentName.setEnabled(ctx: Context, enabled: Boolean) {
     val pm: PackageManager = ctx.packageManager
-    if (this.getEnabled(ctx) == enabled) return
+    if (getEnabled(ctx) == enabled) return
     pm.setComponentEnabledSetting(
         this,
         if (enabled) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else

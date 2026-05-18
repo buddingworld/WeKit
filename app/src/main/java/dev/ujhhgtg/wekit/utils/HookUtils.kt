@@ -43,4 +43,4 @@ inline fun Executable.hookAfterDirectly(
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun XC_MethodHook.MethodHookParam.invokeOriginal(thisObject: Any? = null, args: Array<Any?>? = null): Any? =
-    XposedBridge.invokeOriginalMethod(this.method, thisObject ?: this.thisObject, args ?: this.args)
+    XposedBridge.invokeOriginalMethod(method, thisObject ?: this.thisObject, args ?: this.args)

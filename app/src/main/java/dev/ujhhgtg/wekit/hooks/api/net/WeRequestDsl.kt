@@ -8,11 +8,11 @@ class WeRequestDsl : WeRequestCallback {
     private var failHandler: ((Int, Int, String) -> Unit)? = null
 
     fun onSuccess(handler: (json: String, bytes: ByteArray?) -> Unit) {
-        this.successHandler = handler
+        successHandler = handler
     }
 
     fun onFailure(handler: (errType: Int, errCode: Int, errMsg: String) -> Unit) {
-        this.failHandler = handler
+        failHandler = handler
     }
 
     override fun onSuccess(json: String, bytes: ByteArray?) {

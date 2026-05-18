@@ -303,7 +303,7 @@ private class CustomOsmMarker(mapView: MapView) : Overlay() {
         mPositionPixels = Point()
         mPanToView = true
         mDragOffsetY = 0.0f
-        this.isFlat = false
+        isFlat = false
         mOnMarkerClickListener = null
         mOnMarkerDragListener = null
         setDefaultIcon()
@@ -337,24 +337,24 @@ private class CustomOsmMarker(mapView: MapView) : Overlay() {
 
         pj.toPixels(mPosition, mPositionPixels)
 
-        val rotationOnScreen = (if (this.isFlat) -mBearing else -pj.orientation - mBearing)
+        val rotationOnScreen = (if (isFlat) -mBearing else -pj.orientation - mBearing)
         drawAt(canvas, mPositionPixels.x, mPositionPixels.y, rotationOnScreen)
     }
 
     override fun onDetach(mapView: MapView?) {
         BitmapPool.getInstance().asyncRecycle(mIcon)
         mIcon = null
-        BitmapPool.getInstance().asyncRecycle(this.image)
-        this.mOnMarkerClickListener = null
-        this.mOnMarkerDragListener = null
-        this.mResources = null
+        BitmapPool.getInstance().asyncRecycle(image)
+        mOnMarkerClickListener = null
+        mOnMarkerDragListener = null
+        mResources = null
 
         mMapViewRepository = null
         super.onDetach(mapView)
     }
 
     fun hitTest(event: MotionEvent): Boolean {
-        return mIcon != null && this.isDisplayed && mOrientedMarkerRect.contains(
+        return mIcon != null && isDisplayed && mOrientedMarkerRect.contains(
             event.x.toInt(), event.y.toInt()
         )
     }
@@ -377,7 +377,7 @@ private class CustomOsmMarker(mapView: MapView) : Overlay() {
             mapView.context.resources.displayMetrics
         )
         val pj = mapView.getProjection()
-        this.position =
+        position =
             pj.fromPixels(event.x.toInt(), (event.y - offsetY).toInt()) as GeoPoint?
         mapView.invalidate()
     }
@@ -439,18 +439,18 @@ private class CustomOsmMarker(mapView: MapView) : Overlay() {
         val offsetY = pY - (markerHeight * mAnchorV).roundToInt()
         mRect.set(offsetX, offsetY, offsetX + markerWidth, offsetY + markerHeight)
         RectL.getBounds(mRect, pX, pY, pOrientation.toDouble(), mOrientedMarkerRect)
-        this.isDisplayed = Rect.intersects(mOrientedMarkerRect, pCanvas.getClipBounds())
-        if (!this.isDisplayed) {
+        isDisplayed = Rect.intersects(mOrientedMarkerRect, pCanvas.getClipBounds())
+        if (!isDisplayed) {
             return
         }
-        if (this.alpha == 0f) {
+        if (alpha == 0f) {
             return
         }
         if (pOrientation != 0f) {
             pCanvas.save()
             pCanvas.rotate(pOrientation, pX.toFloat(), pY.toFloat())
         }
-        mIcon!!.alpha = (this.alpha * 255).toInt()
+        mIcon!!.alpha = (alpha * 255).toInt()
         mIcon!!.bounds = mRect
         mIcon!!.draw(pCanvas)
         if (pOrientation != 0f) {

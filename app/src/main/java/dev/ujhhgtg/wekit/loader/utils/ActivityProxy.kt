@@ -2,6 +2,7 @@ package dev.ujhhgtg.wekit.loader.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityThread
 import android.app.Application
 import android.app.Instrumentation
 import android.app.UiAutomation
@@ -24,8 +25,8 @@ import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.comptime.nameOf
 import dev.ujhhgtg.wekit.constants.PackageNames
 import dev.ujhhgtg.wekit.utils.HostInfo
-import dev.ujhhgtg.wekit.utils.ModuleRes
 import dev.ujhhgtg.wekit.utils.WeLogger
+import dev.ujhhgtg.wekit.utils.android.Intent
 import dev.ujhhgtg.wekit.utils.reflection.makeAccessible
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.InvocationTargetException
@@ -45,10 +46,7 @@ object ActivityProxy {
 
         runCatching {
             val clazzActivityThread = Class.forName("android.app.ActivityThread")
-            val currentActivityThread = clazzActivityThread
-                .getDeclaredMethod("currentActivityThread")
-                .makeAccessible()
-                .invoke(null)
+            val currentActivityThread = ActivityThread.currentActivityThread()
 
             // Hook Instrumentation
             val mInstrumentationField = clazzActivityThread.getDeclaredField("mInstrumentation")
@@ -74,7 +72,7 @@ object ActivityProxy {
             }
 
             hookIActivityManager()
-            hookPackageManager(ctx, requireNotNull(currentActivityThread), clazzActivityThread)
+            hookPackageManager(ctx, currentActivityThread, clazzActivityThread)
 
             initialized = true
         }.onFailure { WeLogger.e(TAG, "failed to init stub activity hooks", it) }
@@ -153,7 +151,7 @@ object ActivityProxy {
     object ActProxyMgr {
         const val ACTIVITY_PROXY_INTENT_TOKEN = "wekit_target_intent_token"
         const val STUB_DEFAULT_ACTIVITY =
-            "com.tencent.mm.plugin.facedetect.ui.FaceTransparentStubUI"
+            "${PackageNames.WECHAT}.plugin.facedetect.ui.FaceTransparentStubUI"
 
         fun isModuleProxyActivity(className: String?): Boolean =
             className?.startsWith(PackageNames.THIS) == true
@@ -189,7 +187,7 @@ object ActivityProxy {
 
         private fun createTokenWrapper(raw: Intent): Intent {
             val token = IntentTokenCache.put(Intent(raw))
-            return Intent().apply {
+            return Intent {
                 component = ComponentName(HostInfo.packageName, ActProxyMgr.STUB_DEFAULT_ACTIVITY)
                 flags = raw.flags
                 action = raw.action
@@ -225,7 +223,7 @@ object ActivityProxy {
 
             val token = wrapper.getStringExtra(ActProxyMgr.ACTIVITY_PROXY_INTENT_TOKEN)
             val real = IntentTokenCache.getAndRemove(token) ?: run {
-                WeLogger.w(TAG, "Token expired or lost in Handler: $token")
+                WeLogger.w(TAG, "token expired or lost in handler: $token")
                 return null
             }
             real.setExtrasClassLoader(cl)
@@ -325,7 +323,6 @@ object ActivityProxy {
 
         override fun callActivityOnCreate(activity: Activity, icicle: Bundle?) {
             if (ActProxyMgr.isModuleProxyActivity(activity.javaClass.name)) {
-                checkAndInjectResources(activity)
                 val cl = ParcelableFixer.hybridClassLoader
                 runCatching {
                     Activity::class.java.getDeclaredField("mClassLoader")
@@ -343,16 +340,7 @@ object ActivityProxy {
             activity: Activity,
             icicle: Bundle?,
             persistentState: PersistableBundle?
-        ) {
-            checkAndInjectResources(activity)
-            base.callActivityOnCreate(activity, icicle, persistentState)
-        }
-
-        private fun checkAndInjectResources(activity: Activity) {
-            if (ActProxyMgr.isModuleProxyActivity(activity.javaClass.name)) {
-                ModuleRes.init(activity)
-            }
-        }
+        ) = base.callActivityOnCreate(activity, icicle, persistentState)
 
         override fun onCreate(arguments: Bundle?) = base.onCreate(arguments)
         override fun start() = base.start()

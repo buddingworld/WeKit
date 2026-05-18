@@ -1,11 +1,11 @@
 package dev.ujhhgtg.wekit.hooks.items.shortvideos
 
 import dev.ujhhgtg.comptime.nameOf
-import dev.ujhhgtg.wekit.R
 import dev.ujhhgtg.wekit.hooks.api.ui.WeShortVideosShareMenuApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
-import dev.ujhhgtg.wekit.utils.ModuleRes
+import dev.ujhhgtg.wekit.ui.utils.DownloadIcon
+import dev.ujhhgtg.wekit.ui.utils.LinkIcon
 import dev.ujhhgtg.wekit.utils.WeLogger
 import dev.ujhhgtg.wekit.utils.android.copyToClipboard
 import dev.ujhhgtg.wekit.utils.android.showToast
@@ -47,7 +47,7 @@ object DownloadMedia : SwitchHookItem(),
             WeShortVideosShareMenuApi.MenuItem(
                 777004,
                 "复制链接",
-                { ModuleRes.getDrawable(R.drawable.link_24px)!! }
+                LinkIcon
             )
             { _, mediaType, mediaList ->
                 if (mediaType == 2) {
@@ -97,7 +97,7 @@ object DownloadMedia : SwitchHookItem(),
             WeShortVideosShareMenuApi.MenuItem(
                 777007,
                 "下载",
-                { ModuleRes.getDrawable(R.drawable.download_24px)!! }
+                DownloadIcon
             )
             { _, mediaType, mediaList ->
                 if (mediaType == 2) {

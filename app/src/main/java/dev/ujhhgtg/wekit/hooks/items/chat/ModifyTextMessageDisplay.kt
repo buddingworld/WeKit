@@ -6,14 +6,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import dev.ujhhgtg.wekit.R
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageContextMenuApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.TextButton
+import dev.ujhhgtg.wekit.ui.utils.EditIcon
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
-import dev.ujhhgtg.wekit.utils.ModuleRes
 import dev.ujhhgtg.wekit.utils.reflection.asResolver
 
 @HookItem(
@@ -36,7 +35,7 @@ object ModifyTextMessageDisplay : SwitchHookItem(),
             WeChatMessageContextMenuApi.MenuItem(
                 777002,
                 "修改内容",
-                { ModuleRes.getDrawable(R.drawable.edit_24px)!! },
+                EditIcon,
                 { msgInfo -> msgInfo.type?.isText ?: false }
             ) { view, _, _ ->
                 showComposeDialog(view.context) {

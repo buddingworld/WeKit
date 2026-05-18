@@ -132,22 +132,22 @@ abstract class BaseHookItem {
     inline fun DexMethodDelegate.hookBefore(
         priority: Int = 50,
         crossinline action: HookAction
-    ) = this.method.hookBefore(priority, action)
+    ) = method.hookBefore(priority, action)
 
     inline fun DexMethodDelegate.hookAfter(
         priority: Int = 50,
         crossinline action: HookAction
-    ) = this.method.hookAfter(priority, action)
+    ) = method.hookAfter(priority, action)
 
     inline fun DexConstructorDelegate.hookBefore(
         priority: Int = 50,
         crossinline action: HookAction
-    ) = this.constructor.hookBefore(priority, action)
+    ) = constructor.hookBefore(priority, action)
 
     inline fun DexConstructorDelegate.hookAfter(
         priority: Int = 50,
         crossinline action: HookAction
-    ) = this.constructor.hookAfter(priority, action)
+    ) = constructor.hookAfter(priority, action)
 
     // --- end dex delegate ---
 

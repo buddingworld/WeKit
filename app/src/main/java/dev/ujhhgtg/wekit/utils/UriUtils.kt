@@ -4,11 +4,12 @@ import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
-import dev.ujhhgtg.wekit.R
 import dev.ujhhgtg.wekit.constants.PackageNames
+import dev.ujhhgtg.wekit.ui.utils.ForwardIcon
+import dev.ujhhgtg.wekit.ui.utils.toBitmap
+import dev.ujhhgtg.wekit.ui.utils.toDp
 
 fun Uri.openInSystem(
     context: Context,
@@ -28,7 +29,7 @@ fun Uri.openInSystem(
                     )
                 )
                 .setType("text/plain")
-                .putExtra(Intent.EXTRA_TEXT, this.toString()),
+                .putExtra(Intent.EXTRA_TEXT, toString()),
             PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -40,11 +41,7 @@ fun Uri.openInSystem(
             .setColorScheme(CustomTabsIntent.COLOR_SCHEME_SYSTEM)
             .apply {
                 if (PackageNames.isWeChat(context.packageName)) {
-                    val forwardBitmap =
-                        BitmapFactory.decodeResource(
-                            ModuleRes.resources,
-                            R.drawable.forward_24px
-                        )
+                    val forwardBitmap = ForwardIcon.toBitmap(24.toDp(), 24.toDp())
                     setActionButton(
                         forwardBitmap,
                         "转发",

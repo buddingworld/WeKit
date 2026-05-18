@@ -22,7 +22,7 @@ fun JsonElement.getByPath(path: String): JsonElement? {
 }
 
 @Suppress("NOTHING_TO_INLINE")
-inline operator fun JsonElement.get(key: String): JsonElement? = this.jsonObject[key]
+inline operator fun JsonElement.get(key: String): JsonElement? = jsonObject[key]
 
 inline val JsonElement.asInt: Int get() = jsonPrimitive.int
 inline val JsonElement.asLong: Long get() = jsonPrimitive.long

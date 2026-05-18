@@ -5,15 +5,14 @@ import com.highcapable.kavaref.extension.createInstance
 import com.tencent.mm.plugin.sns.ui.SnsCommentFooter
 import com.tencent.mm.protocal.protobuf.SnsObject
 import dev.ujhhgtg.comptime.nameOf
-import dev.ujhhgtg.wekit.R
 import dev.ujhhgtg.wekit.hooks.api.core.WeDatabaseApi
 import dev.ujhhgtg.wekit.hooks.api.core.WeDatabaseListenerApi
 import dev.ujhhgtg.wekit.hooks.api.ui.WeMomentsContextMenuApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.ui.content.ContactsSelectionDialog
+import dev.ujhhgtg.wekit.ui.utils.StarIcon
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
-import dev.ujhhgtg.wekit.utils.ModuleRes
 import dev.ujhhgtg.wekit.utils.WeLogger
 import dev.ujhhgtg.wekit.utils.android.showToast
 import dev.ujhhgtg.wekit.utils.reflection.resolve
@@ -54,7 +53,7 @@ object FakeMomentsLikes : SwitchHookItem(), WeMomentsContextMenuApi.IMenuItemsPr
             WeMomentsContextMenuApi.MenuItem(
                 777006,
                 "伪点赞",
-                { ModuleRes.getDrawable(R.drawable.star_24px)!! },
+                StarIcon,
                 { _, _ -> true }
             ) { moments ->
                 val allFriends = WeDatabaseApi.getContacts()

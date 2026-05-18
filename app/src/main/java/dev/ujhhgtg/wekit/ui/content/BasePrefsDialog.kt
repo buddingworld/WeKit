@@ -30,6 +30,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -47,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import com.composables.icons.materialsymbols.MaterialSymbols
 import com.composables.icons.materialsymbols.outlined.Arrow_back
 import com.composables.icons.materialsymbols.outlined.Keyboard_arrow_right
+import com.composables.icons.materialsymbols.outlined.Settings
 import dev.ujhhgtg.wekit.preferences.WePrefs
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
 import dev.ujhhgtg.wekit.utils.WeLogger
@@ -99,6 +101,30 @@ private sealed class PrefRow {
         val summary: String?,
         val icon: ImageVector?,
         val onClick: (() -> Unit)?,
+    ) : PrefRow()
+
+    /** Switch backed by a HookItem — supports pre-toggle validation and async completion callbacks. */
+    data class HookSwitch(
+        override val rowKey: String,
+        val configKey: String,
+        val title: String,
+        val summary: String,
+        val initialChecked: Boolean,
+        val onBeforeToggle: (Boolean) -> Boolean,
+        val bindCompletionCallback: ((Boolean) -> Unit) -> Unit,
+    ) : PrefRow()
+
+    /** Clickable row backed by a HookItem — optional switch, pre-toggle validation, async completion. */
+    data class HookClickable(
+        override val rowKey: String,
+        val configKey: String,
+        val title: String,
+        val summary: String,
+        val showSwitch: Boolean,
+        val initialChecked: Boolean,
+        val onBeforeToggle: (Boolean) -> Boolean,
+        val bindCompletionCallback: ((Boolean) -> Unit) -> Unit,
+        val onClick: () -> Unit,
     ) : PrefRow()
 }
 
@@ -204,6 +230,36 @@ abstract class BasePrefsDialog(
         rows += PrefRow.Plain(rk, title, summary, icon, onClick)
     }
 
+    // ── addHookSwitch ──────────────────────────────────────────────────────
+
+    protected fun addHookSwitch(
+        key: String,
+        title: String,
+        summary: String,
+        initialChecked: Boolean,
+        onBeforeToggle: (Boolean) -> Boolean,
+        bindCompletionCallback: ((Boolean) -> Unit) -> Unit,
+    ) {
+        val rk = nextKey("hsw_$key")
+        rows += PrefRow.HookSwitch(rk, key, title, summary, initialChecked, onBeforeToggle, bindCompletionCallback)
+    }
+
+    // ── addHookClickable ───────────────────────────────────────────────────
+
+    protected fun addHookClickable(
+        key: String,
+        title: String,
+        summary: String,
+        showSwitch: Boolean,
+        initialChecked: Boolean,
+        onBeforeToggle: (Boolean) -> Boolean,
+        bindCompletionCallback: ((Boolean) -> Unit) -> Unit,
+        onClick: () -> Unit,
+    ) {
+        val rk = nextKey("hcl_$key")
+        rows += PrefRow.HookClickable(rk, key, title, summary, showSwitch, initialChecked, onBeforeToggle, bindCompletionCallback, onClick)
+    }
+
     // -----------------------------------------------------------------------
     //  Helpers
     // -----------------------------------------------------------------------
@@ -229,6 +285,12 @@ private fun DialogContent(
         mutableStateMapOf<String, Boolean>().also { map ->
             rows.filterIsInstance<PrefRow.Switch>().forEach { row ->
                 map[row.configKey] = WePrefs.getBoolOrFalse(row.configKey)
+            }
+            rows.filterIsInstance<PrefRow.HookSwitch>().forEach { row ->
+                map[row.configKey] = row.initialChecked
+            }
+            rows.filterIsInstance<PrefRow.HookClickable>().forEach { row ->
+                map[row.configKey] = row.initialChecked
             }
         }
     }
@@ -281,8 +343,8 @@ private fun DialogContent(
 
     Surface(
         modifier = Modifier
-            .fillMaxWidth(0.92f)
-            .fillMaxHeight(0.85f),
+            .fillMaxWidth(0.96f)
+            .fillMaxHeight(0.92f),
         shape = RoundedCornerShape(28.dp),
         tonalElevation = 6.dp,
         shadowElevation = 8.dp,
@@ -358,6 +420,54 @@ private fun DialogContent(
                                     },
                                 )
                             }
+                        }
+
+                        // ── HookSwitch ────────────────────────────────
+                        is PrefRow.HookSwitch -> {
+                            val checked = switchStates[row.configKey] ?: row.initialChecked
+
+                            DisposableEffect(row.rowKey) {
+                                row.bindCompletionCallback { newValue ->
+                                    switchStates[row.configKey] = newValue
+                                }
+                                onDispose { }
+                            }
+
+                            HookSwitchRow(
+                                title = row.title,
+                                summary = row.summary,
+                                checked = checked,
+                                onCheckedChange = { requested ->
+                                    if (row.onBeforeToggle(requested)) {
+                                        switchStates[row.configKey] = requested
+                                    }
+                                },
+                            )
+                        }
+
+                        // ── HookClickable ─────────────────────────────
+                        is PrefRow.HookClickable -> {
+                            val checked = switchStates[row.configKey] ?: row.initialChecked
+
+                            DisposableEffect(row.rowKey) {
+                                row.bindCompletionCallback { newValue ->
+                                    switchStates[row.configKey] = newValue
+                                }
+                                onDispose { }
+                            }
+
+                            HookClickableRow(
+                                title = row.title,
+                                summary = row.summary,
+                                showSwitch = row.showSwitch,
+                                checked = checked,
+                                onCheckedChange = { requested ->
+                                    if (row.onBeforeToggle(requested)) {
+                                        switchStates[row.configKey] = requested
+                                    }
+                                },
+                                onClick = row.onClick,
+                            )
                         }
 
                         // ── EditText ──────────────────────────────────
@@ -508,6 +618,78 @@ private fun SwitchRow(
             onCheckedChange = if (enabled) onCheckedChange else null,
             enabled = enabled,
         )
+    }
+}
+
+@Composable
+private fun HookSwitchRow(
+    title: String,
+    summary: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = title, style = MaterialTheme.typography.bodyLarge)
+            if (summary.isNotEmpty()) {
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = summary,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        Spacer(Modifier.width(8.dp))
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+}
+
+@Composable
+private fun HookClickableRow(
+    title: String,
+    summary: String,
+    showSwitch: Boolean,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = title, style = MaterialTheme.typography.bodyLarge)
+                Spacer(Modifier.width(4.dp))
+                Icon(
+                    imageVector = MaterialSymbols.Outlined.Settings,
+                    contentDescription = "Configurable",
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (summary.isNotEmpty()) {
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = summary,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        if (showSwitch) {
+            Spacer(Modifier.width(8.dp))
+            Switch(checked = checked, onCheckedChange = onCheckedChange)
+        }
     }
 }
 

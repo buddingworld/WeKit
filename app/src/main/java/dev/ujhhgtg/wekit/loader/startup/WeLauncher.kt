@@ -11,7 +11,6 @@ import dev.ujhhgtg.wekit.hooks.core.HookItemsLoader
 import dev.ujhhgtg.wekit.loader.utils.ActivityProxy
 import dev.ujhhgtg.wekit.loader.utils.ParcelableFixer
 import dev.ujhhgtg.wekit.utils.HostInfo
-import dev.ujhhgtg.wekit.utils.ModuleRes
 import dev.ujhhgtg.wekit.utils.RuntimeConfig
 import dev.ujhhgtg.wekit.utils.TargetProcesses
 import dev.ujhhgtg.wekit.utils.WeLogger
@@ -49,7 +48,6 @@ object WeLauncher {
                 val sharedPreferences =
                     activity.getSharedPreferences("${PackageNames.WECHAT}_preferences", 0)
                 RuntimeConfig.mmPrefs = sharedPreferences
-                ModuleRes.init(activity)
             }
     }
 

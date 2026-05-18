@@ -9,14 +9,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import dev.ujhhgtg.wekit.R
 import dev.ujhhgtg.wekit.hooks.api.ui.WeChatMessageContextMenuApi
 import dev.ujhhgtg.wekit.hooks.core.HookItem
 import dev.ujhhgtg.wekit.hooks.core.SwitchHookItem
 import dev.ujhhgtg.wekit.ui.content.AlertDialogContent
 import dev.ujhhgtg.wekit.ui.content.Button
+import dev.ujhhgtg.wekit.ui.utils.ChatInfoIcon
 import dev.ujhhgtg.wekit.ui.utils.showComposeDialog
-import dev.ujhhgtg.wekit.utils.ModuleRes
 import dev.ujhhgtg.wekit.utils.android.copyToClipboard
 import dev.ujhhgtg.wekit.utils.android.showToast
 
@@ -36,7 +35,7 @@ object DisplayMessageDetails : SwitchHookItem(),
         return listOf(
             WeChatMessageContextMenuApi.MenuItem(
                 777005, "查看详情",
-                { ModuleRes.getDrawable(R.drawable.chat_info_24px)!! }, { _ -> true })
+                ChatInfoIcon, { _ -> true })
             { view, _, msgInfo ->
                 val displayItems = mutableListOf<Pair<String, String>>()
                 displayItems += "类型" to msgInfo.typeCode.toString()

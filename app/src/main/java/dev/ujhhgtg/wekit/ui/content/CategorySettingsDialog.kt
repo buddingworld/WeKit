@@ -12,9 +12,9 @@ import dev.ujhhgtg.wekit.utils.WeLogger
 class CategorySettingsDialog(
     context: Context,
     private val categoryName: String,
-) : BaseSettingsDialog(context, categoryName) {
+) : BasePrefsDialog(context, categoryName) {
 
-    override fun initList() {
+    override fun initPreferences() {
         val targetItems = HookItemsProvider.ALL_HOOK_ITEMS.filter { item ->
             item.path.startsWith("$categoryName/")
         }
@@ -40,11 +40,10 @@ class CategorySettingsDialog(
         val configKey = item.path
         val initialChecked = WePrefs.getBoolOrFalse(configKey)
 
-        rows += SettingsRow.SwitchRow(
-            rowKey = nextKey("sw_${item.path}"),
+        addHookSwitch(
+            key = configKey,
             title = title,
             summary = summary,
-            configKey = configKey,
             initialChecked = initialChecked,
             onBeforeToggle = { checked ->
                 val allowed = item.onBeforeToggle(checked, context)
@@ -55,8 +54,6 @@ class CategorySettingsDialog(
                 allowed
             },
             bindCompletionCallback = { callback ->
-                // item.setToggleCompletionCallback fires after async confirmation;
-                // we read item.isEnabled as the authoritative post-toggle value.
                 item.setToggleCompletionCallback {
                     callback(item.isEnabled)
                 }
@@ -72,12 +69,11 @@ class CategorySettingsDialog(
         val configKey = item.path
         val initialChecked = WePrefs.getBoolOrFalse(configKey)
 
-        rows += SettingsRow.ClickableRow(
-            rowKey = nextKey("cl_${item.path}"),
+        addHookClickable(
+            key = configKey,
             title = title,
             summary = summary,
             showSwitch = !item.noSwitchWidget,
-            configKey = configKey,
             initialChecked = initialChecked,
             onBeforeToggle = { checked ->
                 val allowed = item.onBeforeToggle(checked, context)

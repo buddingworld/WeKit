@@ -175,8 +175,8 @@ object Lsp100HookWrapper {
 
             val param = InvocationParamWrapper().apply {
                 this.callbacks = callbacks
-                this.before = callback
-                this.isAfter = false
+                before = callback
+                isAfter = false
             }
             for (i in callbacks.indices) {
                 param.index = i

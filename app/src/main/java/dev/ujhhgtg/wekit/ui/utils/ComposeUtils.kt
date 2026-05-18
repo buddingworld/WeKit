@@ -79,7 +79,7 @@ class ShowComposeDialogScope(
 )
 
 fun View.setLifecycleOwner(lifecycleOwner: XposedLifecycleOwner) {
-    this.apply {
+    apply {
         setViewTreeLifecycleOwner(lifecycleOwner)
         setViewTreeViewModelStoreOwner(lifecycleOwner)
         setViewTreeSavedStateRegistryOwner(lifecycleOwner)

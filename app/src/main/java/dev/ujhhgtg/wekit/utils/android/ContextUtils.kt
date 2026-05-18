@@ -11,7 +11,7 @@ inline val Context.isDarkMode
 inline val Context.androidUserId: Long
     get() {
         val userManager =
-            this.getSystemService(Context.USER_SERVICE) as UserManager
+            getSystemService(Context.USER_SERVICE) as UserManager
         val userHandle = Process.myUserHandle()
         return userManager.getSerialNumberForUser(userHandle)
     }

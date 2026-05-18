@@ -96,10 +96,9 @@ android {
         }
 
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            @Suppress("UnstableApiUsage")
+            optimization.enable = true
             signingConfig = signingConfigs.getByName("release")
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
@@ -129,7 +128,6 @@ android {
     }
 
     buildFeatures {
-        resValues = true
         compose = true
         buildConfig = true
     }
@@ -272,7 +270,7 @@ dependencies {
 
     implementation(libs.mcp.server)
     implementation(platform(libs.ktor.bom))
-    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.cio)
     implementation(libs.ktor.server.cors)
     implementation(libs.ktor.server.auth)
     implementation(libs.ktor.server.sse)
