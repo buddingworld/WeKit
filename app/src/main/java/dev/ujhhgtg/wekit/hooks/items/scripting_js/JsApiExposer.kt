@@ -242,8 +242,10 @@ object JsApiExposer {
         // Add headers
         headers?.let { applyHeaders(requestBuilder, it) }
 
-        val response = allowNetworkOnMainThread { httpClient.newCall(requestBuilder.build()).execute() }
-        return createHttpResponse(response)
+        return allowNetworkOnMainThread {
+            val response = httpClient.newCall(requestBuilder.build()).execute()
+            createHttpResponse(response)
+        }
     }
 
     private fun httpPost(
@@ -280,8 +282,10 @@ object JsApiExposer {
         // Add headers
         headers?.let { applyHeaders(requestBuilder, it) }
 
-        val response = allowNetworkOnMainThread { httpClient.newCall(requestBuilder.build()).execute() }
-        return createHttpResponse(response)
+        return allowNetworkOnMainThread {
+            val response = httpClient.newCall(requestBuilder.build()).execute()
+            createHttpResponse(response)
+        }
     }
 
     private fun applyHeaders(requestBuilder: Request.Builder, headers: NativeObject) {
@@ -331,7 +335,7 @@ object JsApiExposer {
         val scope = cx.initStandardObjects()
 
         val statusCode = response.code
-        val body = response.body.string()
+        val body = response.body?.string() ?: ""
 
         val responseObj = NativeObject()
         responseObj.put("status", responseObj, statusCode)
