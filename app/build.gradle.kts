@@ -1,5 +1,6 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
@@ -142,11 +143,10 @@ android {
     }
 }
 
-kotlin {
+tasks.withType<KotlinCompile> {
     compilerOptions {
         jvmTarget.set(JvmTarget.fromTarget(libs.versions.jdk.get()))
     }
-    jvmToolchain(libs.versions.jdk.get().toInt())
 }
 
 val adbProvider = androidComponents.sdkComponents.adb
@@ -201,6 +201,10 @@ val abiToTarget = mapOf(
     "x86" to "i686-linux-android"
 )
 val cargoTasks = abiToTarget.map { (abi, target) ->
+    val soSrcFile = rustProjectDir.resolve("target/$target/release/$rustLibName")
+    val soDestDir = layout.projectDirectory.dir("src/main/jniLibs/$abi").asFile
+    val currentLibName = rustLibName
+
     tasks.register<Exec>("cargoBuild_${abi.replace('-', '_')}") {
         group = "rust"
         description = "Compile Rust for $abi"
@@ -210,13 +214,10 @@ val cargoTasks = abiToTarget.map { (abi, target) ->
             "--release",
             "--target", target,
         )
+
         doLast {
-            val soSrc = rustProjectDir
-                .resolve("target/$target/release/$rustLibName")
-            val soDir = layout.projectDirectory
-                .dir("src/main/jniLibs/$abi").asFile
-            soDir.mkdirs()
-            soSrc.copyTo(soDir.resolve(rustLibName), overwrite = true)
+            soDestDir.mkdirs()
+            soSrcFile.copyTo(soDestDir.resolve(currentLibName), overwrite = true)
         }
     }
 }
@@ -259,6 +260,7 @@ dependencies {
     implementation(libs.androidx.browser)
     implementation(libs.aboutlibraries.core)
     implementation(libs.aboutlibraries.compose.m3)
+    implementation(libs.androidx.profileinstaller)
     implementation(libs.miuix.core)
     implementation(libs.miuix.ui)
     implementation(libs.miuix.blur)
@@ -274,6 +276,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.serialization.protobuf)
     implementation(libs.mmkv)
+
+    implementation(project(":libs:common:bsh"))
 
     compileOnly(libs.legacyxposed.api)
     compileOnly(project(":libs:common:libxposed-api"))
@@ -293,7 +297,6 @@ dependencies {
     implementation(libs.okhttp3.okhttp)
 
     implementation(libs.rhino)
-//    implementation(libs.rhino.kotlin)
 
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)

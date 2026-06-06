@@ -69,10 +69,13 @@ plugins {
 
 rootProject.name = "wekit"
 
+includeBuild("build-logic")
+
 include(":app",
     ":libs:common:annotation-scanner",
     ":libs:external:comptime-kt:plugin",
     ":libs:external:comptime-kt:api",
-    ":libs:common:libxposed-api"
+    ":libs:common:libxposed-api",
+    ":libs:common:stubs",
+    ":libs:common:bsh"
 )
-include(":libs:common:stubs")

@@ -2,11 +2,15 @@ package dev.ujhhgtg.wekit.activity
 
 import android.content.ComponentName
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -60,6 +64,7 @@ import dev.ujhhgtg.wekit.ui.content.TextButton
 import dev.ujhhgtg.wekit.ui.utils.AppTheme
 import dev.ujhhgtg.wekit.ui.utils.GitHubIcon
 import dev.ujhhgtg.wekit.ui.utils.TelegramIcon
+import dev.ujhhgtg.wekit.utils.BshSnapshotDecompiler
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.android.androidUserId
 import dev.ujhhgtg.wekit.utils.android.getEnabled
@@ -72,6 +77,50 @@ import dev.ujhhgtg.wekit.utils.openInSystem
 
 class MainActivity : ComponentActivity() {
 
+    private var pendingDecompileResult: String? = null
+
+    private val selectFileLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            try {
+                Log.i(BuildConfig.TAG, "file $uri chosen")
+                contentResolver.openInputStream(uri)?.use { inputStream ->
+                    Log.i(BuildConfig.TAG, "decompiling file...")
+                    val result = BshSnapshotDecompiler.decompileStream(inputStream).trim()
+                    Log.i(BuildConfig.TAG, "decompiled successfully (${result.length} chars)")
+                    if (result.isEmpty()) {
+                        showToast(this, "错误: 反编译结果为空!")
+                        return@use
+                    }
+                    pendingDecompileResult = result
+                    val inputName = uri.lastPathSegment?.substringBeforeLast(".") ?: "decompiled"
+                    saveFileLauncher.launch("$inputName.java")
+                }
+            } catch (ex: Exception) {
+                Log.e(BuildConfig.TAG, "exception thrown", ex)
+                showToast(this, "错误: ${ex.message}")
+            }
+        } else {
+            showToast(this, "文件选择已取消!")
+        }
+    }
+
+    private val saveFileLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("text/plain")
+    ) { uri: Uri? ->
+        if (uri != null) {
+            val text = pendingDecompileResult
+            if (text != null) {
+                contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.write(text.toByteArray())
+                    showToast(this, "已保存到 $uri")
+                }
+            }
+            pendingDecompileResult = null
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -82,6 +131,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 AppContent(
+                    selectFileLauncher,
                     onUrlClick = { url ->
                         url.toUri().openInSystem(this, true)
                     }
@@ -99,7 +149,7 @@ private data class ActivationState(
 )
 
 @Composable
-private fun AppContent(onUrlClick: (String) -> Unit) {
+private fun AppContent(resultLauncher: ActivityResultLauncher<String>, onUrlClick: (String) -> Unit) {
     val context = LocalActivity.current!!
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -198,6 +248,12 @@ private fun AppContent(onUrlClick: (String) -> Unit) {
                             onClick = {
                                 showMenu = false
                                 showConfirmDeleteTinkerDialog = true
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("反编译 BeanShell 快照") },
+                            onClick = {
+                                resultLauncher.launch("*/*")
                             }
                         )
                         DropdownMenuItem(

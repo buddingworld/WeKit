@@ -96,6 +96,17 @@ chmod +x ./gradlew
 ./gradlew :app:assembleRelease
 ```
 
+### 4. 安装
+
+```bash
+adb install ./app/build/outputs/apk/release/app-arm64-v8a-release.apk
+# --- 或 ---
+./gradlew :app:installRelease
+
+# 可选: 应用基准配置 (Baseline Profile)
+adb shell cmd package compile -m speed-profile dev.ujhhgtg.wekit
+```
+
 ## Q&A
 
 1.
@@ -125,7 +136,7 @@ chmod +x ./gradlew
 
       LSPosed 日志: LSPosed -> 设置 -> 禁用详细日志 (关) -> 日志 -> 右上角保存 -> 上传至 Issue
 
-      模块日志: 模块设置 -> 刷新日志文件缓冲区; /sdcard/Android/data/<宿主包名>/WeKit/logs/*
+      模块日志: /sdcard/Android/data/<宿主包名>/WeKit/logs/*
 
       调试信息: 模块设置 -> 「调试/复制调试信息」 -> 粘贴至 Issue 日志区
 9.

@@ -3,9 +3,9 @@ package dev.ujhhgtg.wekit.utils.crash
 import dev.ujhhgtg.comptime.This
 import dev.ujhhgtg.wekit.utils.HostInfo
 import dev.ujhhgtg.wekit.utils.WeLogger
-import dev.ujhhgtg.wekit.utils.WeLogger.exitProcess
 import dev.ujhhgtg.wekit.utils.crash.CrashInfoCollector.collectCrashInfo
 import dev.ujhhgtg.wekit.utils.polyfills.getThreadId
+import kotlin.system.exitProcess
 
 object JavaCrashHandler : Thread.UncaughtExceptionHandler {
 
@@ -64,8 +64,6 @@ object JavaCrashHandler : Thread.UncaughtExceptionHandler {
         } catch (e: Throwable) {
             WeLogger.e(TAG, "error while handling crash", e)
         } finally {
-            WeLogger.flush()
-
             isHandling = false
 
             // 调用默认处理器，让应用正常崩溃
